@@ -30,15 +30,19 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   messageVariables
 }) => {
   const actionConnectorRef = useRef(actionConnector?.id ?? '');
-  const { subAction } = actionParams;
-
+  // const { subAction, subActionParams } = actionParams;
+  console.log(actionParams);
   useEffect(() => {
     if (actionConnector != null && actionConnectorRef.current !== actionConnector.id) {
       actionConnectorRef.current = actionConnector.id;
       editAction(
         'subActionParams',
         {
-          incident: {},
+          incident: {
+            tlp: 2,
+            severity: 2,
+            tags: []
+          },
           comments: [],
         },
         index
@@ -60,6 +64,12 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
       } as unknown as ExecutorSubActionPushParams),
     [actionParams.subActionParams]
   );
+  const alert = useMemo(
+    () =>
+      actionParams.subActionParams as ExecutorSubActionCreateAlertParams ??
+      ({} as unknown as ExecutorSubActionCreateAlertParams),
+    [actionParams.subActionParams]
+  );
   const editSubActionProperty = useCallback(
     (key: string, value: any) => {
       const newProps =
@@ -79,13 +89,56 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     },
     [editSubActionProperty]
   );
+
   const [eventAction, setEventAction] = useState('case');
+  const setEventActionType = (eventActionType: string) => {
+    const subActionParams =
+      eventActionType === 'alert'
+        ? {
+          tlp: 2,
+          severity: 2,
+          tags: [],
+        }
+        : {
+          incident: {
+            tlp: 2,
+            severity: 2,
+            tags: [],
+          },
+          comments: [],
+        };
+
+    setEventAction(eventActionType);
+    editAction('subActionParams', subActionParams, index);
+  };
 
   useEffect(() => {
-    if (!subAction) {
+    const subAction =
+      eventAction === 'alert' ? SUB_ACTION.CREATE_ALERT : SUB_ACTION.PUSH_TO_SERVICE;
+    editAction('subAction', subAction, index);
+
+  }, [eventAction]);
+
+  useEffect(() => {
+    if (!actionParams.subAction) {
       editAction('subAction', SUB_ACTION.PUSH_TO_SERVICE, index);
     }
-  }, [editAction, index, subAction]);
+    if (!actionParams.subActionParams) {
+      editAction(
+        'subActionParams',
+        {
+          incident: {
+            tlp: 2,
+            severity: 2,
+            tags: []
+          },
+          comments: [],
+        },
+        index
+      );
+    }
+
+  }, [actionParams]);
 
   const eventActionOptions = [
     {
@@ -206,11 +259,13 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     };
 
     setSelected([...selectedOptions, newOption]);
-    editSubActionProperty('tags', [...incident.tags ?? [], searchValue]);
+    if (eventAction === 'case') {
+      editSubActionProperty('tags', [...incident.tags ?? [], searchValue])
+    } else {
+      editAction('subActionParams', { ...alert, tags: [...alert.tags ?? [], searchValue] }, index);
+    }
   };
-  console.log(index)
-  console.log(messageVariables)
-  console.log(incident)
+
   const onSearchChange = (searchValue: string) => {
     if (!searchValue) {
       setInvalid(false);
@@ -220,8 +275,12 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
 
   const onChange = (selectedOptions: Array<{ label: string }>) => {
     setSelected(selectedOptions);
-    console.log("onchanged worked")
-    editSubActionProperty('tags', selectedOptions.map((option) => option.label));
+    if (eventAction === 'case') {
+      editSubActionProperty('tags', selectedOptions.map((option) => option.label));
+    } else {
+      editAction('subActionParams', { ...alert, tags: selectedOptions.map((option) => option.label) }, index);
+    }
+
   }
   return (
     <>
@@ -239,99 +298,207 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           data-test-subj="eventActionSelect"
           options={eventActionOptions}
           value={eventAction}
-          onChange={(e) => setEventAction(e.target.value)}
+          onChange={(e) => setEventActionType(e.target.value)}
         />
       </EuiFormRow>
-      <EuiFormRow
-        data-test-subj="title-row"
-        fullWidth
-        error={errors['pushToServiceParam.incident.title']}
-        isInvalid={
-          errors['pushToServiceParam.incident.title'] !== undefined &&
-          errors['pushToServiceParam.incident.title'].length > 0 &&
-          incident.title !== undefined
-        }
-        label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-          defaultMessage: 'Title',
-        })}
-        labelAppend={
-          <EuiText size="xs" color="subdued">
-            Required
-          </EuiText>
-        }
-      >
-        <TextFieldWithMessageVariables
-          index={index}
-          editAction={editSubActionProperty}
-          messageVariables={messageVariables}
-          paramsProperty={'title'}
-          inputTargetValue={incident.title ?? undefined}
-          errors={errors['pushToServiceParam.incident.title'] as string[]}
-        />
-      </EuiFormRow>
-      {/* <EuiFormRow
-        fullWidth
-        error={errors['subActionParams.incident.title']}
-        isInvalid={
-          errors['subActionParams.incident.title'] !== undefined &&
-          errors['subActionParams.incident.title'].length > 0 &&
-          incident.title !== undefined
-        }
-        label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
-          defaultMessage: 'Title',
-        })}
-      >
-        <EuiFieldText
-          data-test-subj="titleInput"
-          name="title"
-          value={incident?.title}
-          onChange={(e) => {
-            editSubActionProperty('title', e.target.value);
-          }}
-          isInvalid={
-            errors['subActionParams.incident.title'] !== undefined &&
-            errors['subActionParams.incident.title'].length > 0 &&
-            incident.title !== undefined
-          }
-          fullWidth={true}
-        />
-      </EuiFormRow> */}
-      <EuiFormRow
-        data-test-subj="description-row"
-        fullWidth
-        error={errors['pushToServiceParam.incident.description']}
-        isInvalid={
-          errors['pushToServiceParam.incident.description'] !== undefined &&
-          errors['pushToServiceParam.incident.description'].length > 0 &&
-          incident.description !== undefined
-        }
-        label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-          defaultMessage: 'Description',
-        })}
-        labelAppend={
-          <EuiText size="xs" color="subdued">
-            Required
-          </EuiText>
-        }
-      >
-        <TextFieldWithMessageVariables
-          index={index}
-          editAction={editSubActionProperty}
-          messageVariables={messageVariables}
-          paramsProperty={'description'}
-          inputTargetValue={incident.description ?? undefined}
-          errors={errors['pushToServiceParam.incident.description'] as string[]}
-        />
-      </EuiFormRow>
-      {/* {eventAction === 'alert' &&
+      {eventAction === 'case' ?
         <>
           <EuiFormRow
+            data-test-subj="title-row"
             fullWidth
-            error={errors['subActionParams.incident.alertType']}
+            error={errors['pushToServiceParam.incident.title']}
             isInvalid={
-              errors['subActionParams.incident.title'] !== undefined &&
-              errors['subActionParams.incident.title'].length > 0 &&
+              errors['pushToServiceParam.incident.title'] !== undefined &&
+              errors['pushToServiceParam.incident.title'].length > 0 &&
               incident.title !== undefined
+            }
+            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
+              defaultMessage: 'Title',
+            })}
+            labelAppend={
+              <EuiText size="xs" color="subdued">
+                Required
+              </EuiText>
+            }
+          >
+            <TextFieldWithMessageVariables
+              index={index}
+              editAction={editSubActionProperty}
+              messageVariables={messageVariables}
+              paramsProperty={'title'}
+              inputTargetValue={incident.title ?? undefined}
+              errors={errors['pushToServiceParam.incident.title'] as string[]}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            data-test-subj="description-row"
+            fullWidth
+            error={errors['pushToServiceParam.incident.description']}
+            isInvalid={
+              errors['pushToServiceParam.incident.description'] !== undefined &&
+              errors['pushToServiceParam.incident.description'].length > 0 &&
+              incident.description !== undefined
+            }
+            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
+              defaultMessage: 'Description',
+            })}
+            labelAppend={
+              <EuiText size="xs" color="subdued">
+                Required
+              </EuiText>
+            }
+          >
+            <TextFieldWithMessageVariables
+              index={index}
+              editAction={editSubActionProperty}
+              messageVariables={messageVariables}
+              paramsProperty={'description'}
+              inputTargetValue={incident.description ?? undefined}
+              errors={errors['pushToServiceParam.incident.description'] as string[]}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            error={errors.tlp}
+            isInvalid={false}
+            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
+              defaultMessage: 'TLP',
+            })}>
+            <EuiSelect
+              fullWidth
+              data-test-subj="eventTlpSelect"
+              options={tlpOptions}
+              value={tlp}
+              onChange={(e) => {
+                editSubActionProperty('tlp', parseInt(e.target.value));
+                setTlp(tlpOptions[e.target.options.selectedIndex].value);
+              }}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            error={errors.severity}
+            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.severityFieldLabel', {
+              defaultMessage: 'Severity',
+            })}
+          >
+            <EuiSelect
+              fullWidth
+              data-test-subj="eventSeveritySelect"
+              options={severityOptions}
+              value={severity}
+              onChange={(e) => {
+                editSubActionProperty('severity', parseInt(e.target.value))
+                setSeverity(severityOptions[e.target.options.selectedIndex].value);
+              }}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            label={i18n.translate(
+              'xpack.stackConnectors.components.pagerDuty.eventActionSelectFieldLabel',
+              {
+                defaultMessage: 'Tags',
+              }
+            )}
+            labelAppend={
+              <EuiText size="xs">
+                optional
+              </EuiText>
+            }
+          >
+            <EuiComboBox
+              fullWidth
+              noSuggestions
+              placeholder="Create some tags"
+              selectedOptions={selectedOptions}
+              onCreateOption={onCreateOption}
+              onChange={onChange}
+              onSearchChange={onSearchChange}
+              isInvalid={isInvalid}
+            />
+          </EuiFormRow>
+          <TextAreaWithMessageVariables
+            index={index}
+            editAction={editComment}
+            messageVariables={messageVariables}
+            paramsProperty={'comments'}
+            inputTargetValue={comments && comments.length > 0 ? comments[0].comment : undefined}
+            label={i18n.translate(
+              'xpack.stackConnectors.components.thehive.commentsTextAreaFieldLabel',
+              {
+                defaultMessage: 'Additional comments',
+              }
+            )}
+          />
+        </>
+        :
+        <>
+          <EuiFormRow
+            data-test-subj="title-row"
+            fullWidth
+            error={errors['createAlertParam.title']}
+            isInvalid={
+              errors['createAlertParam.title'] !== undefined &&
+              errors['createAlertParam.title'].length > 0 &&
+              alert.title !== undefined
+            }
+            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
+              defaultMessage: 'Title',
+            })}
+            labelAppend={
+              <EuiText size="xs" color="subdued">
+                Required
+              </EuiText>
+            }
+          >
+            <TextFieldWithMessageVariables
+              index={index}
+              editAction={(key, value) => {
+                editAction('subActionParams', { ...alert, [key]: value }, index);
+              }}
+              messageVariables={messageVariables}
+              paramsProperty={'title'}
+              inputTargetValue={alert.title ?? undefined}
+              errors={errors['createAlertParam.title'] as string[]}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            data-test-subj="description-row"
+            fullWidth
+            error={errors['createAlertParam.description']}
+            isInvalid={
+              errors['createAlertParam.description'] !== undefined &&
+              errors['createAlertParam.description'].length > 0 &&
+              alert.description !== undefined
+            }
+            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
+              defaultMessage: 'Description',
+            })}
+            labelAppend={
+              <EuiText size="xs" color="subdued">
+                Required
+              </EuiText>
+            }
+          >
+            <TextFieldWithMessageVariables
+              index={index}
+              editAction={(key, value) => {
+                editAction('subActionParams', { ...alert, [key]: value }, index);
+              }}
+              messageVariables={messageVariables}
+              paramsProperty={'description'}
+              inputTargetValue={alert.description ?? undefined}
+              errors={errors['createAlertParam.description'] as string[]}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            error={errors['createAlertParam.type']}
+            isInvalid={
+              errors['createAlertParam.type'] !== undefined &&
+              errors['createAlertParam.type'].length > 0 &&
+              alert.type !== undefined
             }
             label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
               defaultMessage: 'Type',
@@ -344,20 +511,22 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           >
             <TextFieldWithMessageVariables
               index={index}
-              editAction={editSubActionProperty}
+              editAction={(key, value) => {
+                editAction('subActionParams', { ...alert, [key]: value }, index);
+              }}
               messageVariables={messageVariables}
               paramsProperty={'type'}
-              inputTargetValue={incident.type ?? undefined}
-              errors={(errors['subActionParams.incident.type'] ?? []) as string[]}
+              inputTargetValue={alert.type ?? undefined}
+              errors={(errors['createAlertParam.type'] ?? []) as string[]}
             />
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            error={errors['subActionParams.incident.source']}
+            error={errors['createAlertParam.source']}
             isInvalid={
-              errors['subActionParams.incident.source'] !== undefined &&
-              errors['subActionParams.incident.source'].length > 0 &&
-              incident.source !== undefined
+              errors['createAlertParam.source'] !== undefined &&
+              errors['createAlertParam.source'].length > 0 &&
+              alert.source !== undefined
             }
             label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
               defaultMessage: 'Source',
@@ -370,20 +539,22 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           >
             <TextFieldWithMessageVariables
               index={index}
-              editAction={editSubActionProperty}
+              editAction={(key, value) => {
+                editAction('subActionParams', { ...alert, [key]: value }, index);
+              }}
               messageVariables={messageVariables}
               paramsProperty={'source'}
-              inputTargetValue={incident.source ?? undefined}
-              errors={(errors['subActionParams.incident.source'] ?? []) as string[]}
+              inputTargetValue={alert.source ?? undefined}
+              errors={(errors['createAlertParam.source'] ?? []) as string[]}
             />
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            error={errors['subActionParams.incident.sourceRef']}
+            error={errors['createAlertParam.sourceRef']}
             isInvalid={
-              errors['subActionParams.incident.sourceRef'] !== undefined &&
-              errors['subActionParams.incident.sourceRef'].length > 0 &&
-              incident.title !== undefined
+              errors['createAlertParam.sourceRef'] !== undefined &&
+              errors['createAlertParam.sourceRef'].length > 0 &&
+              alert.sourceRef !== undefined
             }
             label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
               defaultMessage: 'Source Ref',
@@ -396,89 +567,76 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           >
             <TextFieldWithMessageVariables
               index={index}
-              editAction={editSubActionProperty}
+              editAction={(key, value) => {
+                editAction('subActionParams', { ...alert, [key]: value }, index);
+              }}
               messageVariables={messageVariables}
               paramsProperty={'sourceRef'}
-              inputTargetValue={incident.sourceRef ?? undefined}
-              errors={(errors['subActionParams.incident.sourceRef'] ?? []) as string[]}
+              inputTargetValue={alert.sourceRef ?? undefined}
+              errors={(errors['createAlertParam.sourceRef'] ?? []) as string[]}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            isInvalid={false}
+            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
+              defaultMessage: 'TLP',
+            })}>
+            <EuiSelect
+              fullWidth
+              data-test-subj="eventTlpSelect"
+              options={tlpOptions}
+              value={tlp}
+              onChange={(e) => {
+                editAction('subActionParams', { ...alert, tlp: parseInt(e.target.value) }, index);
+                setTlp(tlpOptions[e.target.options.selectedIndex].value);
+              }}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.severityFieldLabel', {
+              defaultMessage: 'Severity',
+            })}
+          >
+            <EuiSelect
+              fullWidth
+              data-test-subj="eventSeveritySelect"
+              options={severityOptions}
+              value={severity}
+              onChange={(e) => {
+                editAction('subActionParams', { ...alert, severity: parseInt(e.target.value) }, index);
+                setSeverity(severityOptions[e.target.options.selectedIndex].value);
+              }}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            label={i18n.translate(
+              'xpack.stackConnectors.components.pagerDuty.eventActionSelectFieldLabel',
+              {
+                defaultMessage: 'Tags',
+              }
+            )}
+            labelAppend={
+              <EuiText size="xs">
+                optional
+              </EuiText>
+            }
+          >
+            <EuiComboBox
+              fullWidth
+              noSuggestions
+              placeholder="Create some tags"
+              selectedOptions={selectedOptions}
+              onCreateOption={onCreateOption}
+              onChange={onChange}
+              onSearchChange={onSearchChange}
+              isInvalid={isInvalid}
             />
           </EuiFormRow>
         </>
-      } */}
-      <EuiFormRow
-        fullWidth
-        error={errors.tlp}
-        isInvalid={false}
-        label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
-          defaultMessage: 'TLP',
-        })}>
-        <EuiSelect
-          fullWidth
-          data-test-subj="eventTlpSelect"
-          options={tlpOptions}
-          value={tlp}
-          onChange={(e) => {
-            editSubActionProperty('tlp', parseInt(e.target.value));
-            setTlp(tlpOptions[e.target.options.selectedIndex].value);
-          }}
-        />
-      </EuiFormRow>
-      <EuiFormRow
-        fullWidth
-        error={errors.severity}
-        label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.severityFieldLabel', {
-          defaultMessage: 'Severity',
-        })}
-      >
-        <EuiSelect
-          fullWidth
-          data-test-subj="eventSeveritySelect"
-          options={severityOptions}
-          value={severity}
-          onChange={(e) => {
-            editSubActionProperty('severity', parseInt(e.target.value))
-            setSeverity(severityOptions[e.target.options.selectedIndex].value);
-          }}
-        />
-      </EuiFormRow>
-      <EuiFormRow
-        fullWidth
-        label={i18n.translate(
-          'xpack.stackConnectors.components.pagerDuty.eventActionSelectFieldLabel',
-          {
-            defaultMessage: 'Tags',
-          }
-        )}
-        labelAppend={
-          <EuiText size="xs">
-            optional
-          </EuiText>
-        }
-      >
-        <EuiComboBox
-          fullWidth
-          noSuggestions
-          placeholder="Create some tags"
-          selectedOptions={selectedOptions}
-          onCreateOption={onCreateOption}
-          onChange={onChange}
-          onSearchChange={onSearchChange}
-          isInvalid={isInvalid}
-        />
-      </EuiFormRow>
-      <TextAreaWithMessageVariables
-        index={index}
-        editAction={editComment}
-        messageVariables={messageVariables}
-        paramsProperty={'comments'}
-        inputTargetValue={comments && comments.length > 0 ? comments[0].comment : undefined}
-        label={i18n.translate(
-          'xpack.stackConnectors.components.thehive.commentsTextAreaFieldLabel',
-          {
-            defaultMessage: 'Additional comments',
-          }
-        )}
-      />
+      }
     </>
   );
 };

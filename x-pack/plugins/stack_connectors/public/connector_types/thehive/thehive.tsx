@@ -17,7 +17,7 @@ export function getConnectorType(): TheHiveConnector {
     id: THEHIVE_CONNECTOR_ID,
     iconClass: lazy(() => import('./logo')),
     selectMessage: i18n.translate('xpack.stackConnectors.components.thehive.selectMessageText', {
-      defaultMessage: 'The Hive Connector', //connector description
+      defaultMessage: 'Create Case and Alert in Hive', //connector description
     }),
     actionTypeTitle: i18n.translate(
       'xpack.stackConnectors.components.thehive.connectorTypeTitle',
