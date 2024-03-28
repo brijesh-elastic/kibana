@@ -16,7 +16,7 @@ import {
 import { THEHIVE_URL_LABEL, THEHIVE_TOKEN_LABEL, ORG_NAME_LABEL } from './translations';
 
 const configFormSchema: ConfigFieldSchema[] = [
-  { id: 'organisation', label: ORG_NAME_LABEL, isRequired: false, helpText: 'By default, the context of the API calls will be the default organisation of the user.' },
+  { id: 'organisation', label: ORG_NAME_LABEL, isRequired: false, helpText: `By default, the user's default organization will be considered.` },
   { id: 'url', label: THEHIVE_URL_LABEL, isUrlField: true },
 ];
 

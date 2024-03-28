@@ -76,7 +76,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     const subAction =
       eventAction === 'alert' ? SUB_ACTION.CREATE_ALERT : SUB_ACTION.PUSH_TO_SERVICE;
     editAction('subAction', subAction, index);
-
+    setSelected([]);
+    setInvalid(false);
   }, [eventAction]);
 
   const setEventActionType = (eventActionType: string) => {
@@ -437,7 +438,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               alert.sourceRef !== undefined
             }
             label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Source Ref',
+              defaultMessage: 'Source Reference',
             })}
             labelAppend={
               <EuiText size="xs" color="subdued">

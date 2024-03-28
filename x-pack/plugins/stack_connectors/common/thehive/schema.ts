@@ -8,15 +8,15 @@
 import { schema } from '@kbn/config-schema';
 import { TheHiveSeverity, TheHiveTLP, SUB_ACTION } from './constants';
 
-// Connector schema
 export const TheHiveConfigSchema = schema.object({
   url: schema.string(),
   organisation: schema.nullable(schema.string()),
 });
 
-export const TheHiveSecretsSchema = schema.object({ api_token: schema.string() });
+export const TheHiveSecretsSchema = schema.object({
+  api_token: schema.string()
+});
 
-// Run action schema
 export const ExecutorSubActionPushParamsSchema = schema.object({
   incident: schema.object({
     title: schema.string(),

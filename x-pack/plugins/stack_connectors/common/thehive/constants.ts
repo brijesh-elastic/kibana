@@ -14,6 +14,7 @@ export const THEHIVE_TITLE = i18n.translate(
   }
 );
 export const THEHIVE_CONNECTOR_ID = '.thehive';
+
 export enum SUB_ACTION {
   PUSH_TO_SERVICE = 'pushToService',
   CREATE_ALERT = 'createAlert',
