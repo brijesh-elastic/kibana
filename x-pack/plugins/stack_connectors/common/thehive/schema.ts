@@ -11,7 +11,7 @@ import { TheHiveSeverity, TheHiveTLP, SUB_ACTION } from './constants';
 // Connector schema
 export const TheHiveConfigSchema = schema.object({
   url: schema.string(),
-  organization: schema.nullable(schema.string()),
+  organisation: schema.nullable(schema.string()),
 });
 
 export const TheHiveSecretsSchema = schema.object({ api_token: schema.string() });
@@ -166,4 +166,12 @@ export const TheHiveCreateAlertResponseSchema = schema.object(
     timeToAcknowledge: schema.nullable(schema.number()),
   },
   { unknowns: 'ignore' }
+);
+
+export const TheHiveFailureResponseSchema = schema.object(
+  {
+    type: schema.number(),
+    message: schema.string(),
+  },
+  { unknowns: 'allow' }
 );

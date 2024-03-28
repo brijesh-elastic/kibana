@@ -8,27 +8,23 @@
 import { lazy } from 'react';
 import { i18n } from '@kbn/i18n';
 import { GenericValidationResult } from '@kbn/triggers-actions-ui-plugin/public/types';
-import { THEHIVE_CONNECTOR_ID, SUB_ACTION } from '../../../common/thehive/constants';
 import { TheHiveConnector } from './types';
+import { THEHIVE_CONNECTOR_ID, SUB_ACTION, THEHIVE_TITLE } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionPushParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 
 export function getConnectorType(): TheHiveConnector {
   return {
     id: THEHIVE_CONNECTOR_ID,
     iconClass: lazy(() => import('./logo')),
-    selectMessage: i18n.translate('xpack.stackConnectors.components.thehive.selectMessageText', {
-      defaultMessage: 'Create Case and Alert in Hive', //connector description
+    selectMessage: i18n.translate('xpack.stackConnectors.components.thehive.descriptionText', {
+      defaultMessage: 'Create Case and Alert in Hive',
     }),
-    actionTypeTitle: i18n.translate(
-      'xpack.stackConnectors.components.thehive.connectorTypeTitle',
-      {
-        defaultMessage: 'TheHive data',
-      }
-    ),
+    actionTypeTitle: THEHIVE_TITLE,
     validateParams: async (
       actionParams: ExecutorParams
     ): Promise<GenericValidationResult<unknown>> => {
       const translations = await import('./translations');
+
       const errors = {
         'pushToServiceParam.incident.title': new Array<string>(),
         'pushToServiceParam.incident.description': new Array<string>(),
@@ -38,6 +34,7 @@ export function getConnectorType(): TheHiveConnector {
         'createAlertParam.source': new Array<string>(),
         'createAlertParam.sourceRef': new Array<string>(),
       };
+
       const validationResult = {
         errors,
       };

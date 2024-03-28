@@ -10,7 +10,7 @@ import { i18n } from '@kbn/i18n';
 export const THEHIVE_TITLE = i18n.translate(
   'xpack.stackConnectors.components.thehive.connectorTypeTitle',
   {
-    defaultMessage: 'TheHive', //connector Title
+    defaultMessage: 'TheHive',
   }
 );
 export const THEHIVE_CONNECTOR_ID = '.thehive';

@@ -12,6 +12,7 @@ import {
   ExecutorParamsSchema,
   ExecutorSubActionPushParamsSchema,
   ExecutorSubActionCreateAlertParamsSchema,
+  TheHiveFailureResponseSchema,
 } from './schema';
 
 export type TheHiveConfig = TypeOf<typeof TheHiveConfigSchema>;
@@ -20,6 +21,8 @@ export type TheHiveSecrets = TypeOf<typeof TheHiveSecretsSchema>;
 export type ExecutorParams = TypeOf<typeof ExecutorParamsSchema>;
 export type ExecutorSubActionPushParams = TypeOf<typeof ExecutorSubActionPushParamsSchema>;
 export type ExecutorSubActionCreateAlertParams = TypeOf<typeof ExecutorSubActionCreateAlertParamsSchema>;
+
+export type TheHiveFailureResponse = TypeOf<typeof TheHiveFailureResponseSchema>;
 
 export interface ExternalServiceIncidentResponse {
   id: string;

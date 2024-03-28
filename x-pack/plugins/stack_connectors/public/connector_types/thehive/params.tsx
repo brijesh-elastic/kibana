@@ -8,18 +8,16 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { i18n } from '@kbn/i18n';
 import { ActionParamsProps, TextAreaWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public';
-import { SUB_ACTION, TheHiveSeverity, TheHiveTLP } from '../../../common/thehive/constants';
+import { TextFieldWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public'
+import { SUB_ACTION } from '../../../common/thehive/constants';
+import { eventActionOptions, severityOptions, tlpOptions } from './constants';
 import { ExecutorParams, ExecutorSubActionPushParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import {
   EuiFormRow,
   EuiSelect,
-  EuiFieldText,
   EuiText,
   EuiComboBox,
 } from '@elastic/eui';
-import {
-  TextFieldWithMessageVariables
-} from '@kbn/triggers-actions-ui-plugin/public'
 
 const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParams>> = ({
   actionConnector,
@@ -29,9 +27,11 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   errors,
   messageVariables
 }) => {
+  const [eventAction, setEventAction] = useState('case');
+  const [selectedOptions, setSelected] = useState<Array<{ label: string }>>([]);
+  const [isInvalid, setInvalid] = useState(false);
   const actionConnectorRef = useRef(actionConnector?.id ?? '');
-  // const { subAction, subActionParams } = actionParams;
-  console.log(actionParams);
+
   useEffect(() => {
     if (actionConnector != null && actionConnectorRef.current !== actionConnector.id) {
       actionConnectorRef.current = actionConnector.id;
@@ -50,74 +50,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionConnector]);
-
-  const { incident, comments } = useMemo(
-    () =>
-      actionParams.subActionParams as ExecutorSubActionPushParams ??
-      ({
-        incident: {
-          tlp: 2,
-          severity: 2,
-          tags: []
-        },
-        comments: [],
-      } as unknown as ExecutorSubActionPushParams),
-    [actionParams.subActionParams]
-  );
-  const alert = useMemo(
-    () =>
-      actionParams.subActionParams as ExecutorSubActionCreateAlertParams ??
-      ({} as unknown as ExecutorSubActionCreateAlertParams),
-    [actionParams.subActionParams]
-  );
-  const editSubActionProperty = useCallback(
-    (key: string, value: any) => {
-      const newProps =
-        key !== 'comments'
-          ? {
-            incident: { ...incident, [key]: value },
-            comments,
-          }
-          : { incident, [key]: value };
-      editAction('subActionParams', newProps, index);
-    },
-    [comments, editAction, incident, index]
-  );
-  const editComment = useCallback(
-    (key, value) => {
-      editSubActionProperty(key, [{ commentId: '1', comment: value }]);
-    },
-    [editSubActionProperty]
-  );
-
-  const [eventAction, setEventAction] = useState('case');
-  const setEventActionType = (eventActionType: string) => {
-    const subActionParams =
-      eventActionType === 'alert'
-        ? {
-          tlp: 2,
-          severity: 2,
-          tags: [],
-        }
-        : {
-          incident: {
-            tlp: 2,
-            severity: 2,
-            tags: [],
-          },
-          comments: [],
-        };
-
-    setEventAction(eventActionType);
-    editAction('subActionParams', subActionParams, index);
-  };
-
-  useEffect(() => {
-    const subAction =
-      eventAction === 'alert' ? SUB_ACTION.CREATE_ALERT : SUB_ACTION.PUSH_TO_SERVICE;
-    editAction('subAction', subAction, index);
-
-  }, [eventAction]);
 
   useEffect(() => {
     if (!actionParams.subAction) {
@@ -140,125 +72,83 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
 
   }, [actionParams]);
 
-  const eventActionOptions = [
-    {
-      value: 'case',
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectResolveOptionLabel',
-        {
-          defaultMessage: 'Create Case',
-        }
-      ),
-    },
-    {
-      value: 'alert',
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectTriggerOptionLabel',
-        {
-          defaultMessage: 'Create Alert',
-        }
-      ),
-    }
-  ];
-  const severityOptions = [
-    {
-      value: TheHiveSeverity.LOW,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectResolveOptionLabel',
-        {
-          defaultMessage: 'Low',
-        }
-      )
-    },
-    {
-      value: TheHiveSeverity.MEDIUM,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectResolveOptionLabel',
-        {
-          defaultMessage: 'Medium',
-        }
-      ),
-    },
-    {
-      value: TheHiveSeverity.HIGH,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectResolveOptionLabel',
-        {
-          defaultMessage: 'High',
-        }
-      ),
-    },
-    {
-      value: TheHiveSeverity.CRITICAL,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectResolveOptionLabel',
-        {
-          defaultMessage: 'Critical',
-        }
-      ),
-    },
-  ];
-  const tlpOptions = [
-    {
-      value: TheHiveTLP.CLEAR,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectResolveOptionLabel',
-        {
-          defaultMessage: 'Clear',
-        }
-      ),
-    },
-    {
-      value: TheHiveTLP.GREEN,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectTriggerOptionLabel',
-        {
-          defaultMessage: 'Green',
-        }
-      ),
-    },
-    {
-      value: TheHiveTLP.AMBER,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectTriggerOptionLabel',
-        {
-          defaultMessage: 'Amber',
-        }
-      ),
-    },
-    {
-      value: TheHiveTLP.AMBER_STRICT,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectTriggerOptionLabel',
-        {
-          defaultMessage: 'Amber Strict',
-        }
-      ),
-    },
-    {
-      value: TheHiveTLP.RED,
-      text: i18n.translate(
-        'xpack.stackConnectors.components.thehive.eventSelectTriggerOptionLabel',
-        {
-          defaultMessage: 'Red',
-        }
-      ),
-    }
-  ];
+  useEffect(() => {
+    const subAction =
+      eventAction === 'alert' ? SUB_ACTION.CREATE_ALERT : SUB_ACTION.PUSH_TO_SERVICE;
+    editAction('subAction', subAction, index);
 
-  //do we need it? if we are using the props from parent components
-  const [severity, setSeverity] = useState(severityOptions[1].value);
-  const [tlp, setTlp] = useState(tlpOptions[2].value);
+  }, [eventAction]);
 
-  const [selectedOptions, setSelected] = useState<Array<{ label: string }>>([]);
-  const [isInvalid, setInvalid] = useState(false);
+  const setEventActionType = (eventActionType: string) => {
+    const subActionParams =
+      eventActionType === 'alert'
+        ? {
+          tlp: 2,
+          severity: 2,
+          tags: [],
+        }
+        : {
+          incident: {
+            tlp: 2,
+            severity: 2,
+            tags: [],
+          },
+          comments: [],
+        };
+
+    setEventAction(eventActionType);
+    editAction('subActionParams', subActionParams, index);
+  };
+
+  const { incident, comments } = useMemo(
+    () =>
+      actionParams.subActionParams as ExecutorSubActionPushParams ??
+      ({
+        incident: {
+          tlp: 2,
+          severity: 2,
+          tags: []
+        },
+        comments: [],
+      } as unknown as ExecutorSubActionPushParams),
+    [actionParams.subActionParams]
+  );
+
+  const alert = useMemo(
+    () =>
+      actionParams.subActionParams as ExecutorSubActionCreateAlertParams ??
+      ({} as unknown as ExecutorSubActionCreateAlertParams),
+    [actionParams.subActionParams]
+  );
+
+  const editSubActionProperty = useCallback(
+    (key: string, value: any) => {
+      const newProps =
+        key !== 'comments'
+          ? {
+            incident: { ...incident, [key]: value },
+            comments,
+          }
+          : { incident, [key]: value };
+      editAction('subActionParams', newProps, index);
+    },
+    [comments, editAction, incident, index]
+  );
+
+  const editComment = useCallback(
+    (key, value) => {
+      editSubActionProperty(key, [{ commentId: '1', comment: value }]);
+    },
+    [editSubActionProperty]
+  );
+
   const onCreateOption = (searchValue: string) => {
-
     const newOption = {
       label: searchValue,
     };
 
     setSelected([...selectedOptions, newOption]);
+
     if (eventAction === 'case') {
       editSubActionProperty('tags', [...incident.tags ?? [], searchValue])
     } else {
@@ -280,14 +170,14 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     } else {
       editAction('subActionParams', { ...alert, tags: selectedOptions.map((option) => option.label) }, index);
     }
-
   }
+
   return (
     <>
       <EuiFormRow
         fullWidth
         label={i18n.translate(
-          'xpack.stackConnectors.components.pagerDuty.eventActionSelectFieldLabel',
+          'xpack.stackConnectors.components.thehive.eventActionSelectFieldLabel',
           {
             defaultMessage: 'Event Action',
           }
@@ -360,7 +250,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           <EuiFormRow
             fullWidth
             error={errors.tlp}
-            isInvalid={false}
             label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
               defaultMessage: 'TLP',
             })}>
@@ -368,10 +257,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               fullWidth
               data-test-subj="eventTlpSelect"
               options={tlpOptions}
-              value={tlp}
               onChange={(e) => {
                 editSubActionProperty('tlp', parseInt(e.target.value));
-                setTlp(tlpOptions[e.target.options.selectedIndex].value);
               }}
             />
           </EuiFormRow>
@@ -386,31 +273,24 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               fullWidth
               data-test-subj="eventSeveritySelect"
               options={severityOptions}
-              value={severity}
               onChange={(e) => {
                 editSubActionProperty('severity', parseInt(e.target.value))
-                setSeverity(severityOptions[e.target.options.selectedIndex].value);
               }}
             />
           </EuiFormRow>
           <EuiFormRow
             fullWidth
             label={i18n.translate(
-              'xpack.stackConnectors.components.pagerDuty.eventActionSelectFieldLabel',
+              'xpack.stackConnectors.components.tehhive.eventActionSelectFieldLabel',
               {
                 defaultMessage: 'Tags',
               }
             )}
-            labelAppend={
-              <EuiText size="xs">
-                optional
-              </EuiText>
-            }
           >
             <EuiComboBox
               fullWidth
-              noSuggestions
-              placeholder="Create some tags"
+              options={[]}
+              placeholder="Tags"
               selectedOptions={selectedOptions}
               onCreateOption={onCreateOption}
               onChange={onChange}
@@ -578,7 +458,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            isInvalid={false}
             label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
               defaultMessage: 'TLP',
             })}>
@@ -586,10 +465,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               fullWidth
               data-test-subj="eventTlpSelect"
               options={tlpOptions}
-              value={tlp}
               onChange={(e) => {
                 editAction('subActionParams', { ...alert, tlp: parseInt(e.target.value) }, index);
-                setTlp(tlpOptions[e.target.options.selectedIndex].value);
               }}
             />
           </EuiFormRow>
@@ -603,31 +480,24 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               fullWidth
               data-test-subj="eventSeveritySelect"
               options={severityOptions}
-              value={severity}
               onChange={(e) => {
                 editAction('subActionParams', { ...alert, severity: parseInt(e.target.value) }, index);
-                setSeverity(severityOptions[e.target.options.selectedIndex].value);
               }}
             />
           </EuiFormRow>
           <EuiFormRow
             fullWidth
             label={i18n.translate(
-              'xpack.stackConnectors.components.pagerDuty.eventActionSelectFieldLabel',
+              'xpack.stackConnectors.components.thehive.eventActionSelectFieldLabel',
               {
                 defaultMessage: 'Tags',
               }
             )}
-            labelAppend={
-              <EuiText size="xs">
-                optional
-              </EuiText>
-            }
           >
             <EuiComboBox
               fullWidth
-              noSuggestions
-              placeholder="Create some tags"
+              options={[]}
+              placeholder="Tags"
               selectedOptions={selectedOptions}
               onCreateOption={onCreateOption}
               onChange={onChange}

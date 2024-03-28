@@ -13,22 +13,18 @@ export const THEHIVE_URL_LABEL = i18n.translate(
     defaultMessage: 'URL',
   }
 );
+
 export const ORG_NAME_LABEL = i18n.translate(
   'xpack.stackConnectors.components.thehive.inputFieldLabel',
   {
     defaultMessage: 'Organisation',
   }
 );
+
 export const THEHIVE_TOKEN_LABEL = i18n.translate(
   'xpack.stackConnectors.components.thehive.tokenFieldLabel',
   {
     defaultMessage: 'API Key',
-  }
-);
-export const BODY_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.thehive.requiredBodyTextField',
-  {
-    defaultMessage: 'Body is required.',
   }
 );
 
