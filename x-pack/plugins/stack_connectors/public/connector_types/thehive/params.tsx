@@ -30,6 +30,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   const [eventAction, setEventAction] = useState('case');
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>([]);
   const [isInvalid, setInvalid] = useState(false);
+  const [severity, setSeverity] = useState(severityOptions[1].value);
+  const [tlp, setTlp] = useState(tlpOptions[2].value);
   const actionConnectorRef = useRef(actionConnector?.id ?? '');
 
   useEffect(() => {
@@ -78,6 +80,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     editAction('subAction', subAction, index);
     setSelected([]);
     setInvalid(false);
+    setSeverity(severityOptions[1].value);
+    setTlp(tlpOptions[2].value);
   }, [eventAction]);
 
   const setEventActionType = (eventActionType: string) => {
@@ -144,11 +148,11 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   );
 
   const onCreateOption = (searchValue: string) => {
-    const newOption = {
-      label: searchValue,
-    };
+    if (searchValue.match(/^[a-zA-Z0-9]+([\s]*[a-zA-Z0-9])*$/) === null) {
+      return false;
+    }
 
-    setSelected([...selectedOptions, newOption]);
+    setSelected([...selectedOptions, { label: searchValue }]);
 
     if (eventAction === 'case') {
       editSubActionProperty('tags', [...incident.tags ?? [], searchValue])
@@ -256,10 +260,12 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             })}>
             <EuiSelect
               fullWidth
+              value={tlp}
               data-test-subj="eventTlpSelect"
               options={tlpOptions}
               onChange={(e) => {
                 editSubActionProperty('tlp', parseInt(e.target.value));
+                setTlp(parseInt(e.target.value));
               }}
             />
           </EuiFormRow>
@@ -273,9 +279,11 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <EuiSelect
               fullWidth
               data-test-subj="eventSeveritySelect"
+              value={severity}
               options={severityOptions}
               onChange={(e) => {
                 editSubActionProperty('severity', parseInt(e.target.value))
+                setSeverity(parseInt(e.target.value));
               }}
             />
           </EuiFormRow>
@@ -465,9 +473,11 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <EuiSelect
               fullWidth
               data-test-subj="eventTlpSelect"
+              value={tlp}
               options={tlpOptions}
               onChange={(e) => {
                 editAction('subActionParams', { ...alert, tlp: parseInt(e.target.value) }, index);
+                setTlp(parseInt(e.target.value));
               }}
             />
           </EuiFormRow>
@@ -480,9 +490,11 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <EuiSelect
               fullWidth
               data-test-subj="eventSeveritySelect"
+              value={severity}
               options={severityOptions}
               onChange={(e) => {
                 editAction('subActionParams', { ...alert, severity: parseInt(e.target.value) }, index);
+                setSeverity(parseInt(e.target.value));
               }}
             />
           </EuiFormRow>
