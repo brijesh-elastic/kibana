@@ -13,15 +13,15 @@ import {
   SecretsFieldSchema,
 } from '@kbn/triggers-actions-ui-plugin/public';
 
-import { THEHIVE_URL_LABEL, THEHIVE_TOKEN_LABEL, ORG_NAME_LABEL } from './translations';
+import { URL_LABEL, API_KEY_LABEL, ORGANISATION_LABEL } from './translations';
 
 const configFormSchema: ConfigFieldSchema[] = [
-  { id: 'organisation', label: ORG_NAME_LABEL, isRequired: false, helpText: `By default, the user's default organization will be considered.` },
-  { id: 'url', label: THEHIVE_URL_LABEL, isUrlField: true },
+  { id: 'organisation', label: ORGANISATION_LABEL, isRequired: false, helpText: `By default, the user's default organization will be considered.` },
+  { id: 'url', label: URL_LABEL, isUrlField: true },
 ];
 
 const secretsFormSchema: SecretsFieldSchema[] = [
-  { id: 'api_token', label: THEHIVE_TOKEN_LABEL, isPasswordField: true },
+  { id: 'api_key', label: API_KEY_LABEL, isPasswordField: true },
 ];
 
 const theHiveSecurityConnectorFields: React.FC<ActionConnectorFieldsProps> = ({ readOnly, isEdit }) => {

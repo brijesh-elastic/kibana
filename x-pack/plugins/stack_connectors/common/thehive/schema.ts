@@ -14,7 +14,7 @@ export const TheHiveConfigSchema = schema.object({
 });
 
 export const TheHiveSecretsSchema = schema.object({
-  api_token: schema.string()
+  api_key: schema.string()
 });
 
 export const ExecutorSubActionPushParamsSchema = schema.object({

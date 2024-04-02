@@ -6,12 +6,12 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { i18n } from '@kbn/i18n';
 import { ActionParamsProps, TextAreaWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public';
 import { TextFieldWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public'
 import { SUB_ACTION } from '../../../common/thehive/constants';
 import { eventActionOptions, severityOptions, tlpOptions } from './constants';
 import { ExecutorParams, ExecutorSubActionPushParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
+import * as translations from './translations';
 import {
   EuiFormRow,
   EuiSelect,
@@ -122,7 +122,11 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   const alert = useMemo(
     () =>
       actionParams.subActionParams as ExecutorSubActionCreateAlertParams ??
-      ({} as unknown as ExecutorSubActionCreateAlertParams),
+      ({
+        tlp: 2,
+        severity: 2,
+        tags: [],
+      } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
 
@@ -148,10 +152,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   );
 
   const onCreateOption = (searchValue: string) => {
-    if (searchValue.match(/^[a-zA-Z0-9]+([\s]*[a-zA-Z0-9])*$/) === null) {
-      return false;
-    }
-
     setSelected([...selectedOptions, { label: searchValue }]);
 
     if (eventAction === 'case') {
@@ -181,12 +181,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
     <>
       <EuiFormRow
         fullWidth
-        label={i18n.translate(
-          'xpack.stackConnectors.components.thehive.eventActionSelectFieldLabel',
-          {
-            defaultMessage: 'Event Action',
-          }
-        )}
+        label={translations.EVENT_ACTION_LABEL}
       >
         <EuiSelect
           fullWidth
@@ -207,9 +202,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['pushToServiceParam.incident.title'].length > 0 &&
               incident.title !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Title',
-            })}
+            label={translations.TITLE_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -234,9 +227,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['pushToServiceParam.incident.description'].length > 0 &&
               incident.description !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Description',
-            })}
+            label={translations.DESCRIPTION_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -254,27 +245,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            error={errors.tlp}
-            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
-              defaultMessage: 'TLP',
-            })}>
-            <EuiSelect
-              fullWidth
-              value={tlp}
-              data-test-subj="eventTlpSelect"
-              options={tlpOptions}
-              onChange={(e) => {
-                editSubActionProperty('tlp', parseInt(e.target.value));
-                setTlp(parseInt(e.target.value));
-              }}
-            />
-          </EuiFormRow>
-          <EuiFormRow
-            fullWidth
             error={errors.severity}
-            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.severityFieldLabel', {
-              defaultMessage: 'Severity',
-            })}
+            label={translations.SEVERITY_LABEL}
           >
             <EuiSelect
               fullWidth
@@ -289,12 +261,22 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            label={i18n.translate(
-              'xpack.stackConnectors.components.tehhive.eventActionSelectFieldLabel',
-              {
-                defaultMessage: 'Tags',
-              }
-            )}
+            error={errors.tlp}
+            label={translations.TLP_LABEL}>
+            <EuiSelect
+              fullWidth
+              value={tlp}
+              data-test-subj="eventTlpSelect"
+              options={tlpOptions}
+              onChange={(e) => {
+                editSubActionProperty('tlp', parseInt(e.target.value));
+                setTlp(parseInt(e.target.value));
+              }}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            label={translations.TAGS_LABEL}
           >
             <EuiComboBox
               fullWidth
@@ -313,12 +295,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             messageVariables={messageVariables}
             paramsProperty={'comments'}
             inputTargetValue={comments && comments.length > 0 ? comments[0].comment : undefined}
-            label={i18n.translate(
-              'xpack.stackConnectors.components.thehive.commentsTextAreaFieldLabel',
-              {
-                defaultMessage: 'Additional comments',
-              }
-            )}
+            label={translations.COMMENTS_LABEL}
           />
         </>
         :
@@ -332,9 +309,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['createAlertParam.title'].length > 0 &&
               alert.title !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Title',
-            })}
+            label={translations.TITLE_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -361,9 +336,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['createAlertParam.description'].length > 0 &&
               alert.description !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Description',
-            })}
+            label={translations.DESCRIPTION_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -389,9 +362,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['createAlertParam.type'].length > 0 &&
               alert.type !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Type',
-            })}
+            label={translations.TYPE_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -417,9 +388,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['createAlertParam.source'].length > 0 &&
               alert.source !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Source',
-            })}
+            label={translations.SOURCE_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -445,9 +414,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               errors['createAlertParam.sourceRef'].length > 0 &&
               alert.sourceRef !== undefined
             }
-            label={i18n.translate('xpack.stackConnectors.components.thehive.FieldLabel', {
-              defaultMessage: 'Source Reference',
-            })}
+            label={translations.SOURCE_REF_LABEL}
             labelAppend={
               <EuiText size="xs" color="subdued">
                 Required
@@ -467,25 +434,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.eventTypeFieldLabel', {
-              defaultMessage: 'TLP',
-            })}>
-            <EuiSelect
-              fullWidth
-              data-test-subj="eventTlpSelect"
-              value={tlp}
-              options={tlpOptions}
-              onChange={(e) => {
-                editAction('subActionParams', { ...alert, tlp: parseInt(e.target.value) }, index);
-                setTlp(parseInt(e.target.value));
-              }}
-            />
-          </EuiFormRow>
-          <EuiFormRow
-            fullWidth
-            label={i18n.translate('xpack.stackConnectors.components.thehivesecurity.severityFieldLabel', {
-              defaultMessage: 'Severity',
-            })}
+            label={translations.SEVERITY_LABEL}
           >
             <EuiSelect
               fullWidth
@@ -500,12 +449,21 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           </EuiFormRow>
           <EuiFormRow
             fullWidth
-            label={i18n.translate(
-              'xpack.stackConnectors.components.thehive.eventActionSelectFieldLabel',
-              {
-                defaultMessage: 'Tags',
-              }
-            )}
+            label={translations.TLP_LABEL}>
+            <EuiSelect
+              fullWidth
+              data-test-subj="eventTlpSelect"
+              value={tlp}
+              options={tlpOptions}
+              onChange={(e) => {
+                editAction('subActionParams', { ...alert, tlp: parseInt(e.target.value) }, index);
+                setTlp(parseInt(e.target.value));
+              }}
+            />
+          </EuiFormRow>
+          <EuiFormRow
+            fullWidth
+            label={translations.TAGS_LABEL}
           >
             <EuiComboBox
               fullWidth

@@ -30,3 +30,9 @@ export interface ExternalServiceIncidentResponse {
   url: string;
   pushedDate: string;
 }
+
+export interface ExternalServiceCommentResponse {
+  commentId: string;
+  pushedDate: string;
+  externalCommentId?: string;
+}

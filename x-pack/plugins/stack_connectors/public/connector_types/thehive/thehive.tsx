@@ -38,53 +38,36 @@ export function getConnectorType(): TheHiveConnector {
       const validationResult = {
         errors,
       };
-      if (actionParams.subAction === SUB_ACTION.PUSH_TO_SERVICE) {
-        const pushToServiceParam = actionParams.subActionParams as ExecutorSubActionPushParams;
-        if (
-          pushToServiceParam &&
-          pushToServiceParam.incident &&
-          !pushToServiceParam.incident.title?.length
-        ) {
-          errors['pushToServiceParam.incident.title'].push(translations.TITLE_REQUIRED);
+
+      const { subAction, subActionParams } = actionParams;
+      if (subAction === SUB_ACTION.PUSH_TO_SERVICE) {
+        const pushToServiceParam = subActionParams as ExecutorSubActionPushParams;
+        if (pushToServiceParam && pushToServiceParam.incident) {
+          if (!pushToServiceParam.incident.title?.length) {
+            errors['pushToServiceParam.incident.title'].push(translations.TITLE_REQUIRED);
+          }
+          if (!pushToServiceParam.incident.description?.length) {
+            errors['pushToServiceParam.incident.description'].push(translations.DESCRIPTION_REQUIRED);
+          }
         }
-        if (
-          pushToServiceParam &&
-          pushToServiceParam.incident &&
-          !pushToServiceParam.incident.description?.length
-        ) {
-          errors['pushToServiceParam.incident.description'].push(translations.DESCRIPTION_REQUIRED);
-        }
-      } else {
-        const createAlertParam = actionParams.subActionParams as ExecutorSubActionCreateAlertParams;
-        if (
-          createAlertParam &&
-          !createAlertParam.title?.length
-        ) {
-          errors['createAlertParam.title'].push(translations.TITLE_REQUIRED);
-        }
-        if (
-          createAlertParam &&
-          !createAlertParam.description?.length
-        ) {
-          errors['createAlertParam.description'].push(translations.DESCRIPTION_REQUIRED);
-        }
-        if (
-          createAlertParam &&
-          !createAlertParam.type?.length
-        ) {
-          errors['createAlertParam.type'].push(translations.TYPE_REQUIRED);
-        }
-        if (
-          createAlertParam &&
-          !createAlertParam.source?.length
-        ) {
-          errors['createAlertParam.source'].push(translations.SOURCE_REQUIRED);
-        }
-        if (
-          createAlertParam &&
-          !createAlertParam.sourceRef?.length
-        ) {
-          errors['createAlertParam.sourceRef'].push(translations.SOURCE_REF_REQUIRED);
+      } else if (subAction === SUB_ACTION.CREATE_ALERT) {
+        const createAlertParam = subActionParams as ExecutorSubActionCreateAlertParams;
+        if (createAlertParam) {
+          if (!createAlertParam.title?.length) {
+            errors['createAlertParam.title'].push(translations.TITLE_REQUIRED);
+          }
+          if (!createAlertParam.description?.length) {
+            errors['createAlertParam.description'].push(translations.DESCRIPTION_REQUIRED);
+          }
+          if (!createAlertParam.type?.length) {
+            errors['createAlertParam.type'].push(translations.TYPE_REQUIRED);
+          }
+          if (!createAlertParam.source?.length) {
+            errors['createAlertParam.source'].push(translations.SOURCE_REQUIRED);
+          }
+          if (!createAlertParam.sourceRef?.length) {
+            errors['createAlertParam.sourceRef'].push(translations.SOURCE_REF_REQUIRED);
+          }
         }
       }
 

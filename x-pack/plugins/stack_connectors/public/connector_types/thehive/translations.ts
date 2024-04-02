@@ -7,24 +7,94 @@
 
 import { i18n } from '@kbn/i18n';
 
-export const THEHIVE_URL_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.inputFieldLabel',
+export const URL_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.urlFieldLabel',
   {
     defaultMessage: 'URL',
   }
 );
 
-export const ORG_NAME_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.inputFieldLabel',
+export const ORGANISATION_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.organisationFieldLabel',
   {
     defaultMessage: 'Organisation',
   }
 );
 
-export const THEHIVE_TOKEN_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.tokenFieldLabel',
+export const API_KEY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.apiKeyFieldLabel',
   {
     defaultMessage: 'API Key',
+  }
+);
+
+export const EVENT_ACTION_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.eventActionSelectFieldLabel',
+  {
+    defaultMessage: 'Event Action',
+  }
+);
+
+export const TITLE_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.titleFieldLabel',
+  {
+    defaultMessage: 'Title',
+  }
+);
+
+export const DESCRIPTION_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.descriptionFieldLabel',
+  {
+    defaultMessage: 'Description',
+  }
+);
+
+export const TLP_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.tlpSelectFieldLabel',
+  {
+    defaultMessage: 'TLP',
+  }
+);
+
+export const SEVERITY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.severitySelectFieldLabel',
+  {
+    defaultMessage: 'Severity',
+  }
+);
+
+export const TAGS_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.TagsMultiSelectFieldLabel',
+  {
+    defaultMessage: 'Tags',
+  }
+);
+
+export const COMMENTS_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.commentsTextAreaFieldLabel',
+  {
+    defaultMessage: 'Additional comments',
+  }
+);
+
+export const TYPE_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.typeFieldLabel',
+  {
+    defaultMessage: 'Type',
+  }
+);
+
+export const SOURCE_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.sourceFieldLabel',
+  {
+    defaultMessage: 'Source',
+  }
+);
+
+export const SOURCE_REF_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.sourceRefFieldLabel',
+  {
+    defaultMessage: 'Source Reference',
   }
 );
 
@@ -59,6 +129,6 @@ export const SOURCE_REQUIRED = i18n.translate(
 export const SOURCE_REF_REQUIRED = i18n.translate(
   'xpack.stackConnectors.components.thehive.requiredSourceRefText',
   {
-    defaultMessage: 'SourceRef is required.',
+    defaultMessage: 'Source Reference is required.',
   }
 );

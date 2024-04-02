@@ -19,17 +19,19 @@ import type {
   TheHiveConfig,
   TheHiveSecrets,
   ExecutorSubActionPushParams,
-  ExternalServiceIncidentResponse,
   ExecutorSubActionCreateAlertParams,
   TheHiveFailureResponse,
+  ExternalServiceIncidentResponse,
+  ExternalServiceCommentResponse,
 } from '../../../common/thehive/types';
 
 export const API_VERSION = 'v1';
 
 export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecrets> {
-  private url;
-  private api_token;
-  private organisation;
+  private url: string;
+  private api_key: string;
+  private organisation: string | null;
+  private urlWithoutTrailingSlash: string;
 
   constructor(params: ServiceParams<TheHiveConfig, TheHiveSecrets>) {
     super(params);
@@ -42,7 +44,8 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
 
     this.url = this.config.url;
     this.organisation = this.config.organisation;
-    this.api_token = this.secrets.api_token;
+    this.api_key = this.secrets.api_key;
+    this.urlWithoutTrailingSlash = this.url.endsWith('/') ? this.url.slice(0, -1) : this.url;
   }
 
   protected getResponseErrorMessage(error: AxiosError<TheHiveFailureResponse>): string {
@@ -57,15 +60,15 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
       method: 'post',
       url: `${this.url}/api/${API_VERSION}/case`,
       data: incident,
-      headers: { Authorization: `Bearer ${this.api_token}`, 'X-Organisation': this.organisation },
+      headers: { Authorization: `Bearer ${this.api_key}`, 'X-Organisation': this.organisation },
       responseSchema: TheHiveIncidentResponseSchema,
     });
 
     return {
       id: res.data._id,
       title: res.data.title,
-      url: `${res.config.baseURL}/cases/${res.data._id}`,
-      pushedDate: res.data._createdAt.toString(),
+      url: `${this.urlWithoutTrailingSlash}/cases/${res.data._id}/details`,
+      pushedDate: new Date(res.data._createdAt).toISOString(),
     };
   }
 
@@ -75,20 +78,19 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
   }: {
     incidentId: string;
     comment: string;
-  }): Promise<ExternalServiceIncidentResponse> {
+  }): Promise<ExternalServiceCommentResponse> {
     const res = await this.request({
       method: 'post',
       url: `${this.url}/api/${API_VERSION}/case/${incidentId}/comment`,
       data: { message: comment },
-      headers: { Authorization: `Bearer ${this.api_token}`, 'X-Organisation': this.organisation },
+      headers: { Authorization: `Bearer ${this.api_key}`, 'X-Organisation': this.organisation },
       responseSchema: TheHiveAddCommentResponseSchema,
     });
 
     return {
-      id: res.data._id,
-      title: res.data.message,
-      url: `${res.config.baseURL}/cases/${res.data._id}`,
-      pushedDate: res.data.createdAt.toString(),
+      commentId: res.data._id,
+      externalCommentId: res.data._id,
+      pushedDate: new Date(res.data.createdAt).toISOString(),
     };
   }
 
@@ -99,18 +101,18 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
     incidentId: string;
     incident: ExecutorSubActionPushParams["incident"];
   }): Promise<ExternalServiceIncidentResponse> {
-    const res = await this.request({
+    await this.request({
       method: 'patch',
       url: `${this.url}/api/${API_VERSION}/case/${incidentId}`,
       data: incident,
-      headers: { Authorization: `Bearer ${this.api_token}`, 'X-Organisation': this.organisation },
+      headers: { Authorization: `Bearer ${this.api_key}`, 'X-Organisation': this.organisation },
       responseSchema: schema.any(),
     });
 
     return {
       id: incidentId,
       title: incident.title,
-      url: `${res.config.baseURL}/cases/${incidentId}`,
+      url: `${this.urlWithoutTrailingSlash}/cases/${incidentId}/details`,
       pushedDate: new Date().toISOString(),
     };
   }
@@ -118,15 +120,15 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
   public async getIncident({ id }: { id: string }): Promise<ExternalServiceIncidentResponse> {
     const res = await this.request({
       url: `${this.url}/api/${API_VERSION}/case/${id}`,
-      headers: { Authorization: `Bearer ${this.api_token}`, 'X-Organisation': this.organisation },
+      headers: { Authorization: `Bearer ${this.api_key}`, 'X-Organisation': this.organisation },
       responseSchema: TheHiveIncidentResponseSchema,
     });
 
     return {
       id: res.data._id,
       title: res.data.title,
-      url: `${res.config.baseURL}/cases/${res.data._id}`,
-      pushedDate: res.data._createdAt.toString(),
+      url: `${this.urlWithoutTrailingSlash}/cases/${res.data._id}/details`,
+      pushedDate: new Date().toISOString(),
     };
   }
 
@@ -135,7 +137,7 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
       method: 'post',
       url: `${this.url}/api/${API_VERSION}/alert`,
       data: alert,
-      headers: { Authorization: `Bearer ${this.api_token}`, 'X-Organisation': this.organisation },
+      headers: { Authorization: `Bearer ${this.api_key}`, 'X-Organisation': this.organisation },
       responseSchema: TheHiveCreateAlertResponseSchema,
     });
   }
