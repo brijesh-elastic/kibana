@@ -54,6 +54,7 @@ const enabledActionTypes = [
   SENTINELONE_CONNECTOR_ID,
   '.slack',
   '.slack_api',
+  '.thehive',
   '.tines',
   '.webhook',
   '.xmatters',
@@ -120,14 +121,14 @@ export function createTestConfig(name: string, options: CreateTestConfigOptions)
     const proxyHosts = ['localhost', 'some.non.existent.com'];
     const actionsProxyUrl = options.enableActionsProxy
       ? [
-          `--xpack.actions.proxyUrl=http://localhost:${proxyPort}`,
-          `--xpack.actions.proxyOnlyHosts=${JSON.stringify(proxyHosts)}`,
-          '--xpack.actions.proxyRejectUnauthorizedCertificates=false',
-        ]
+        `--xpack.actions.proxyUrl=http://localhost:${proxyPort}`,
+        `--xpack.actions.proxyOnlyHosts=${JSON.stringify(proxyHosts)}`,
+        '--xpack.actions.proxyRejectUnauthorizedCertificates=false',
+      ]
       : [
-          `--xpack.actions.proxyUrl=http://elastic.co`,
-          `--xpack.actions.proxyBypassHosts=${JSON.stringify(proxyHosts)}`,
-        ];
+        `--xpack.actions.proxyUrl=http://elastic.co`,
+        `--xpack.actions.proxyBypassHosts=${JSON.stringify(proxyHosts)}`,
+      ];
 
     // set up custom host settings for webhook ports; don't set one for noCustom
     const customHostSettingsValue = [
@@ -177,8 +178,7 @@ export function createTestConfig(name: string, options: CreateTestConfigOptions)
         ssl,
         serverArgs: [
           `xpack.license.self_generated.type=${license}`,
-          `xpack.security.enabled=${
-            !disabledPlugins.includes('security') && ['trial', 'basic'].includes(license)
+          `xpack.security.enabled=${!disabledPlugins.includes('security') && ['trial', 'basic'].includes(license)
           }`,
         ],
       },
@@ -341,9 +341,9 @@ export function createTestConfig(name: string, options: CreateTestConfigOptions)
           `--server.xsrf.allowlist=${JSON.stringify(getAllExternalServiceSimulatorPaths())}`,
           ...(ssl
             ? [
-                `--elasticsearch.hosts=${servers.elasticsearch.protocol}://${servers.elasticsearch.hostname}:${servers.elasticsearch.port}`,
-                `--elasticsearch.ssl.certificateAuthorities=${CA_CERT_PATH}`,
-              ]
+              `--elasticsearch.hosts=${servers.elasticsearch.protocol}://${servers.elasticsearch.hostname}:${servers.elasticsearch.port}`,
+              `--elasticsearch.ssl.certificateAuthorities=${CA_CERT_PATH}`,
+            ]
             : []),
           '--notifications.connectors.default.email=notification-email',
           '--xpack.task_manager.allow_reading_invalid_state=false',

@@ -29,6 +29,7 @@ export default function createRegisteredConnectorTypeTests({ getService }: FtrPr
       ).to.eql(
         [
           '.d3security',
+          '.thehive',
           '.email',
           '.index',
           '.pagerduty',
