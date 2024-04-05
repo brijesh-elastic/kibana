@@ -6,8 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { ActionParamsProps, TextAreaWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public';
-import { TextFieldWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public'
+import { ActionParamsProps, TextAreaWithMessageVariables, TextFieldWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public';
 import { SUB_ACTION } from '../../../common/thehive/constants';
 import { eventActionOptions, severityOptions, tlpOptions } from './constants';
 import { ExecutorParams, ExecutorSubActionPushParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
@@ -27,7 +26,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   errors,
   messageVariables
 }) => {
-  const [eventAction, setEventAction] = useState('case');
+  const [eventAction, setEventAction] = useState(actionParams.subAction ?? SUB_ACTION.PUSH_TO_SERVICE);
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>([]);
   const [isInvalid, setInvalid] = useState(false);
   const [severity, setSeverity] = useState(severityOptions[1].value);
@@ -75,18 +74,16 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   }, [actionParams]);
 
   useEffect(() => {
-    const subAction =
-      eventAction === 'alert' ? SUB_ACTION.CREATE_ALERT : SUB_ACTION.PUSH_TO_SERVICE;
-    editAction('subAction', subAction, index);
+    editAction('subAction', eventAction, index);
     setSelected([]);
     setInvalid(false);
     setSeverity(severityOptions[1].value);
     setTlp(tlpOptions[2].value);
   }, [eventAction]);
 
-  const setEventActionType = (eventActionType: string) => {
+  const setEventActionType = (eventActionType: SUB_ACTION) => {
     const subActionParams =
-      eventActionType === 'alert'
+      eventActionType === SUB_ACTION.CREATE_ALERT
         ? {
           tlp: 2,
           severity: 2,
@@ -154,7 +151,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
 
-    if (eventAction === 'case') {
+    if (eventAction === SUB_ACTION.PUSH_TO_SERVICE) {
       editSubActionProperty('tags', [...incident.tags ?? [], searchValue])
     } else {
       editAction('subActionParams', { ...alert, tags: [...alert.tags ?? [], searchValue] }, index);
@@ -170,7 +167,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
 
   const onChange = (selectedOptions: Array<{ label: string }>) => {
     setSelected(selectedOptions);
-    if (eventAction === 'case') {
+    if (eventAction === SUB_ACTION.PUSH_TO_SERVICE) {
       editSubActionProperty('tags', selectedOptions.map((option) => option.label));
     } else {
       editAction('subActionParams', { ...alert, tags: selectedOptions.map((option) => option.label) }, index);
@@ -188,10 +185,10 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           data-test-subj="eventActionSelect"
           options={eventActionOptions}
           value={eventAction}
-          onChange={(e) => setEventActionType(e.target.value)}
+          onChange={(e) => setEventActionType(e.target.value as SUB_ACTION)}
         />
       </EuiFormRow>
-      {eventAction === 'case' ?
+      {eventAction === SUB_ACTION.PUSH_TO_SERVICE ?
         <>
           <EuiFormRow
             data-test-subj="title-row"
@@ -212,7 +209,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <TextFieldWithMessageVariables
               index={index}
               editAction={editSubActionProperty}
-              messageVariables={messageVariables}
               paramsProperty={'title'}
               inputTargetValue={incident.title ?? undefined}
               errors={errors['pushToServiceParam.incident.title'] as string[]}
@@ -237,7 +233,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <TextFieldWithMessageVariables
               index={index}
               editAction={editSubActionProperty}
-              messageVariables={messageVariables}
               paramsProperty={'description'}
               inputTargetValue={incident.description ?? undefined}
               errors={errors['pushToServiceParam.incident.description'] as string[]}
@@ -279,6 +274,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             label={translations.TAGS_LABEL}
           >
             <EuiComboBox
+              data-test-subj="eventTags"
               fullWidth
               options={[]}
               placeholder="Tags"
@@ -290,6 +286,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             />
           </EuiFormRow>
           <TextAreaWithMessageVariables
+            data-test-subj="comment"
             index={index}
             editAction={editComment}
             messageVariables={messageVariables}
@@ -301,7 +298,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
         :
         <>
           <EuiFormRow
-            data-test-subj="title-row"
+            data-test-subj="alert-title-row"
             fullWidth
             error={errors['createAlertParam.title']}
             isInvalid={
@@ -321,14 +318,13 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'title'}
               inputTargetValue={alert.title ?? undefined}
               errors={errors['createAlertParam.title'] as string[]}
             />
           </EuiFormRow>
           <EuiFormRow
-            data-test-subj="description-row"
+            data-test-subj="alert-description-row"
             fullWidth
             error={errors['createAlertParam.description']}
             isInvalid={
@@ -348,13 +344,13 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'description'}
               inputTargetValue={alert.description ?? undefined}
               errors={errors['createAlertParam.description'] as string[]}
             />
           </EuiFormRow>
           <EuiFormRow
+            data-test-subj="alert-type-row"
             fullWidth
             error={errors['createAlertParam.type']}
             isInvalid={
@@ -374,13 +370,13 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'type'}
               inputTargetValue={alert.type ?? undefined}
               errors={(errors['createAlertParam.type'] ?? []) as string[]}
             />
           </EuiFormRow>
           <EuiFormRow
+            data-test-subj="alert-source-row"
             fullWidth
             error={errors['createAlertParam.source']}
             isInvalid={
@@ -400,13 +396,13 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'source'}
               inputTargetValue={alert.source ?? undefined}
               errors={(errors['createAlertParam.source'] ?? []) as string[]}
             />
           </EuiFormRow>
           <EuiFormRow
+            data-test-subj="alert-sourceRef-row"
             fullWidth
             error={errors['createAlertParam.sourceRef']}
             isInvalid={
@@ -438,7 +434,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           >
             <EuiSelect
               fullWidth
-              data-test-subj="eventSeveritySelect"
+              data-test-subj="alert-eventSeveritySelect"
               value={severity}
               options={severityOptions}
               onChange={(e) => {
@@ -452,7 +448,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             label={translations.TLP_LABEL}>
             <EuiSelect
               fullWidth
-              data-test-subj="eventTlpSelect"
+              data-test-subj="alert-eventTlpSelect"
               value={tlp}
               options={tlpOptions}
               onChange={(e) => {
@@ -466,6 +462,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             label={translations.TAGS_LABEL}
           >
             <EuiComboBox
+              data-test-subj="alert-eventTags"
               fullWidth
               options={[]}
               placeholder="Tags"
