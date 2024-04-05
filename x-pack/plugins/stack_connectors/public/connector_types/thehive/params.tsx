@@ -6,8 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { ActionParamsProps, TextAreaWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public';
-import { TextFieldWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public'
+import { ActionParamsProps, TextAreaWithMessageVariables, TextFieldWithMessageVariables } from '@kbn/triggers-actions-ui-plugin/public';
 import { SUB_ACTION } from '../../../common/thehive/constants';
 import { eventActionOptions, severityOptions, tlpOptions } from './constants';
 import { ExecutorParams, ExecutorSubActionPushParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
@@ -210,7 +209,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <TextFieldWithMessageVariables
               index={index}
               editAction={editSubActionProperty}
-              messageVariables={messageVariables}
               paramsProperty={'title'}
               inputTargetValue={incident.title ?? undefined}
               errors={errors['pushToServiceParam.incident.title'] as string[]}
@@ -235,7 +233,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             <TextFieldWithMessageVariables
               index={index}
               editAction={editSubActionProperty}
-              messageVariables={messageVariables}
               paramsProperty={'description'}
               inputTargetValue={incident.description ?? undefined}
               errors={errors['pushToServiceParam.incident.description'] as string[]}
@@ -321,7 +318,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'title'}
               inputTargetValue={alert.title ?? undefined}
               errors={errors['createAlertParam.title'] as string[]}
@@ -348,7 +344,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'description'}
               inputTargetValue={alert.description ?? undefined}
               errors={errors['createAlertParam.description'] as string[]}
@@ -375,7 +370,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'type'}
               inputTargetValue={alert.type ?? undefined}
               errors={(errors['createAlertParam.type'] ?? []) as string[]}
@@ -402,7 +396,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
               editAction={(key, value) => {
                 editAction('subActionParams', { ...alert, [key]: value }, index);
               }}
-              messageVariables={messageVariables}
               paramsProperty={'source'}
               inputTargetValue={alert.source ?? undefined}
               errors={(errors['createAlertParam.source'] ?? []) as string[]}

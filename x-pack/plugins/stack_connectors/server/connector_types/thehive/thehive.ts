@@ -64,8 +64,6 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
       responseSchema: TheHiveIncidentResponseSchema,
     });
 
-    console.log(incident);
-
     return {
       id: res.data._id,
       title: res.data.title,
