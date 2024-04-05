@@ -18,7 +18,7 @@ describe('TheHiveActionConnectorFields renders', () => {
   test('TheHive connector fields are rendered', () => {
     const actionConnector = {
       actionTypeId: '.thehive',
-      name: 'theHive',
+      name: 'thehive',
       config: {
         url: 'https://test.com',
       },
@@ -57,7 +57,7 @@ describe('TheHiveActionConnectorFields renders', () => {
     it('connector validation succeeds when connector config is valid', async () => {
       const actionConnector = {
         actionTypeId: '.thehive',
-        name: 'theHive',
+        name: 'thehive',
         config: {
           url: 'https://test.com',
         },
@@ -85,7 +85,7 @@ describe('TheHiveActionConnectorFields renders', () => {
         expect(onSubmit).toBeCalledWith({
           data: {
             actionTypeId: '.thehive',
-            name: 'theHive',
+            name: 'thehive',
             config: {
               url: 'https://test.com',
             },
@@ -102,7 +102,7 @@ describe('TheHiveActionConnectorFields renders', () => {
     it.each(tests)('validates correctly %p', async (field, value) => {
       const actionConnector = {
         actionTypeId: '.thehive',
-        name: 'theHive',
+        name: 'thehive',
         config: {
           url: 'https://test.com',
         },
