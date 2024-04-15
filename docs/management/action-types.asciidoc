@@ -77,7 +77,7 @@ a| <<swimlane-action-type,{swimlane}>>
 
 a| <<thehive-action-type,{thehive}>>
 
-| Create a Case and Alert in {thehive}.
+| Create cases and alerts in {thehive}.
 
 a| <<tines-action-type,Tines>>
 
