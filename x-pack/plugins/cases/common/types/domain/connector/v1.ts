@@ -21,7 +21,7 @@ export enum ConnectorTypes {
   serviceNowITSM = '.servicenow',
   serviceNowSIR = '.servicenow-sir',
   swimlane = '.swimlane',
-  thehive = '.thehive',
+  theHive = '.thehive',
 }
 
 const ConnectorCasesWebhookTypeFieldsRt = rt.strict({
@@ -130,7 +130,7 @@ export const TheHiveFieldsRt = rt.strict({
 export type TheHiveFieldsType = rt.TypeOf<typeof TheHiveFieldsRt>;
 
 const ConnectorTheHiveTypeFieldsRt = rt.strict({
-  type: rt.literal(ConnectorTypes.thehive),
+  type: rt.literal(ConnectorTypes.theHive),
   fields: rt.union([TheHiveFieldsRt, rt.null]),
 });
 

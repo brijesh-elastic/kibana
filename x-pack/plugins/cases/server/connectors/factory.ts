@@ -21,7 +21,7 @@ const mapping: Record<ConnectorTypes, ICasesConnector | null> = {
   [ConnectorTypes.serviceNowSIR]: getServiceNowSIRCaseConnector(),
   [ConnectorTypes.resilient]: getResilientCaseConnector(),
   [ConnectorTypes.swimlane]: getSwimlaneCaseConnector(),
-  [ConnectorTypes.thehive]: getTheHiveCaseConnector(),
+  [ConnectorTypes.theHive]: getTheHiveCaseConnector(),
   [ConnectorTypes.none]: null,
 };
 
