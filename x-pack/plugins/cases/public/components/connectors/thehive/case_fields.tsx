@@ -9,7 +9,6 @@ import React from 'react';
 import { SelectField } from '@kbn/es-ui-shared-plugin/static/forms/components';
 import { UseField } from '@kbn/es-ui-shared-plugin/static/forms/hook_form_lib';
 import { fieldValidators } from '@kbn/es-ui-shared-plugin/static/forms/helpers';
-
 import type { ConnectorFieldsProps } from '../types';
 import * as i18n from './translations';
 import { TheHiveTLP } from './types';
@@ -56,7 +55,7 @@ const TheHiveFieldsComponent: React.FunctionComponent<ConnectorFieldsProps> = ()
         }}
         componentProps={{
           euiFieldProps: {
-            'data-test-subj': 'tlpSelect',
+            'data-test-subj': 'tlp-field',
             options: tlpOptions,
             fullWidth: true,
             hasNoInitialSelection: true,

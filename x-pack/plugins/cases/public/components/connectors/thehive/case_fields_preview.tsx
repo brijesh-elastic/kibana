@@ -49,7 +49,7 @@ const TheHiveFieldsPreviewComponent: React.FunctionComponent<
 
   return (
     <ConnectorCard
-      connectorType={ConnectorTypes.thehive}
+      connectorType={ConnectorTypes.theHive}
       isLoading={false}
       listItems={listItems}
       title={connector.name}
