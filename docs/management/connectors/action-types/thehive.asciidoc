@@ -8,7 +8,7 @@
 :frontmatter-tags-content-type: [how-to]
 :frontmatter-tags-user-goals: [configure]
 
-TheHive connector uses the https://docs.strangebee.com/thehive/api-docs/[TheHive (v1) REST API] to create cases and alerts in TheHive.
+TheHive connector uses the https://docs.strangebee.com/thehive/api-docs/[TheHive (v1) REST API] to create cases and alerts.
 
 [float]
 [[define-thehive-ui]]
