@@ -43,6 +43,7 @@ export default function createRegisteredConnectorTypeTests({ getService }: FtrPr
           '.servicenow-sir',
           '.servicenow-itom',
           '.jira',
+          '.observability-ai-assistant',
           '.resilient',
           '.teams',
           '.thehive',
@@ -52,6 +53,7 @@ export default function createRegisteredConnectorTypeTests({ getService }: FtrPr
           '.gen-ai',
           '.bedrock',
           '.sentinelone',
+          '.cases',
         ].sort()
       );
     });
