@@ -28,7 +28,7 @@ image::management/connectors/images/thehive-connector.png[TheHive connector]
 TheHive connectors have the following configuration properties:
 
 Name::         The name of the connector.
-Organisation:: Organisation name of the user.
+Organisation:: Organisation name in which user intends to create cases or alerts.
 URL::          TheHive instance URL.
 API Key::      TheHive API key for authentication.
 
@@ -64,3 +64,15 @@ Source Reference:: Source reference of the Alert.
 === Connector networking configuration
 
 Use the <<action-settings, Action configuration settings>> to customize connector networking configurations, such as proxies, certificates, or TLS settings. You can set configurations that apply to all your connectors or use `xpack.actions.customHostSettings` to set per-host configurations.
+
+[float]
+[[configure-thehive]]
+=== Configure TheHive
+
+To generate an API Key in TheHive:
+
+1. Log in to your TheHive instance.
+2. Open profile tab and select the settings.
+3. Go to *API Key*.
+4. Click *Create* if no API key has been created previously; otherwise, you can view the API key by clicking on *Reveal*.
+5. Copy the *API key* value to configure the connector in {kib}.
