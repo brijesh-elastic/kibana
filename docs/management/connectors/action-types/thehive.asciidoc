@@ -49,12 +49,13 @@ image::management/connectors/images/thehive-params-alert-test.png[TheHive alert 
 
 TheHive actions have the following configuration properties.
 
+EventAction:: Action that will be performed in thehive. Supported actions are Create Case (default) and Create Alert.
 Title:: Title of the incident.
 Description:: The details about the incident.
 Severity:: Severity of the incident. This can be one of `LOW`, `MEDIUM`(default), `HIGH` or `CRITICAL`.
 TLP:: Traffic Light Protocol designation for the incident. This can be one of `CLEAR`, `GREEN`, `AMBER`(default), `AMBER+STRICT` or `RED`.
 Tags:: The keywords or tags about the incident.
-Additional comments:: Additional information about the incident. 
+Additional comments:: Additional information about the Case. 
 Type:: Type of the Alert.
 Source:: Source of the Alert.
 Source Reference:: Source reference of the Alert.

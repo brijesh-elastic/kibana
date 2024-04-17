@@ -16,7 +16,7 @@ import { FtrProviderContext } from '../../../../../common/ftr_provider_context';
 const connectorTypeId = '.thehive';
 const name = 'TheHive action';
 const secrets = {
-    api_key: 'token12345',
+    apiKey: 'token12345',
 };
 
 // eslint-disable-next-line import/no-default-export
@@ -164,7 +164,7 @@ export default function theHiveTest({ getService }: FtrProviderContext) {
                             statusCode: 400,
                             error: 'Bad Request',
                             message:
-                                'error validating action type secrets: [api_key]: expected value of type [string] but got [undefined]',
+                                'error validating action type secrets: [apiKey]: expected value of type [string] but got [undefined]',
                         });
                     });
             });
