@@ -71,6 +71,7 @@ describe('TheHiveParamsFields renders', () => {
         tlp: 2,
         severity: 2,
         tags: [],
+        sourceRef: '{{alert.uuid}}',
       },
       0
     );

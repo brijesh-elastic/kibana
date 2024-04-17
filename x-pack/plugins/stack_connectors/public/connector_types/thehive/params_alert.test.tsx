@@ -12,7 +12,6 @@ import { TheHiveParamsAlertFields } from './params_alert';
 import { SUB_ACTION } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 
-
 describe('TheHiveParamsFields renders', () => {
   const subActionParams: ExecutorSubActionCreateAlertParams = {
     title: 'title {test}',

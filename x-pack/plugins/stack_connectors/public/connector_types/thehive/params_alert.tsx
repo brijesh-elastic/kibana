@@ -44,12 +44,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
     editAction('subActionParams', { ...alert, tags: [...alert.tags ?? [], searchValue] }, index);
   };
 
-  const onSearchChange = (searchValue: string) => {
-    if (!searchValue) {
-      return;
-    }
-  };
-
   const onChange = (selectedOptions: Array<{ label: string }>) => {
     setSelected(selectedOptions);
     editAction('subActionParams', { ...alert, tags: selectedOptions.map((option) => option.label) }, index);
@@ -229,7 +223,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           selectedOptions={selectedOptions}
           onCreateOption={onCreateOption}
           onChange={onChange}
-          onSearchChange={onSearchChange}
         />
       </EuiFormRow>
     </>

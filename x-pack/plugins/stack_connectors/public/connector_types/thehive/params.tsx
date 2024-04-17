@@ -5,8 +5,8 @@
  * 2.0.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { ActionParamsProps } from '@kbn/triggers-actions-ui-plugin/public';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { ActionParamsProps, ActionConnectorMode } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, } from '@elastic/eui';
 import { eventActionOptions } from './constants';
 import { SUB_ACTION } from '../../../common/thehive/constants';
@@ -21,10 +21,12 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   editAction,
   index,
   errors,
-  messageVariables
+  messageVariables,
+  executionMode
 }) => {
   const [eventAction, setEventAction] = useState(actionParams.subAction ?? SUB_ACTION.PUSH_TO_SERVICE);
   const actionConnectorRef = useRef(actionConnector?.id ?? '');
+  const isTest = useMemo(() => executionMode === ActionConnectorMode.Test, [executionMode]);
 
   useEffect(() => {
     if (actionConnector != null && actionConnectorRef.current !== actionConnector.id) {
@@ -77,6 +79,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           tlp: 2,
           severity: 2,
           tags: [],
+          sourceRef: isTest ? undefined : '{{alert.uuid}}',
         }
         : {
           incident: {

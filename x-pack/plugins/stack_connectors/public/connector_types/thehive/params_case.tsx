@@ -27,7 +27,6 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
   const [severity, setSeverity] = useState(severityOptions[1].value);
   const [tlp, setTlp] = useState(tlpOptions[2].value);
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>([]);
-  const [isInvalid, setInvalid] = useState(false);
 
   const { incident, comments } = useMemo(
     () =>
@@ -67,13 +66,6 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
     editSubActionProperty('tags', [...incident.tags ?? [], searchValue])
-  };
-
-  const onSearchChange = (searchValue: string) => {
-    if (!searchValue) {
-      setInvalid(false);
-      return;
-    }
   };
 
   const onChange = (selectedOptions: Array<{ label: string }>) => {
@@ -174,8 +166,6 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
           selectedOptions={selectedOptions}
           onCreateOption={onCreateOption}
           onChange={onChange}
-          onSearchChange={onSearchChange}
-          isInvalid={isInvalid}
         />
       </EuiFormRow>
       <TextAreaWithMessageVariables
