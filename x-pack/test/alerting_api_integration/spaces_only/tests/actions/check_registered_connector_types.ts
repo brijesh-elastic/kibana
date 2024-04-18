@@ -54,6 +54,7 @@ export default function createRegisteredConnectorTypeTests({ getService }: FtrPr
           '.bedrock',
           '.sentinelone',
           '.cases',
+          '.crowdstrike',
         ].sort()
       );
     });
