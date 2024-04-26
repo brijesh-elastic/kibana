@@ -108,7 +108,7 @@ export const TheHiveIncidentResponseSchema = schema.object(
   { unknowns: 'ignore' }
 );
 
-export const TheHiveUpdateIncidentResponseSchema = schema.never();
+export const TheHiveUpdateIncidentResponseSchema = schema.any();
 
 export const TheHiveAddCommentResponseSchema = schema.object(
   {
