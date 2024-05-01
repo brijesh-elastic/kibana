@@ -9,7 +9,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { TextFieldWithMessageVariables, TextAreaWithMessageVariables, ActionParamsProps } from '@kbn/triggers-actions-ui-plugin/public';
 import { severityOptions, tlpOptions } from './constants';
 import * as translations from './translations';
-import { ExecutorParams, ExecutorSubActionPushParams } from '@kbn/stack-connectors-plugin/common/thehive/types';
+import { ExecutorParams, ExecutorSubActionPushParams } from '../../../common/thehive/types';
 import {
   EuiFormRow,
   EuiSelect,

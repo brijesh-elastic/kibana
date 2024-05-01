@@ -36,6 +36,14 @@ export const ExecutorSubActionPushParamsSchema = schema.object({
   ),
 });
 
+export const PushToServiceIncidentSchema = {
+  title: schema.string(),
+  description: schema.string(),
+  severity: schema.nullable(schema.number()),
+  tlp: schema.nullable(schema.number()),
+  tags: schema.nullable(schema.arrayOf(schema.string())),
+};
+
 export const ExecutorSubActionGetIncidentParamsSchema = schema.object({
   externalId: schema.string(),
 });
