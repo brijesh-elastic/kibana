@@ -13,7 +13,6 @@ import { ExecutorParams, ExecutorSubActionPushParams } from '../../../common/the
 import {
   EuiFormRow,
   EuiSelect,
-  EuiText,
   EuiComboBox,
 } from '@elastic/eui';
 
@@ -75,54 +74,34 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
 
   return (
     <>
-      <EuiFormRow
-        data-test-subj="title-row"
-        fullWidth
-        error={errors['pushToServiceParam.incident.title']}
-        isInvalid={
-          errors['pushToServiceParam.incident.title'] !== undefined &&
-          errors['pushToServiceParam.incident.title'].length > 0 &&
-          incident.title !== undefined
-        }
-        label={translations.TITLE_LABEL}
-        labelAppend={
-          <EuiText size="xs" color="subdued">
-            Required
-          </EuiText>
-        }
-      >
-        <TextFieldWithMessageVariables
-          index={index}
-          editAction={editSubActionProperty}
-          paramsProperty={'title'}
-          inputTargetValue={incident.title ?? undefined}
-          errors={errors['pushToServiceParam.incident.title'] as string[]}
-        />
-      </EuiFormRow>
-      <EuiFormRow
-        data-test-subj="description-row"
-        fullWidth
-        error={errors['pushToServiceParam.incident.description']}
-        isInvalid={
-          errors['pushToServiceParam.incident.description'] !== undefined &&
-          errors['pushToServiceParam.incident.description'].length > 0 &&
-          incident.description !== undefined
-        }
+      <TextFieldWithMessageVariables
+        index={index}
+        editAction={editSubActionProperty}
+        messageVariables={messageVariables}
+        paramsProperty={'title'}
+        inputTargetValue={incident.title ?? undefined}
+        wrapField={true}
+        formRowProps={{
+          label: translations.TITLE_LABEL,
+          fullWidth: true,
+          helpText: "",
+          isInvalid:
+            errors['pushToServiceParam.incident.title'] !== undefined &&
+            errors['pushToServiceParam.incident.title'].length > 0 &&
+            incident.title !== undefined,
+          error: errors['pushToServiceParam.incident.title'] as string,
+        }}
+        errors={errors['pushToServiceParam.incident.title'] as string[]}
+      />
+      <TextAreaWithMessageVariables
+        index={index}
         label={translations.DESCRIPTION_LABEL}
-        labelAppend={
-          <EuiText size="xs" color="subdued">
-            Required
-          </EuiText>
-        }
-      >
-        <TextFieldWithMessageVariables
-          index={index}
-          editAction={editSubActionProperty}
-          paramsProperty={'description'}
-          inputTargetValue={incident.description ?? undefined}
-          errors={errors['pushToServiceParam.incident.description'] as string[]}
-        />
-      </EuiFormRow>
+        editAction={editSubActionProperty}
+        messageVariables={messageVariables}
+        paramsProperty={'description'}
+        inputTargetValue={incident.description ?? undefined}
+        errors={errors['pushToServiceParam.incident.description'] as string[]}
+      />
       <EuiFormRow
         fullWidth
         error={errors.severity}
@@ -130,7 +109,7 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
       >
         <EuiSelect
           fullWidth
-          data-test-subj="eventSeveritySelect"
+          data-test-subj="severitySelectInput"
           value={severity}
           options={severityOptions}
           onChange={(e) => {
@@ -146,7 +125,7 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
         <EuiSelect
           fullWidth
           value={tlp}
-          data-test-subj="eventTlpSelect"
+          data-test-subj="tlpSelectInput"
           options={tlpOptions}
           onChange={(e) => {
             editSubActionProperty('tlp', parseInt(e.target.value));
@@ -159,9 +138,8 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
         label={translations.TAGS_LABEL}
       >
         <EuiComboBox
-          data-test-subj="eventTags"
+          data-test-subj="tagsInput"
           fullWidth
-          options={[]}
           placeholder="Tags"
           selectedOptions={selectedOptions}
           onCreateOption={onCreateOption}
@@ -169,7 +147,6 @@ export const TheHiveParamsCaseFields: React.FC<ActionParamsProps<ExecutorParams>
         />
       </EuiFormRow>
       <TextAreaWithMessageVariables
-        data-test-subj="comment"
         index={index}
         editAction={editComment}
         messageVariables={messageVariables}
