@@ -16,7 +16,11 @@ import {
 } from '@kbn/actions-plugin/common/types';
 import { urlAllowListValidator } from '@kbn/actions-plugin/server';
 import { TheHiveConnector } from './thehive';
-import { TheHiveConfigSchema, TheHiveSecretsSchema, PushToServiceIncidentSchema } from '../../../common/thehive/schema';
+import {
+  TheHiveConfigSchema,
+  TheHiveSecretsSchema,
+  PushToServiceIncidentSchema,
+} from '../../../common/thehive/schema';
 import { THEHIVE_CONNECTOR_ID, THEHIVE_TITLE } from '../../../common/thehive/constants';
 import { TheHiveConfig, TheHiveSecrets } from '../../../common/thehive/types';
 
@@ -28,7 +32,11 @@ export function getConnectorType(): TheHiveConnectorType {
     minimumLicenseRequired: 'platinum',
     name: THEHIVE_TITLE,
     getService: (params) => new TheHiveConnector(params, PushToServiceIncidentSchema),
-    supportedFeatureIds: [AlertingConnectorFeatureId, SecurityConnectorFeatureId, UptimeConnectorFeatureId],
+    supportedFeatureIds: [
+      AlertingConnectorFeatureId,
+      SecurityConnectorFeatureId,
+      UptimeConnectorFeatureId,
+    ],
     schema: {
       config: TheHiveConfigSchema,
       secrets: TheHiveSecretsSchema,

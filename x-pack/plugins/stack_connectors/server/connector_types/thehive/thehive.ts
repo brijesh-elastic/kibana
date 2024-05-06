@@ -28,13 +28,21 @@ import type {
 
 export const API_VERSION = 'v1';
 
-export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecrets, Incident, GetIncidentResponse> {
+export class TheHiveConnector extends CaseConnector<
+  TheHiveConfig,
+  TheHiveSecrets,
+  Incident,
+  GetIncidentResponse
+> {
   private url: string;
   private apiKey: string;
   private organisation: string | null;
   private urlWithoutTrailingSlash: string;
 
-  constructor(params: ServiceParams<TheHiveConfig, TheHiveSecrets>, pushToServiceParamsExtendedSchema: Record<string, Type<unknown>>) {
+  constructor(
+    params: ServiceParams<TheHiveConfig, TheHiveSecrets>,
+    pushToServiceParamsExtendedSchema: Record<string, Type<unknown>>
+  ) {
     super(params, pushToServiceParamsExtendedSchema);
 
     this.registerSubAction({
@@ -77,13 +85,7 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
     };
   }
 
-  public async addComment({
-    incidentId,
-    comment,
-  }: {
-    incidentId: string;
-    comment: string;
-  }) {
+  public async addComment({ incidentId, comment }: { incidentId: string; comment: string }) {
     await this.request({
       method: 'post',
       url: `${this.url}/api/${API_VERSION}/case/${incidentId}/comment`,
@@ -135,5 +137,4 @@ export class TheHiveConnector extends CaseConnector<TheHiveConfig, TheHiveSecret
       responseSchema: TheHiveCreateAlertResponseSchema,
     });
   }
-
 }
