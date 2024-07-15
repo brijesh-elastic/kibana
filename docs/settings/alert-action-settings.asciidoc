@@ -5,8 +5,8 @@
 ++++
 
 :frontmatter-description: Learn about the settings that affect {kib} {alert-features}.
-:frontmatter-tags-products: [kibana, alerting]
-:frontmatter-tags-content-type: [reference]
+:frontmatter-tags-products: [kibana, alerting] 
+:frontmatter-tags-content-type: [reference] 
 :frontmatter-tags-user-goals: [configure]
 
 Alerting and actions are enabled by default in {kib}, but require you to configure the following:
