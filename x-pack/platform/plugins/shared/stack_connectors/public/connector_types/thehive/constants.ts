@@ -161,19 +161,11 @@ export const testBodyOptions = [
           tags: ['source.ip'],
         },
       ],
-      procedures: [
-        {
-          patternId: 'T1132',
-          occurDate: 1640000000000,
-          tactic: 'command-and-control',
-        },
-      ],
     },
     null,
     2
   ),
   JSON.stringify(
-    // change this template
     {
       observables: [
         {

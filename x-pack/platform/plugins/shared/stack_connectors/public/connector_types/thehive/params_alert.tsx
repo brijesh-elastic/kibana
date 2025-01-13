@@ -207,7 +207,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           onChange={(e) => {
             editAction(
               'subActionParams',
-              { ...alert, body: bodyOptions[parseInt(e.target.value, 10)] },
+              { ...alert, body: testBodyOptions[parseInt(e.target.value, 10)] },
               index
             );
             setTemplate(parseInt(e.target.value, 10));
