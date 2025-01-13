@@ -22,6 +22,26 @@ describe('TheHiveParamsFields renders', () => {
     source: 'source test',
     type: 'sourceType test',
     sourceRef: 'sourceRef test',
+    body: JSON.stringify(
+      {
+        observables: [
+          {
+            dataType: 'ip',
+            data: '127.0.0.1',
+            tags: ['source.ip'],
+          },
+        ],
+        procedures: [
+          {
+            patternId: 'T1132',
+            occurDate: 1640000000000,
+            tactic: 'command-and-control',
+          },
+        ],
+      },
+      null,
+      2
+    ),
   };
   const actionParams: ExecutorParams = {
     subAction: SUB_ACTION.CREATE_ALERT,
@@ -63,8 +83,11 @@ describe('TheHiveParamsFields renders', () => {
     expect(getByTestId('typeInput')).toBeInTheDocument();
     expect(getByTestId('sourceInput')).toBeInTheDocument();
     expect(getByTestId('sourceRefInput')).toBeInTheDocument();
+    expect(getByTestId('bodyJsonEditor')).toBeInTheDocument();
+    expect(getByTestId('templateSelectInput')).toBeInTheDocument();
 
     expect(getByTestId('severitySelectInput')).toHaveValue('2');
     expect(getByTestId('tlpSelectInput')).toHaveValue('2');
+    expect(getByTestId('templateSelectInput')).toHaveValue('0');
   });
 });
