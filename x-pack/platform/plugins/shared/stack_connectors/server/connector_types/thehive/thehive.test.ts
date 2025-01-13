@@ -390,7 +390,7 @@ describe('TheHiveConnector', () => {
         papLabel: 'AMBER',
         follow: true,
         customFields: [],
-        observableCount: 0,
+        observableCount: 1,
         status: 'New',
         stage: 'New',
         extraData: {},
@@ -415,6 +415,26 @@ describe('TheHiveConnector', () => {
       severity: 1,
       tlp: 2,
       tags: ['tag1', 'tag2'],
+      body: JSON.stringify(
+        {
+          observables: [
+            {
+              dataType: 'url',
+              data: 'http://example.com',
+              tags: ['url'],
+            },
+          ],
+          procedures: [
+            {
+              patternId: 'T1132',
+              occurDate: 1640000000000,
+              tactic: 'command-and-control',
+            },
+          ],
+        },
+        null,
+        2
+      ),
     };
 
     it('TheHive API call is successful with correct parameters', async () => {

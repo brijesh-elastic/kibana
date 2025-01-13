@@ -72,6 +72,26 @@ describe('TheHiveParamsFields renders', () => {
         severity: 2,
         tags: [],
         sourceRef: '{{alert.uuid}}',
+        body: JSON.stringify(
+          {
+            observables: [
+              {
+                dataType: 'ip',
+                data: '127.0.0.1',
+                tags: ['source.ip'],
+              },
+            ],
+            procedures: [
+              {
+                patternId: 'T1132',
+                occurDate: 1640000000000,
+                tactic: 'command-and-control',
+              },
+            ],
+          },
+          null,
+          2
+        ),
       },
       0
     );
