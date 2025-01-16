@@ -112,7 +112,6 @@ export const tlpOptions = [
     }),
   },
 ];
-
 export const templateOptions = [
   {
     value: 0,

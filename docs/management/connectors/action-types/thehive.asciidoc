@@ -65,7 +65,7 @@ Additional comments:: Additional information about the incident.
 Type:: The type of alert.
 Source:: The source of the alert.
 Source reference:: A source reference for the alert.
-Body:: The additional body parameters, such as observables, procedures (TTPs), and custom fields, to include in the API call request.
+Body:: The additional body parameters, such as observables, procedures (TTPs), custom fields, etc., to include in the API call request.
 
 [float]
 [[thehive-connector-networking-configuration]]
