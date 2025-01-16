@@ -119,7 +119,7 @@ export const templateOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.thehive.eventSelectTemplate1OptionLabel',
       {
-        defaultMessage: 'IP Observables', // change this
+        defaultMessage: 'Fortigate Firewall Threat Detection',
       }
     ),
   },
@@ -128,7 +128,34 @@ export const templateOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.thehive.eventSelectTemplate2OptionLabel',
       {
-        defaultMessage: 'Hostname Observables', // change this
+        defaultMessage: 'Suspicious Network Activity',
+      }
+    ),
+  },
+  {
+    value: 2,
+    text: i18n.translate(
+      'xpack.stackConnectors.components.thehive.eventSelectTemplate3OptionLabel',
+      {
+        defaultMessage: 'Compromised User Account Investigation',
+      }
+    ),
+  },
+  {
+    value: 3,
+    text: i18n.translate(
+      'xpack.stackConnectors.components.thehive.eventSelectTemplate4OptionLabel',
+      {
+        defaultMessage: 'Malicious File Analysis',
+      }
+    ),
+  },
+  {
+    value: 4,
+    text: i18n.translate(
+      'xpack.stackConnectors.components.thehive.eventSelectTemplate5OptionLabel',
+      {
+        defaultMessage: 'Data Exfiltration Monitoring',
       }
     ),
   },
@@ -136,21 +163,130 @@ export const templateOptions = [
 
 export const bodyOptions = [
   '{"observables":[{"dataType":"ip","data":"{{#context.alerts}}{{source.ip}}{{/context.alerts}}","tags":["source.ip"]},{"dataType":"hostname","data":"{{#context.alerts}}{{host.hostname}}{{/context.alerts}}","tags":["Fortigate-FW"]}],"procedures":[{{#context.rule.threat}}{"patternId":"{{technique.0.id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{#technique.0.subtechnique}},{"patternId":"{{id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{/technique.0.subtechnique}}{{^technique.0.subtechnique}}{{^@last}},{{/@last}}{{/technique.0.subtechnique}}{{/context.rule.threat}}]}',
-  // change this template
   JSON.stringify(
     {
       observables: [
         {
           dataType: 'ip',
-          data: '127.0.0.1',
-          tags: ['source.ip'],
+          data: '{{source.ip}}',
+          tags: ['source', 'malicious-activity'],
+        },
+        {
+          dataType: 'hostname',
+          data: '{{host.hostname}}',
+          tags: ['endpoint', 'suspicious'],
+        },
+        {
+          dataType: 'url',
+          data: '{{network.url}}',
+          tags: ['malware-distribution', 'phishing-site'],
         },
       ],
       procedures: [
         {
-          patternId: 'T1132',
-          occurDate: 1640000000000,
-          tactic: 'command-and-control',
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Initial Access',
+        },
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Command and Control',
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'email',
+          data: '{{user.email}}',
+          tags: ['phishing', 'targeted-user'],
+        },
+        {
+          dataType: 'username',
+          data: '{{user.name}}',
+          tags: ['compromised-account', 'unauthorized-access'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Credential Access',
+        },
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Privilege Escalation',
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'hash',
+          data: '{{file.hash.md5}}',
+          tags: ['malware', 'file-analysis'],
+        },
+        {
+          dataType: 'hash',
+          data: '{{file.hash.sha256}}',
+          tags: ['malware', 'suspicious-file'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Defense Evasion',
+        },
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Execution',
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'ip',
+          data: '{{destination.ip}}',
+          tags: ['exfiltration', 'suspicious'],
+        },
+        {
+          dataType: 'hostname',
+          data: '{{destination.hostname}}',
+          tags: ['data-leakage', 'endpoint'],
+        },
+        {
+          dataType: 'url',
+          data: '{{destination.url}}',
+          tags: ['data-exfiltration', 'command-and-control'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Exfiltration',
+        },
+        {
+          patternId: '{{technique.id}}',
+          occurDate: '{{timestamp}}',
+          tactic: 'Command and Control',
         },
       ],
     },
@@ -194,6 +330,79 @@ export const testBodyOptions = [
           patternId: 'T1132',
           occurDate: 1640000000000,
           tactic: 'command-and-control',
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'email',
+          data: 'john@ex.com',
+          tags: ['phishing', 'targeted-user'],
+        },
+        {
+          dataType: 'username',
+          data: 'user1',
+          tags: ['compromised-account', 'unauthorized-access'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: 'T1132',
+          occurDate: '1640000000000',
+          tactic: 'Credential Access',
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'hash',
+          data: '5d41402abc4b2a76b9719d911017c592',
+          tags: ['malware', 'file-analysis'],
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'ip',
+          data: '127.0.0.1',
+          tags: ['exfiltration', 'suspicious'],
+        },
+        {
+          dataType: 'hostname',
+          data: 'www.example.com',
+          tags: ['data-leakage', 'endpoint'],
+        },
+        {
+          dataType: 'url',
+          data: 'https://www.example.com',
+          tags: ['data-exfiltration', 'command-and-control'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: 'TA0002',
+          occurDate: '1736976000000',
+          tactic: 'Exfiltration',
+        },
+        {
+          patternId: 'TA0003',
+          occurDate: '1704067199000',
+          tactic: 'Command and Control',
         },
       ],
     },
