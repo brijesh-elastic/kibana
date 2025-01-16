@@ -11,10 +11,17 @@ import {
   TextAreaWithMessageVariables,
   ActionParamsProps,
   JsonEditorWithMessageVariables,
+  ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, EuiComboBox, EuiIconTip } from '@elastic/eui';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
-import { severityOptions, testBody, tlpOptions } from './constants';
+import {
+  bodyOptions,
+  severityOptions,
+  templateOptions,
+  testBodyOptions,
+  tlpOptions,
+} from './constants';
 import * as translations from './translations';
 
 export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams>> = ({
@@ -23,6 +30,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   index,
   errors,
   messageVariables,
+  executionMode,
 }) => {
   const alert = useMemo(
     () =>
@@ -31,16 +39,18 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         tlp: 2,
         severity: 2,
         tags: [],
-        body: testBody,
+        body: testBodyOptions[0],
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
+  const isTest = useMemo(() => executionMode === ActionConnectorMode.Test, [executionMode]);
 
   const [severity, setSeverity] = useState(alert.severity ?? severityOptions[1].value);
   const [tlp, setTlp] = useState(alert.tlp ?? tlpOptions[2].value);
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>(
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
+  const [template, setTemplate] = useState(templateOptions[0].value);
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
@@ -187,6 +197,27 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           onCreateOption={onCreateOption}
           onChange={onChange}
           noSuggestions
+        />
+      </EuiFormRow>
+      <EuiFormRow fullWidth label={translations.TEMPLATE_LABEL}>
+        <EuiSelect
+          fullWidth
+          data-test-subj="templateSelectInput"
+          value={template}
+          options={templateOptions}
+          onChange={(e) => {
+            editAction(
+              'subActionParams',
+              {
+                ...alert,
+                body: isTest
+                  ? testBodyOptions[parseInt(e.target.value, 10)]
+                  : bodyOptions[parseInt(e.target.value, 10)],
+              },
+              index
+            );
+            setTemplate(parseInt(e.target.value, 10));
+          }}
         />
       </EuiFormRow>
       <JsonEditorWithMessageVariables

@@ -72,26 +72,7 @@ describe('TheHiveParamsFields renders', () => {
         severity: 2,
         tags: [],
         sourceRef: '{{alert.uuid}}',
-        otherBody: JSON.stringify(
-          {
-            observables: [
-              {
-                dataType: 'ip',
-                data: '127.0.0.1',
-                tags: ['source.ip'],
-              },
-            ],
-            procedures: [
-              {
-                patternId: 'T1132',
-                occurDate: 1640000000000,
-                tactic: 'command-and-control',
-              },
-            ],
-          },
-          null,
-          2
-        ),
+        body: '{"observables":[{"dataType":"ip","data":"{{#context.alerts}}{{source.ip}}{{/context.alerts}}","tags":["source.ip"]},{"dataType":"hostname","data":"{{#context.alerts}}{{host.hostname}}{{/context.alerts}}","tags":["Fortigate-FW"]}],"procedures":[{{#context.rule.threat}}{"patternId":"{{technique.0.id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{#technique.0.subtechnique}},{"patternId":"{{id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{/technique.0.subtechnique}}{{^technique.0.subtechnique}}{{^@last}},{{/@last}}{{/technique.0.subtechnique}}{{/context.rule.threat}}]}',
       },
       0
     );

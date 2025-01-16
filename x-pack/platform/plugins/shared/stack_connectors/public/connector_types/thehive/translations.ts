@@ -102,6 +102,13 @@ export const SOURCE_REF_LABEL = i18n.translate(
   }
 );
 
+export const TEMPLATE_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.templateFieldLabel',
+  {
+    defaultMessage: 'Template',
+  }
+);
+
 export const BODY_LABEL = i18n.translate(
   'xpack.stackConnectors.components.thehive.bodyFieldLabel',
   {

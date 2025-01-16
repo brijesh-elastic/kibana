@@ -437,6 +437,9 @@ describe('TheHiveConnector', () => {
       ),
     };
 
+    const { body, ...restOfAlert } = alert;
+    const expectedAlertBody = { ...restOfAlert, ...JSON.parse(body ?? '{}') };
+
     it('TheHive API call is successful with correct parameters', async () => {
       await connector.createAlert(alert, connectorUsageCollector);
       expect(mockRequest).toBeCalledTimes(1);
@@ -445,7 +448,7 @@ describe('TheHiveConnector', () => {
           url: 'https://example.com/api/v1/alert',
           method: 'post',
           responseSchema: TheHiveCreateAlertResponseSchema,
-          data: alert,
+          data: expectedAlertBody,
           headers: {
             Authorization: 'Bearer test123',
             'X-Organisation': null,
