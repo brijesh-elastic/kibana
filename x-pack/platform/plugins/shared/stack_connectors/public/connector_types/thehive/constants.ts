@@ -153,7 +153,7 @@ export const templateOptions = [
 ];
 
 export const bodyOptions = [
-  '{}',
+  null,
   JSON.stringify(
     {
       observables: [
@@ -220,40 +220,20 @@ export const bodyOptions = [
 ];
 
 export const testBodyOptions = [
-  '{}',
+  null,
   JSON.stringify(
     {
       observables: [
         {
           dataType: 'ip',
           data: '127.0.0.1',
-          tags: ['source.ip'],
+          tags: ['source'],
         },
       ],
       procedures: [
         {
           patternId: 'T1132',
-          occurDate: 1640000000000,
-          tactic: 'command-and-control',
-        },
-      ],
-    },
-    null,
-    2
-  ),
-  JSON.stringify(
-    {
-      observables: [
-        {
-          dataType: 'hostname',
-          data: 'test-host.example.com',
-          tags: ['hostname'],
-        },
-      ],
-      procedures: [
-        {
-          patternId: 'T1132',
-          occurDate: 1640000000000,
+          occurDate: 1737105104000,
           tactic: 'command-and-control',
         },
       ],
@@ -266,20 +246,41 @@ export const testBodyOptions = [
       observables: [
         {
           dataType: 'email',
-          data: 'john@ex.com',
-          tags: ['phishing', 'targeted-user'],
+          data: 'john@example.com',
+          tags: ['iam-user'],
         },
         {
           dataType: 'username',
           data: 'user1',
-          tags: ['compromised-account', 'unauthorized-access'],
         },
       ],
       procedures: [
         {
           patternId: 'T1132',
-          occurDate: '1640000000000',
-          tactic: 'Credential Access',
+          occurDate: 1737103254000,
+        },
+      ],
+      customFields: {
+        reason: 'N/A',
+      },
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'hash',
+          data: '5d41402abc4b2a76b9719d911017c592',
+          tags: ['md5'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: 'T1612',
+          occurDate: 1737107904000,
+          tactic: 'Defense Evasion',
         },
       ],
     },
