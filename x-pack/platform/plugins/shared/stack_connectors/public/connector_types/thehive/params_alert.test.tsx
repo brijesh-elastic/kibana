@@ -23,6 +23,7 @@ describe('TheHiveParamsFields renders', () => {
     source: 'source test',
     type: 'sourceType test',
     sourceRef: 'sourceRef test',
+    template: 0,
     body: null,
   };
   const actionParams: ExecutorParams = {
@@ -72,35 +73,23 @@ describe('TheHiveParamsFields renders', () => {
     expect(getByTestId('templateSelectInput')).toHaveValue('0');
   });
 
-  it('display json editor when template is selected', () => {
-    const { getByTestId } = render(<TheHiveParamsAlertFields {...defaultProps} />);
-    const templateSelectEl = getByTestId('templateSelectInput');
-
-    fireEvent.change(templateSelectEl, { target: { value: 1 } });
-
-    expect(getByTestId('bodyJsonEditor')).toBeInTheDocument();
-  });
-
   it('changes the content of json editor when template is changed', () => {
     const { getByTestId } = render(<TheHiveParamsAlertFields {...defaultProps} />);
     const templateSelectEl = getByTestId('templateSelectInput');
 
     fireEvent.change(templateSelectEl, { target: { value: 1 } });
-    expect(getByTestId('templateSelectInput')).toHaveValue('1');
     expect(editAction).toHaveBeenNthCalledWith(
       1,
       'subActionParams',
-      { ...subActionParams, body: bodyOptions[1] },
+      { ...subActionParams, body: bodyOptions[1], template: 1 },
       0
     );
 
     fireEvent.change(templateSelectEl, { target: { value: 2 } });
-    expect(getByTestId('bodyJsonEditor')).toBeInTheDocument();
-    expect(getByTestId('templateSelectInput')).toHaveValue('2');
     expect(editAction).toHaveBeenNthCalledWith(
       2,
       'subActionParams',
-      { ...subActionParams, body: bodyOptions[2] },
+      { ...subActionParams, body: bodyOptions[2], template: 2 },
       0
     );
   });

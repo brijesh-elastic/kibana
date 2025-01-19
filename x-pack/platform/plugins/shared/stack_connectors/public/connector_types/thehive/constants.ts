@@ -154,69 +154,9 @@ export const templateOptions = [
 
 export const bodyOptions = [
   null,
-  JSON.stringify(
-    {
-      observables: [
-        {
-          dataType: 'ip',
-          data: '{{threat.indicator.ip}}',
-          tags: ['source', 'malicious-activity'],
-        },
-      ],
-      procedures: [
-        {
-          patternId: '{{threat.technique.id}}',
-          occurDate:
-            '{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}',
-        },
-      ],
-    },
-    null,
-    2
-  ),
-  JSON.stringify(
-    {
-      observables: [
-        {
-          dataType: 'email',
-          data: '{{user.email}}',
-          tags: ['phishing', 'targeted-user'],
-        },
-        {
-          dataType: 'username',
-          data: '{{user.name}}',
-          tags: ['compromised-account', 'unauthorized-access'],
-        },
-      ],
-      procedures: [
-        {
-          patternId: '{{threat.technique.id}}',
-          occurDate:
-            '{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}',
-        },
-      ],
-    },
-    null,
-    2
-  ),
-  JSON.stringify(
-    {
-      observables: [
-        {
-          dataType: 'hash',
-          data: '{{file.hash.md5}}',
-          tags: ['malware', 'file-analysis'],
-        },
-        {
-          dataType: 'hash',
-          data: '{{file.hash.sha256}}',
-          tags: ['malware', 'suspicious-file'],
-        },
-      ],
-    },
-    null,
-    2
-  ),
+  '{\r\n  "observables":\r\n    [\r\n      {\r\n        "dataType": "ip",\r\n        "data": "{{#context.alerts}}{{threat.indicator.ip}}{{/context.alerts}}",\r\n        "tags": ["source", "malicious-activity"]\r\n      }\r\n    ],\r\n  "procedures":\r\n    [\r\n      {\r\n        "patternId": "{{#context.alerts}}{{threat.technique.id}}{{/context.alerts}}",\r\n        "occurDate": {{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}\r\n      }\r\n    ]\r\n}\r\n',
+  '{\r\n  "observables": [\r\n    {\r\n      "dataType": "mail",\r\n      "data": "{{#context.alerts}}{{user.email}}{{/context.alerts}}",\r\n      "tags": [\r\n        "phishing",\r\n        "targeted-user"\r\n      ]\r\n    },\r\n    {\r\n      "dataType": "other",\r\n      "data": "{{#context.alerts}}{{user.name}}{{/context.alerts}}",\r\n      "tags": [\r\n        "username",\r\n        "compromised-account",\r\n        "unauthorized-access"\r\n      ]\r\n    }\r\n  ],\r\n  "procedures": [\r\n    {\r\n      "patternId": "{{threat.technique.id}}",\r\n      "occurDate": {{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}\r\n    }\r\n  ]\r\n}',
+  '{\r\n  "observables": [\r\n    {\r\n      "dataType": "hash",\r\n      "data": "{{#context.alerts}}{{file.hash.md5}}{{/context.alerts}}",\r\n      "tags": ["malware", "file-analysis"]\r\n    },\r\n    {\r\n      "dataType": "hash",\r\n      "data": "{{#context.alerts}}{{file.hash.sha256}}{{/context.alerts}}",\r\n      "tags": ["malware", "suspicious-file"]\r\n    }\r\n  ]\r\n}',
 ];
 
 export const testBodyOptions = [
@@ -245,13 +185,14 @@ export const testBodyOptions = [
     {
       observables: [
         {
-          dataType: 'email',
+          dataType: 'mail',
           data: 'john@example.com',
           tags: ['iam-user'],
         },
         {
-          dataType: 'username',
-          data: 'user1',
+          dataType: 'other',
+          data: 'john',
+          tags: ['username'],
         },
       ],
       procedures: [
@@ -260,9 +201,6 @@ export const testBodyOptions = [
           occurDate: 1737103254000,
         },
       ],
-      customFields: {
-        reason: 'N/A',
-      },
     },
     null,
     2

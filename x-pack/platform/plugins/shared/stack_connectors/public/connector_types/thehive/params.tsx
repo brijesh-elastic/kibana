@@ -83,6 +83,8 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             severity: 2,
             tags: [],
             sourceRef: isTest ? undefined : '{{alert.uuid}}',
+            template: 0,
+            body: null,
           }
         : {
             incident: {

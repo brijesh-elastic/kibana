@@ -39,6 +39,8 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         tlp: 2,
         severity: 2,
         tags: [],
+        template: 0,
+        body: null,
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
@@ -49,7 +51,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>(
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
-  const [template, setTemplate] = useState(templateOptions[0].value);
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
@@ -202,7 +203,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         <EuiSelect
           fullWidth
           data-test-subj="templateSelectInput"
-          value={template}
+          value={alert.template}
           options={templateOptions}
           onChange={(e) => {
             editAction(
@@ -212,14 +213,14 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
                 body: isTest
                   ? testBodyOptions[parseInt(e.target.value, 10)]
                   : bodyOptions[parseInt(e.target.value, 10)],
+                template: parseInt(e.target.value, 10),
               },
               index
             );
-            setTemplate(parseInt(e.target.value, 10));
           }}
         />
       </EuiFormRow>
-      {template !== 0 ? (
+      {alert.body !== null ? (
         <JsonEditorWithMessageVariables
           messageVariables={messageVariables}
           paramsProperty={'body'}
@@ -246,7 +247,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           dataTestSubj="thehive-body"
           onBlur={() => {
             if (!alert.body) {
-              editAction('subActionParams', { ...alert, body: '' }, index);
+              editAction('subActionParams', { ...alert, body: null }, index);
             }
           }}
         />
