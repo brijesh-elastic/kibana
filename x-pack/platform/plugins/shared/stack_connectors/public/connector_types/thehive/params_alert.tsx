@@ -40,7 +40,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         severity: 2,
         tags: [],
         template: 0,
-        body: null,
+        body: '{}',
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
@@ -220,40 +220,36 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           }}
         />
       </EuiFormRow>
-      {alert.body !== null ? (
-        <JsonEditorWithMessageVariables
-          messageVariables={messageVariables}
-          paramsProperty={'body'}
-          inputTargetValue={alert.body}
-          label={
-            <>
-              {translations.BODY_LABEL}
-              <EuiIconTip
-                size="s"
-                color="subdued"
-                type="questionInCircle"
-                className="eui-alignTop"
-                data-test-subj="otherFieldsHelpTooltip"
-                aria-label={translations.BODY_HELP_LABEL}
-                content={translations.BODY_HELP_TEXT}
-              />
-            </>
+      <JsonEditorWithMessageVariables
+        messageVariables={messageVariables}
+        paramsProperty={'body'}
+        inputTargetValue={alert.body}
+        label={
+          <>
+            {translations.BODY_LABEL}
+            <EuiIconTip
+              size="s"
+              color="subdued"
+              type="questionInCircle"
+              className="eui-alignTop"
+              data-test-subj="otherFieldsHelpTooltip"
+              aria-label={translations.BODY_HELP_LABEL}
+              content={translations.BODY_HELP_TEXT}
+            />
+          </>
+        }
+        ariaLabel={translations.BODY_DESCRIPTION}
+        errors={errors.body as string[]}
+        onDocumentsChange={(json: string) =>
+          editAction('subActionParams', { ...alert, body: json }, index)
+        }
+        dataTestSubj="thehive-body"
+        onBlur={() => {
+          if (!alert.body) {
+            editAction('subActionParams', { ...alert, body: '{}' }, index);
           }
-          ariaLabel={translations.BODY_DESCRIPTION}
-          errors={errors.body as string[]}
-          onDocumentsChange={(json: string) =>
-            editAction('subActionParams', { ...alert, body: json }, index)
-          }
-          dataTestSubj="thehive-body"
-          onBlur={() => {
-            if (!alert.body) {
-              editAction('subActionParams', { ...alert, body: null }, index);
-            }
-          }}
-        />
-      ) : (
-        <></>
-      )}
+        }}
+      />
     </>
   );
 };
