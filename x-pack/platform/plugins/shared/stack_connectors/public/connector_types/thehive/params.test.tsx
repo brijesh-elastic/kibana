@@ -72,7 +72,8 @@ describe('TheHiveParamsFields renders', () => {
         severity: 2,
         tags: [],
         sourceRef: '{{alert.uuid}}',
-        body: '{"observables":[{"dataType":"ip","data":"{{#context.alerts}}{{source.ip}}{{/context.alerts}}","tags":["source.ip"]},{"dataType":"hostname","data":"{{#context.alerts}}{{host.hostname}}{{/context.alerts}}","tags":["Fortigate-FW"]}],"procedures":[{{#context.rule.threat}}{"patternId":"{{technique.0.id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{#technique.0.subtechnique}},{"patternId":"{{id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{/technique.0.subtechnique}}{{^technique.0.subtechnique}}{{^@last}},{{/@last}}{{/technique.0.subtechnique}}{{/context.rule.threat}}]}',
+        template: 0,
+        body: null,
       },
       0
     );
