@@ -65,7 +65,7 @@ Additional comments:: Additional information about the incident.
 Type:: The type of alert.
 Source:: The source of the alert.
 Source reference:: A source reference for the alert.
-Body:: The additional body parameters, such as observables, procedures (TTPs), custom fields, etc., to include in the API call request.
+Template:: Templates provide predefined configurations that include observables and procedures. When you select a template, its corresponding values will automatically populate the `Body` field. You can also use the `Build Your Own` option to create a custom template.
 
 [float]
 [[thehive-connector-networking-configuration]]

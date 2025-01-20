@@ -84,7 +84,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             tags: [],
             sourceRef: isTest ? undefined : '{{alert.uuid}}',
             template: 0,
-            body: null,
+            body: '{}',
           }
         : {
             incident: {

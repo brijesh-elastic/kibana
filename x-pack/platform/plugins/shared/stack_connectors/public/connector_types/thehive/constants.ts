@@ -119,7 +119,7 @@ export const templateOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.thehive.eventSelectTemplate1OptionLabel',
       {
-        defaultMessage: 'none',
+        defaultMessage: 'Build Your Own',
       }
     ),
   },
@@ -128,7 +128,7 @@ export const templateOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.thehive.eventSelectTemplate2OptionLabel',
       {
-        defaultMessage: 'Suspicious Network Activity',
+        defaultMessage: 'Compromised User Account Investigation',
       }
     ),
   },
@@ -137,7 +137,7 @@ export const templateOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.thehive.eventSelectTemplate3OptionLabel',
       {
-        defaultMessage: 'Compromised User Account Investigation',
+        defaultMessage: 'Malicious File Analysis',
       }
     ),
   },
@@ -146,41 +146,21 @@ export const templateOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.thehive.eventSelectTemplate4OptionLabel',
       {
-        defaultMessage: 'Malicious File Analysis',
+        defaultMessage: 'Suspicious Network Activity',
       }
     ),
   },
 ];
 
 export const bodyOptions = [
-  null,
-  '{\r\n  "observables":\r\n    [\r\n      {\r\n        "dataType": "ip",\r\n        "data": "{{#context.alerts}}{{threat.indicator.ip}}{{/context.alerts}}",\r\n        "tags": ["source", "malicious-activity"]\r\n      }\r\n    ],\r\n  "procedures":\r\n    [\r\n      {\r\n        "patternId": "{{#context.alerts}}{{threat.technique.id}}{{/context.alerts}}",\r\n        "occurDate": {{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}\r\n      }\r\n    ]\r\n}\r\n',
+  '{}',
   '{\r\n  "observables": [\r\n    {\r\n      "dataType": "mail",\r\n      "data": "{{#context.alerts}}{{user.email}}{{/context.alerts}}",\r\n      "tags": [\r\n        "phishing",\r\n        "targeted-user"\r\n      ]\r\n    },\r\n    {\r\n      "dataType": "other",\r\n      "data": "{{#context.alerts}}{{user.name}}{{/context.alerts}}",\r\n      "tags": [\r\n        "username",\r\n        "compromised-account",\r\n        "unauthorized-access"\r\n      ]\r\n    }\r\n  ],\r\n  "procedures": [\r\n    {\r\n      "patternId": "{{#context.alerts}}{{threat.technique.id}}{{/context.alerts}}",\r\n      "occurDate": {{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}\r\n    }\r\n  ]\r\n}',
   '{\r\n  "observables": [\r\n    {\r\n      "dataType": "hash",\r\n      "data": "{{#context.alerts}}{{file.hash.md5}}{{/context.alerts}}",\r\n      "tags": ["malware", "file-analysis"]\r\n    },\r\n    {\r\n      "dataType": "hash",\r\n      "data": "{{#context.alerts}}{{file.hash.sha256}}{{/context.alerts}}",\r\n      "tags": ["malware", "suspicious-file"]\r\n    }\r\n  ]\r\n}',
+  '{\r\n  "observables":\r\n    [\r\n      {\r\n        "dataType": "ip",\r\n        "data": "{{#context.alerts}}{{threat.indicator.ip}}{{/context.alerts}}",\r\n        "tags": ["source", "malicious-activity"]\r\n      }\r\n    ],\r\n  "procedures":\r\n    [\r\n      {\r\n        "patternId": "{{#context.alerts}}{{threat.technique.id}}{{/context.alerts}}",\r\n        "occurDate": {{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}\r\n      }\r\n    ]\r\n}\r\n',
 ];
 
 export const testBodyOptions = [
-  null,
-  JSON.stringify(
-    {
-      observables: [
-        {
-          dataType: 'ip',
-          data: '127.0.0.1',
-          tags: ['source'],
-        },
-      ],
-      procedures: [
-        {
-          patternId: 'T1132',
-          occurDate: 1737105104000,
-          tactic: 'command-and-control',
-        },
-      ],
-    },
-    null,
-    2
-  ),
+  '{}',
   JSON.stringify(
     {
       observables: [
@@ -219,6 +199,26 @@ export const testBodyOptions = [
           patternId: 'T1612',
           occurDate: 1737107904000,
           tactic: 'Defense Evasion',
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'ip',
+          data: '127.0.0.1',
+          tags: ['source'],
+        },
+      ],
+      procedures: [
+        {
+          patternId: 'T1132',
+          occurDate: 1737105104000,
+          tactic: 'command-and-control',
         },
       ],
     },
