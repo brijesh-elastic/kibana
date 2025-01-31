@@ -13,7 +13,9 @@ import {
   JsonEditorWithMessageVariables,
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
+import { AddMessageVariables } from '@kbn/alerts-ui-shared';
 import { EuiFormRow, EuiSelect, EuiComboBox, EuiIconTip } from '@elastic/eui';
+import { ActionVariable } from '@kbn/alerting-plugin/common';
 import { TheHiveTemplate } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import {
@@ -63,6 +65,41 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
     editAction(
       'subActionParams',
       { ...alert, tags: selectedOptionList.map((option) => option.label) },
+      index
+    );
+  };
+
+  const templateVariables: ActionVariable[] = [
+    {
+      name: 'Build Your Own',
+      description: 'Build Your Own',
+      useWithTripleBracesInTemplates: false,
+    },
+    {
+      name: 'Compromised User Account Investigation',
+      description: 'Compromised User Account Investigation',
+      useWithTripleBracesInTemplates: false,
+    },
+    {
+      name: 'Malicious File Analysis',
+      description: 'Malicious File Analysis',
+      useWithTripleBracesInTemplates: false,
+    },
+    {
+      name: 'Suspicious Network Activity',
+      description: 'Suspicious Network Activity',
+      useWithTripleBracesInTemplates: false,
+    },
+  ];
+
+  const onSelectMessageVariable = (variable: ActionVariable) => {
+    editAction(
+      'subActionParams',
+      {
+        ...alert,
+        body: isTest ? testBodyOption[variable.name] : bodyOption[variable.name],
+        template: variable.name,
+      },
       index
     );
   };
@@ -227,14 +264,10 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         label={
           <>
             {translations.BODY_LABEL}
-            <EuiIconTip
-              size="s"
-              color="subdued"
-              type="questionInCircle"
-              className="eui-alignTop"
-              data-test-subj="otherFieldsHelpTooltip"
-              aria-label={translations.BODY_HELP_LABEL}
-              content={translations.BODY_HELP_TEXT}
+            <AddMessageVariables
+              messageVariables={templateVariables}
+              onSelectEventHandler={onSelectMessageVariable}
+              paramsProperty="body"
             />
           </>
         }
