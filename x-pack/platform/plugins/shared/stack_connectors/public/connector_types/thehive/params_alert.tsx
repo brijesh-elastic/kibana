@@ -56,7 +56,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
   const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(
-    alert.severity === severityOptions[4].value ? true : false
+    alert.severity === TheHiveSeverity.RULE_SEVERITY ? true : false
   );
 
   const onCreateOption = (searchValue: string) => {
@@ -185,79 +185,56 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         }}
         errors={errors['createAlertParam.sourceRef'] as string[]}
       />
-      <EuiFormRow fullWidth>
-        <EuiSwitch
-          label="Enable to use severity from rule"
-          checked={isRuleSeverity}
-          compressed={true}
-          onChange={(e) => {
-            setIsRuleSeverity(e.target.checked);
-            if (e.target.checked) {
-              setSeverity(TheHiveSeverity.RULE_SEVERITY);
+      {!isTest && (
+        <EuiFormRow fullWidth>
+          <EuiSwitch
+            label="Enable to use severity from rule"
+            checked={isRuleSeverity}
+            compressed={true}
+            onChange={(e) => {
+              setIsRuleSeverity(e.target.checked);
+              if (e.target.checked) {
+                setSeverity(TheHiveSeverity.RULE_SEVERITY);
+                editAction(
+                  'subActionParams',
+                  { ...alert, severity: TheHiveSeverity.RULE_SEVERITY },
+                  index
+                );
+              } else {
+                setSeverity(TheHiveSeverity.MEDIUM);
+                editAction(
+                  'subActionParams',
+                  { ...alert, severity: TheHiveSeverity.MEDIUM },
+                  index
+                );
+              }
+            }}
+          />
+        </EuiFormRow>
+      )}
+
+      {!isRuleSeverity && (
+        <EuiFormRow fullWidth label={translations.SEVERITY_LABEL}>
+          <EuiSelect
+            fullWidth
+            data-test-subj="severitySelectInput"
+            disabled={isRuleSeverity || alert.severity === TheHiveSeverity.RULE_SEVERITY}
+            value={severity}
+            options={severityOptions}
+            onChange={(e) => {
               editAction(
                 'subActionParams',
-                { ...alert, severity: TheHiveSeverity.RULE_SEVERITY },
+                { ...alert, severity: parseInt(e.target.value, 10) },
                 index
               );
-            } else {
-              setSeverity(TheHiveSeverity.MEDIUM);
-              editAction('subActionParams', { ...alert, severity: TheHiveSeverity.MEDIUM }, index);
-            }
-          }}
-        />
-      </EuiFormRow>
-      <EuiFormRow
-        fullWidth
-        label={
-          <>
-            {translations.SEVERITY_LABEL}
-            {/* {!isTest && (
-              <EuiSwitch
-                label="Enable to use severity from rule"
-                checked={isRuleSeverity}
-                compressed={true}
-                onChange={(e) => {
-                  setIsRuleSeverity(e.target.checked);
-                  if (e.target.checked) {
-                    setSeverity(TheHiveSeverity.RULE_SEVERITY);
-                    editAction(
-                      'subActionParams',
-                      { ...alert, severity: TheHiveSeverity.RULE_SEVERITY },
-                      index
-                    );
-                  } else {
-                    setSeverity(TheHiveSeverity.MEDIUM);
-                    editAction(
-                      'subActionParams',
-                      { ...alert, severity: TheHiveSeverity.MEDIUM },
-                      index
-                    );
-                  }
-                }}
-              />
-            )} */}
-          </>
-        }
-      >
-        <EuiSelect
-          fullWidth
-          data-test-subj="severitySelectInput"
-          disabled={isRuleSeverity || alert.severity === TheHiveSeverity.RULE_SEVERITY}
-          value={severity}
-          options={severityOptions}
-          onChange={(e) => {
-            editAction(
-              'subActionParams',
-              { ...alert, severity: parseInt(e.target.value, 10) },
-              index
-            );
-            setSeverity(e.target.value);
-            if (e.target.value === TheHiveSeverity.RULE_SEVERITY) {
-              setIsRuleSeverity(true);
-            }
-          }}
-        />
-      </EuiFormRow>
+              setSeverity(parseInt(e.target.value, 10));
+              if (parseInt(e.target.value, 10) === TheHiveSeverity.RULE_SEVERITY) {
+                setIsRuleSeverity(true);
+              }
+            }}
+          />
+        </EuiFormRow>
+      )}
       <EuiFormRow fullWidth label={translations.TLP_LABEL}>
         <EuiSelect
           fullWidth

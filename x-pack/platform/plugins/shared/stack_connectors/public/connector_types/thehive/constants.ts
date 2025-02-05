@@ -71,15 +71,6 @@ export const severityOptions = [
       }
     ),
   },
-  {
-    value: TheHiveSeverity.RULE_SEVERITY,
-    text: i18n.translate(
-      'xpack.stackConnectors.components.thehive.eventSelectSeverityCriticalOptionLabel',
-      {
-        defaultMessage: 'SEVERITY OF RULE',
-      }
-    ),
-  },
 ];
 
 export const tlpOptions = [
@@ -244,5 +235,22 @@ export const testBodyOption: { [key: string]: string | null } = {
   ),
 };
 
-export const customTemplatePlaceHolder =
-  "{\r\n    observables: [\r\n      {\r\n        dataType: 'url',\r\n        data: 'http://example.org',\r\n      },\r\n    ],\r\n    procedures: [\r\n      {\r\n        patternId: 'TA0001',\r\n        occurDate: 1640000000000,\r\n        tactic: 'tactic-name'\r\n      }\r\n    ]\r\n  }";
+export const customTemplatePlaceHolder = JSON.stringify(
+  {
+    observables: [
+      {
+        dataType: 'url',
+        data: 'http://example.org',
+      },
+    ],
+    procedures: [
+      {
+        patternId: 'TA0001',
+        occurDate: 1640000000000,
+        tactic: 'tactic-name',
+      },
+    ],
+  },
+  null,
+  2
+).replace(/ /g, '\u00A0');

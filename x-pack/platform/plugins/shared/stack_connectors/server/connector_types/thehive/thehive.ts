@@ -154,28 +154,10 @@ export class TheHiveConnector extends CaseConnector<
     return res.data;
   }
 
-  private mapSeverity(severity: string): number {
-    switch (severity) {
-      case 'low':
-        return 1;
-      case 'medium':
-        return 2;
-      case 'high':
-        return 3;
-      case 'critical':
-        return 4;
-      default:
-        return 2;
-    }
-  }
-
   private formatAlertBody(alert: ExecutorSubActionCreateAlertParams) {
     try {
-      const alert1 = { ...alert, severity: this.mapSeverity(alert.severity ?? 'medium') };
-      const { body, template, ...restOfAlert } = alert1;
+      const { body, template, ...restOfAlert } = alert;
       const bodyJson = JSON.parse(body ?? '{}');
-      // eslint-disable-next-line no-console
-      console.log(alert1);
       const mergedAlertBody = { ...restOfAlert, ...bodyJson };
 
       return mergedAlertBody;
