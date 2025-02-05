@@ -72,7 +72,7 @@ describe('TheHiveParamsFields renders', () => {
         severity: 2,
         tags: [],
         sourceRef: '{{alert.uuid}}',
-        template: TheHiveTemplate.BUILD_YOUR_OWN,
+        template: TheHiveTemplate.CUSTOM_TEMPLATE,
         body: '{}',
       },
       0

@@ -23,7 +23,7 @@ describe('TheHiveParamsFields renders', () => {
     source: 'source test',
     type: 'sourceType test',
     sourceRef: 'sourceRef test',
-    template: TheHiveTemplate.BUILD_YOUR_OWN,
+    template: TheHiveTemplate.CUSTOM_TEMPLATE,
     body: '{}',
   };
   const actionParams: ExecutorParams = {
@@ -71,10 +71,10 @@ describe('TheHiveParamsFields renders', () => {
 
     expect(getByTestId('severitySelectInput')).toHaveValue('2');
     expect(getByTestId('tlpSelectInput')).toHaveValue('2');
-    expect(getByTestId('templateSelectInput')).toHaveValue(TheHiveTemplate.BUILD_YOUR_OWN);
+    expect(getByTestId('templateSelectInput')).toHaveValue(TheHiveTemplate.CUSTOM_TEMPLATE);
     expect(getByTestId('bodyJsonEditor')).toHaveProperty(
       'value',
-      bodyOption[TheHiveTemplate.BUILD_YOUR_OWN]
+      bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE]
     );
   });
 
