@@ -251,8 +251,8 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
               { ...alert, severity: parseInt(e.target.value, 10) },
               index
             );
-            setSeverity(parseInt(e.target.value, 10));
-            if (parseInt(e.target.value, 10) === TheHiveSeverity.RULE_SEVERITY) {
+            setSeverity(e.target.value);
+            if (e.target.value === TheHiveSeverity.RULE_SEVERITY) {
               setIsRuleSeverity(true);
             }
           }}

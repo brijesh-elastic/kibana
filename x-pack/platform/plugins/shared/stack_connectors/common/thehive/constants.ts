@@ -20,11 +20,11 @@ export enum SUB_ACTION {
   CREATE_ALERT = 'createAlert',
 }
 export enum TheHiveSeverity {
-  LOW = 1,
-  MEDIUM = 2,
-  HIGH = 3,
-  CRITICAL = 4,
-  RULE_SEVERITY = 5,
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+  RULE_SEVERITY = '{{context.rule.severity}}',
 }
 export enum TheHiveTLP {
   CLEAR = 0,
