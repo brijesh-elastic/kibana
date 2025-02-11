@@ -118,45 +118,6 @@ export const tlpOptions = [
   },
 ];
 
-export const templateOptions = [
-  {
-    value: TheHiveTemplate.CUSTOM_TEMPLATE,
-    text: i18n.translate(
-      'xpack.stackConnectors.components.thehive.eventSelectTemplate1OptionLabel',
-      {
-        defaultMessage: 'Custom Template',
-      }
-    ),
-  },
-  {
-    value: TheHiveTemplate.COMPROMISED_USER_ACCOUNT_INVESTIGATION,
-    text: i18n.translate(
-      'xpack.stackConnectors.components.thehive.eventSelectTemplate2OptionLabel',
-      {
-        defaultMessage: 'Compromised User Account Investigation',
-      }
-    ),
-  },
-  {
-    value: TheHiveTemplate.MALICIOUS_FILE_ANALYSIS,
-    text: i18n.translate(
-      'xpack.stackConnectors.components.thehive.eventSelectTemplate3OptionLabel',
-      {
-        defaultMessage: 'Malicious File Analysis',
-      }
-    ),
-  },
-  {
-    value: TheHiveTemplate.SUSPICIOUS_NETWORK_ACTIVITY,
-    text: i18n.translate(
-      'xpack.stackConnectors.components.thehive.eventSelectTemplate4OptionLabel',
-      {
-        defaultMessage: 'Suspicious Network Activity',
-      }
-    ),
-  },
-];
-
 export const bodyOption: { [key: string]: string | null } = {
   [TheHiveTemplate.CUSTOM_TEMPLATE]: null,
   [TheHiveTemplate.COMPROMISED_USER_ACCOUNT_INVESTIGATION]:
@@ -235,7 +196,7 @@ export const testBodyOption: { [key: string]: string | null } = {
   ),
 };
 
-export const customTemplatePlaceHolder = JSON.stringify(
+export const testCustomTemplatePlaceHolder = JSON.stringify(
   {
     observables: [
       {
@@ -248,6 +209,26 @@ export const customTemplatePlaceHolder = JSON.stringify(
         patternId: 'TA0001',
         occurDate: 1640000000000,
         tactic: 'tactic-name',
+      },
+    ],
+  },
+  null,
+  2
+).replace(/ /g, '\u00A0');
+
+export const ruleCustomTemplatePlaceHolder = JSON.stringify(
+  {
+    observables: [
+      {
+        dataType: 'url',
+        data: '{{#context.alerts}}{{url.original}}{{/context.alerts}}',
+      },
+    ],
+    procedures: [
+      {
+        patternId: '{{#context.alerts}}{{threat.technique.id}}{{/context.alerts}}',
+        occurDate: 1640000000000,
+        tactic: '{{#context.alerts}}{{threat.tactic.name}}{{/context.alerts}}',
       },
     ],
   },

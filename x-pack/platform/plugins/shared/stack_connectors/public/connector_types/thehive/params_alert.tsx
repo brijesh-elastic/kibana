@@ -13,18 +13,18 @@ import {
   JsonEditorWithMessageVariables,
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
-import { EuiFormRow, EuiSelect, EuiComboBox, EuiIconTip, EuiSwitch, EuiSpacer } from '@elastic/eui';
+import { EuiFormRow, EuiSelect, EuiComboBox, EuiSwitch } from '@elastic/eui';
 import { ActionVariable } from '@kbn/alerting-plugin/common';
-import { TemplateVariables } from './pop_over';
+import { TemplateVariables } from './template_component';
 import { TheHiveSeverity, TheHiveTemplate } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import {
   bodyOption,
   testBodyOption,
   severityOptions,
-  templateOptions,
   tlpOptions,
-  customTemplatePlaceHolder,
+  testCustomTemplatePlaceHolder,
+  ruleCustomTemplatePlaceHolder,
 } from './constants';
 import * as translations from './translations';
 
@@ -44,7 +44,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         severity: 2,
         tags: [],
         template: TheHiveTemplate.CUSTOM_TEMPLATE,
-        body: null,
+        body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
@@ -74,8 +74,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   };
 
   const onSelectMessageVariable = (variable: ActionVariable) => {
-    // eslint-disable-next-line no-console
-    console.log(variable);
     editAction(
       'subActionParams',
       {
@@ -86,9 +84,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
       index
     );
   };
-
-  // eslint-disable-next-line no-console
-  console.log(alert);
 
   return (
     <>
@@ -191,6 +186,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
             label="Enable to use severity from rule"
             checked={isRuleSeverity}
             compressed={true}
+            data-test-subj="rule-severity-toggle"
             onChange={(e) => {
               setIsRuleSeverity(e.target.checked);
               if (e.target.checked) {
@@ -212,13 +208,12 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           />
         </EuiFormRow>
       )}
-
       {!isRuleSeverity && (
         <EuiFormRow fullWidth label={translations.SEVERITY_LABEL}>
           <EuiSelect
             fullWidth
             data-test-subj="severitySelectInput"
-            disabled={isRuleSeverity || alert.severity === TheHiveSeverity.RULE_SEVERITY}
+            disabled={isRuleSeverity}
             value={severity}
             options={severityOptions}
             onChange={(e) => {
@@ -228,9 +223,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
                 index
               );
               setSeverity(parseInt(e.target.value, 10));
-              if (parseInt(e.target.value, 10) === TheHiveSeverity.RULE_SEVERITY) {
-                setIsRuleSeverity(true);
-              }
             }}
           />
         </EuiFormRow>
@@ -257,32 +249,13 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           noSuggestions
         />
       </EuiFormRow>
-      {/* <EuiFormRow fullWidth label={translations.TEMPLATE_LABEL}>
-        <EuiSelect
-          fullWidth
-          data-test-subj="templateSelectInput"
-          value={alert.template ?? TheHiveTemplate.CUSTOM_TEMPLATE}
-          options={templateOptions}
-          onChange={(e) => {
-            editAction(
-              'subActionParams',
-              {
-                ...alert,
-                body: isTest ? testBodyOption[e.target.value] : bodyOption[e.target.value],
-                template: e.target.value,
-              },
-              index
-            );
-          }}
-        />
-      </EuiFormRow> */}
       <JsonEditorWithMessageVariables
         key={alert.template}
         messageVariables={messageVariables}
         paramsProperty={'body'}
         inputTargetValue={alert.body}
         euiCodeEditorProps={{
-          placeholder: customTemplatePlaceHolder,
+          placeholder: isTest ? testCustomTemplatePlaceHolder : ruleCustomTemplatePlaceHolder,
           height: '320px',
         }}
         label={

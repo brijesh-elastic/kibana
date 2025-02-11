@@ -17,12 +17,10 @@ import {
   useEuiTheme,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiPopoverFooter,
   EuiToolTip,
   EuiSelectableOption,
 } from '@elastic/eui';
 import type { ActionVariable } from '@kbn/alerting-types';
-import './add_message_variables.scss';
 import { TruncatedText } from './truncated_text';
 import * as i18n from './translations';
 
@@ -67,65 +65,45 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
 
   const { euiTheme } = useEuiTheme();
 
-  const messageVariablesObject: Record<string, ActionVariable> | undefined = useMemo(
-    () =>
-      messageVariables?.reduce((acc, variable) => {
-        return {
-          ...acc,
-          [variable.name]: variable,
-        };
-      }, {}),
-    [messageVariables]
-  );
+  const messageVariablesObject: Record<string, ActionVariable> = {};
+  messageVariables?.forEach((variable) => {
+    messageVariablesObject[variable.name] = variable;
+  });
 
-  // const messageVariablesToShow = useMemo(
-  //   () =>
-  //     isShowAllPressed
-  //       ? messageVariables
-  //       : messageVariables?.filter((variable) => !variable.deprecated),
-  //   [messageVariables, isShowAllPressed]
-  // );
+  const optionsToShow = messageVariables?.map((variable) => ({
+    label: variable.name,
+    data: {
+      description: variable.description,
+    },
+    'data-test-subj': `${variable.name}-selectableOption`,
+  }));
 
-  const optionsToShow = useMemo(() => {
-    return messageVariables?.map((variable) => ({
-      label: variable.name,
-      ...(variable.deprecated ? { disabled: true } : {}),
-      data: {
-        description: variable.description,
-      },
-      'data-test-subj': `${variable.name}-selectableOption`,
-    }));
-  }, [messageVariables]);
-
-  const addVariableButtonTitle = buttonTitle ? buttonTitle : i18n.ADD_VARIABLE_TITLE;
+  const addTemplateButtonTitle = buttonTitle ?? i18n.SELECT_TEMPLATES_TITLE;
 
   const Button = useMemo(
     () =>
       showButtonTitle ? (
         <EuiButtonEmpty
           id={`${paramsProperty}AddVariableButton`}
-          data-test-subj={`${paramsProperty}AddVariableButton-Title`}
+          data-test-subj={`${paramsProperty}TemplateSelectButton-Title`}
           size="xs"
-          onClick={() => setIsVariablesPopoverOpen(true)}
-          aria-label={i18n.ADD_VARIABLE_POPOVER_BUTTON}
+          onClick={() => setIsVariablesPopoverOpen(!isVariablesPopoverOpen)}
+          aria-label={i18n.SELECT_TEMPLATES_POPOVER_BUTTON}
         >
-          {addVariableButtonTitle}
+          {addTemplateButtonTitle}
         </EuiButtonEmpty>
       ) : (
         <EuiButtonIcon
           id={`${paramsProperty}AddVariableButton`}
-          data-test-subj={`${paramsProperty}AddVariableButton`}
-          title={addVariableButtonTitle}
-          onClick={() => setIsVariablesPopoverOpen(true)}
-          iconType="indexOpen"
-          aria-label={i18n.ADD_VARIABLE_POPOVER_BUTTON}
+          data-test-subj={`${paramsProperty}TemplateSelectButton`}
+          title={addTemplateButtonTitle}
+          onClick={() => setIsVariablesPopoverOpen(!isVariablesPopoverOpen)}
+          iconType="documents"
+          aria-label={i18n.SELECT_TEMPLATES_POPOVER_BUTTON}
         />
       ),
-    [addVariableButtonTitle, paramsProperty, showButtonTitle]
+    [addTemplateButtonTitle, isVariablesPopoverOpen, paramsProperty, showButtonTitle]
   );
-  if ((messageVariables?.length ?? 0) === 0) {
-    return <></>;
-  }
 
   const ToolTipContent = ({ description, label }: { description: string; label: string }) => {
     return (
@@ -151,7 +129,7 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
     searchValue: string
   ) => {
     return (
-      <EuiFlexGroup data-test-subj={`variableMenuButton-${option.label}`}>
+      <EuiFlexGroup data-test-subj={`templateMenuButton-${option.label}`}>
         <EuiFlexItem>
           <EuiText
             size="s"
@@ -190,7 +168,7 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
     >
       <EuiSelectable
         height={300}
-        data-test-subj={'messageVariablesSelectableList'}
+        data-test-subj={'bodyTemplateSelectableList'}
         isLoading={false}
         options={optionsToShow}
         listProps={{
@@ -199,9 +177,6 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
           paddingSize: 'none',
           textWrap: 'wrap',
         }}
-        loadingMessage={i18n.LOADING_VARIABLES}
-        noMatchesMessage={i18n.NO_VARIABLES_FOUND}
-        emptyMessage={i18n.NO_VARIABLES_AVAILABLE}
         renderOption={renderOption}
         onChange={(variables) => {
           variables.map((variable) => {
@@ -213,21 +188,7 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
         }}
         singleSelection
       >
-        {(list) => (
-          <>
-            <EuiSpacer size="xs" />
-            {list}
-            <EuiPopoverFooter style={{ paddingTop: 0, paddingBottom: 0 }}>
-              <EuiFlexGroup
-                gutterSize="s"
-                alignItems="center"
-                justifyContent="spaceBetween"
-                responsive={false}
-                wrap={true}
-              />
-            </EuiPopoverFooter>
-          </>
-        )}
+        {(list) => <>{list}</>}
       </EuiSelectable>
     </EuiPopover>
   );

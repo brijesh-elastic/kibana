@@ -6,10 +6,10 @@
  */
 
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ActionConnector } from '@kbn/triggers-actions-ui-plugin/public/types';
 import { TheHiveParamsAlertFields } from './params_alert';
-import { SUB_ACTION, TheHiveTemplate } from '../../../common/thehive/constants';
+import { SUB_ACTION, TheHiveSeverity, TheHiveTemplate } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import { bodyOption } from './constants';
 
@@ -24,7 +24,7 @@ describe('TheHiveParamsFields renders', () => {
     type: 'sourceType test',
     sourceRef: 'sourceRef test',
     template: TheHiveTemplate.CUSTOM_TEMPLATE,
-    body: '{}',
+    body: null,
   };
   const actionParams: ExecutorParams = {
     subAction: SUB_ACTION.CREATE_ALERT,
@@ -61,28 +61,44 @@ describe('TheHiveParamsFields renders', () => {
     expect(getByTestId('titleInput')).toBeInTheDocument();
     expect(getByTestId('descriptionTextArea')).toBeInTheDocument();
     expect(getByTestId('tagsInput')).toBeInTheDocument();
+    expect(getByTestId('rule-severity-toggle')).toBeInTheDocument();
     expect(getByTestId('severitySelectInput')).toBeInTheDocument();
     expect(getByTestId('tlpSelectInput')).toBeInTheDocument();
     expect(getByTestId('typeInput')).toBeInTheDocument();
     expect(getByTestId('sourceInput')).toBeInTheDocument();
     expect(getByTestId('sourceRefInput')).toBeInTheDocument();
-    expect(getByTestId('templateSelectInput')).toBeInTheDocument();
+    expect(getByTestId('bodyTemplateSelectButton')).toBeInTheDocument();
     expect(getByTestId('bodyJsonEditor')).toBeInTheDocument();
 
     expect(getByTestId('severitySelectInput')).toHaveValue('2');
+    expect(getByTestId('rule-severity-toggle')).not.toBeChecked();
     expect(getByTestId('tlpSelectInput')).toHaveValue('2');
-    expect(getByTestId('templateSelectInput')).toHaveValue(TheHiveTemplate.CUSTOM_TEMPLATE);
-    expect(getByTestId('bodyJsonEditor')).toHaveProperty(
-      'value',
-      bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE]
-    );
+    expect(getByTestId('bodyJsonEditor')).toHaveProperty('value', '');
   });
 
-  it('changes the content of json editor when template is changed', () => {
+  it('hides the severity select input when rule severity is enabled', () => {
     const { getByTestId } = render(<TheHiveParamsAlertFields {...defaultProps} />);
-    const templateSelectEl = getByTestId('templateSelectInput');
+    const ruleSeverityToggleEl = getByTestId('rule-severity-toggle');
 
-    fireEvent.change(templateSelectEl, {
+    fireEvent.click(ruleSeverityToggleEl);
+    expect(getByTestId('rule-severity-toggle')).toBeEnabled();
+    expect(editAction).toHaveBeenCalledWith(
+      'subActionParams',
+      { ...subActionParams, severity: TheHiveSeverity.RULE_SEVERITY },
+      0
+    );
+
+    expect(screen.queryByTestId('severitySelectInput')).not.toBeInTheDocument();
+  });
+
+  it('changes the content of json editor when template is selected', () => {
+    const { getByTestId } = render(<TheHiveParamsAlertFields {...defaultProps} />);
+    const templateSelectButton = getByTestId('bodyTemplateSelectButton');
+
+    fireEvent.click(templateSelectButton);
+    let templateToSelect = getByTestId('Compromised User Account Investigation-selectableOption');
+
+    fireEvent.click(templateToSelect, {
       target: { value: TheHiveTemplate.COMPROMISED_USER_ACCOUNT_INVESTIGATION },
     });
     expect(editAction).toHaveBeenNthCalledWith(
@@ -96,7 +112,10 @@ describe('TheHiveParamsFields renders', () => {
       0
     );
 
-    fireEvent.change(templateSelectEl, {
+    fireEvent.click(templateSelectButton);
+    templateToSelect = getByTestId('Malicious File Analysis-selectableOption');
+
+    fireEvent.click(templateToSelect, {
       target: { value: TheHiveTemplate.MALICIOUS_FILE_ANALYSIS },
     });
     expect(editAction).toHaveBeenNthCalledWith(

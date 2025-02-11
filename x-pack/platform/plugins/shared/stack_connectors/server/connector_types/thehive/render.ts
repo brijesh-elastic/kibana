@@ -36,14 +36,16 @@ export const renderParameterTemplates: RenderParameterTemplates<ExecutorParams> 
     ...params,
     subActionParams: {
       ...params.subActionParams,
-      sourceRef: renderMustacheString(
-        logger,
-        params.subActionParams.sourceRef as string,
-        variables,
-        'json'
+      ...Object.fromEntries(
+        Object.entries(params.subActionParams).map(([key, value]) => {
+          if (typeof value !== 'string') return [key, value];
+          return [key, renderMustacheString(logger, value as string, variables, 'json')];
+        })
       ),
-      severity: mapSeverity((variables.rule as any).params.severity as string),
-      body: renderMustacheString(logger, params.subActionParams.body as string, variables, 'json'),
+      severity:
+        params.subActionParams.severity === 5
+          ? mapSeverity((variables.rule as { params: { severity: string } }).params.severity)
+          : params.subActionParams.severity,
     },
   };
 };
