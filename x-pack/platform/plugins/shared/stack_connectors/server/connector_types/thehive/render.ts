@@ -6,7 +6,10 @@
  */
 
 import { ExecutorParams } from '@kbn/actions-plugin/server/sub_action_framework/types';
-import { renderMustacheObject } from '@kbn/actions-plugin/server/lib/mustache_renderer';
+import {
+  renderMustacheObject,
+  renderMustacheString,
+} from '@kbn/actions-plugin/server/lib/mustache_renderer';
 import { RenderParameterTemplates } from '@kbn/actions-plugin/server/types';
 import { SUB_ACTION } from '../../../common/thehive/constants';
 
@@ -39,7 +42,9 @@ export const renderParameterTemplates: RenderParameterTemplates<ExecutorParams> 
         ...renderMustacheObject(logger, params.subActionParams, variables),
         severity:
           params.subActionParams.severity === 5
-            ? mapSeverity((variables.rule as { params: { severity: string } }).params.severity)
+            ? mapSeverity(
+                renderMustacheString(logger, '{{context.rule.severity}}', variables, 'json')
+              )
             : params.subActionParams.severity,
       },
     };
