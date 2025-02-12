@@ -9,7 +9,7 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { ActionConnector } from '@kbn/triggers-actions-ui-plugin/public/types';
 import TheHiveParamsFields from './params';
-import { SUB_ACTION, TheHiveSeverity, TheHiveTemplate } from '../../../common/thehive/constants';
+import { SUB_ACTION, TheHiveSeverity } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionPushParams } from '../../../common/thehive/types';
 
 describe('TheHiveParamsFields renders', () => {
@@ -72,7 +72,6 @@ describe('TheHiveParamsFields renders', () => {
         severity: TheHiveSeverity.RULE_SEVERITY,
         tags: [],
         sourceRef: '{{alert.uuid}}',
-        template: TheHiveTemplate.CUSTOM_TEMPLATE,
         body: null,
       },
       0

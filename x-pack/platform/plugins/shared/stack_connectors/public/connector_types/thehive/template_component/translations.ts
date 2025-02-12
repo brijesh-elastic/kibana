@@ -7,31 +7,60 @@
 
 import { i18n } from '@kbn/i18n';
 
-// popover
-export const LOADING_TEMPLATES = i18n.translate(
-  'alertsUIShared.components.selectTemplateVariables.loadingMessage',
+export const CUSTOM_TEMPLATE_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.customTemplateLabel',
   {
-    defaultMessage: 'Loading Templates',
+    defaultMessage: 'Custom Template',
   }
 );
 
-export const NO_TEMPLATES_AVAILABLE = i18n.translate(
-  'alertsUIShared.components.selectTemplateVariables.noTemplateVariablesAvailable',
+export const CUSTOM_TEMPLATE_DESCRIPTION = i18n.translate(
+  'xpack.stackConnectors.components.thehive.customTemplateDescription',
   {
-    defaultMessage: 'No templates available',
+    defaultMessage: 'Create Your Own Template',
   }
 );
 
-export const SELECT_TEMPLATES_POPOVER_BUTTON = i18n.translate(
-  'alertsUIShared.components.selectTemplateVariables.selectTemplateVariablePopoverButton',
+export const COMPROMISED_USER_ACCOUNT_INVESTIGATION_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.compromisedUserAccountInvestigationLabel',
   {
-    defaultMessage: 'Select body Template',
+    defaultMessage: 'Compromised User Account Investigation',
   }
 );
 
-export const SELECT_TEMPLATES_TITLE = i18n.translate(
-  'alertsUIShared.components.selectTemplateVariables.selectRuleVariableTitle',
+export const COMPROMISED_USER_ACCOUNT_INVESTIGATION_DESCRIPTION = i18n.translate(
+  'xpack.stackConnectors.components.thehive.compromisedUserAccountInvestigationDescription',
   {
-    defaultMessage: 'Select body template',
+    defaultMessage:
+      'Investigate potential account compromise using username and email observables.',
+  }
+);
+
+export const MALICIOUS_FILE_ANALYSIS_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.maliciousFileAnalysisLabel',
+  {
+    defaultMessage: 'Malicious File Analysis',
+  }
+);
+
+export const MALICIOUS_FILE_ANALYSIS_DESCRIPTION = i18n.translate(
+  'xpack.stackConnectors.components.thehive.maliciousFileAnalysisDescription',
+  {
+    defaultMessage: 'Analyze a potentially malicious file using its hash as an observable.',
+  }
+);
+
+export const SUSPICIOUS_NETWORK_ACTIVITY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.suspiciousNetworkActivityLabel',
+  {
+    defaultMessage: 'Suspicious Network Activity',
+  }
+);
+
+export const SUSPICIOUS_NETWORK_ACTIVITY_DESCRIPTION = i18n.translate(
+  'xpack.stackConnectors.components.thehive.suspiciousNetworkActivityDescription',
+  {
+    defaultMessage:
+      'Investigate suspicious network activity using threat indicator IP as an observable.',
   }
 );

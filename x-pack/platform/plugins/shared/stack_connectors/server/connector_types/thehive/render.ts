@@ -6,7 +6,7 @@
  */
 
 import { ExecutorParams } from '@kbn/actions-plugin/server/sub_action_framework/types';
-import { renderMustacheString } from '@kbn/actions-plugin/server/lib/mustache_renderer';
+import { renderMustacheObject } from '@kbn/actions-plugin/server/lib/mustache_renderer';
 import { RenderParameterTemplates } from '@kbn/actions-plugin/server/types';
 import { SUB_ACTION } from '../../../common/thehive/constants';
 
@@ -30,22 +30,18 @@ export const renderParameterTemplates: RenderParameterTemplates<ExecutorParams> 
   params,
   variables
 ) => {
-  if (params?.subAction === SUB_ACTION.PUSH_TO_SERVICE) return params;
-
-  return {
-    ...params,
-    subActionParams: {
-      ...params.subActionParams,
-      ...Object.fromEntries(
-        Object.entries(params.subActionParams).map(([key, value]) => {
-          if (typeof value !== 'string') return [key, value];
-          return [key, renderMustacheString(logger, value as string, variables, 'json')];
-        })
-      ),
-      severity:
-        params.subActionParams.severity === 5
-          ? mapSeverity((variables.rule as { params: { severity: string } }).params.severity)
-          : params.subActionParams.severity,
-    },
-  };
+  if (params?.subAction === SUB_ACTION.PUSH_TO_SERVICE) {
+    return renderMustacheObject(logger, params, variables);
+  } else {
+    return {
+      ...params,
+      subActionParams: {
+        ...renderMustacheObject(logger, params.subActionParams, variables),
+        severity:
+          params.subActionParams.severity === 5
+            ? mapSeverity((variables.rule as { params: { severity: string } }).params.severity)
+            : params.subActionParams.severity,
+      },
+    };
+  }
 };

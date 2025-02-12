@@ -10,7 +10,6 @@ import {
   EuiPopover,
   EuiButtonIcon,
   EuiText,
-  EuiButtonEmpty,
   EuiSelectable,
   EuiSpacer,
   EuiHighlight,
@@ -20,89 +19,73 @@ import {
   EuiToolTip,
   EuiSelectableOption,
 } from '@elastic/eui';
-import type { ActionVariable } from '@kbn/alerting-types';
 import { TruncatedText } from './truncated_text';
 import * as i18n from './translations';
 
 interface Props {
-  buttonTitle?: string;
+  buttonTitle: string;
   paramsProperty: string;
-  onSelectEventHandler: (variable: ActionVariable) => void;
-  showButtonTitle?: boolean;
+  onSelectEventHandler: (template: Template) => void;
 }
 
-const messageVariables: ActionVariable[] = [
+export interface Template {
+  name: string;
+  description: string;
+}
+
+const templates: Template[] = [
   {
-    name: 'Custom Template',
-    description: 'Create Your Own Template',
-    useWithTripleBracesInTemplates: false,
+    name: i18n.CUSTOM_TEMPLATE_LABEL,
+    description: i18n.CUSTOM_TEMPLATE_DESCRIPTION,
   },
   {
-    name: 'Compromised User Account Investigation',
-    description: 'Investigate potential account compromise using username and email observables.',
-    useWithTripleBracesInTemplates: false,
+    name: i18n.COMPROMISED_USER_ACCOUNT_INVESTIGATION_LABEL,
+    description: i18n.COMPROMISED_USER_ACCOUNT_INVESTIGATION_DESCRIPTION,
   },
   {
-    name: 'Malicious File Analysis',
-    description: 'Analyze a potentially malicious file using its hash as an observable.',
-    useWithTripleBracesInTemplates: false,
+    name: i18n.MALICIOUS_FILE_ANALYSIS_LABEL,
+    description: i18n.MALICIOUS_FILE_ANALYSIS_DESCRIPTION,
   },
   {
-    name: 'Suspicious Network Activity',
-    description:
-      'Investigate suspicious network activity using threat indicator IP as an observable.',
-    useWithTripleBracesInTemplates: false,
+    name: i18n.SUSPICIOUS_NETWORK_ACTIVITY_LABEL,
+    description: i18n.SUSPICIOUS_NETWORK_ACTIVITY_DESCRIPTION,
   },
 ];
 
-export const TemplateVariables: React.FunctionComponent<Props> = ({
+export const TemplateOptions: React.FunctionComponent<Props> = ({
   buttonTitle,
   paramsProperty,
-  showButtonTitle = false,
   onSelectEventHandler,
 }) => {
-  const [isVariablesPopoverOpen, setIsVariablesPopoverOpen] = useState<boolean>(false);
+  const [isTemplatesPopoverOpen, setIsTemplatesPopoverOpen] = useState<boolean>(false);
 
   const { euiTheme } = useEuiTheme();
 
-  const messageVariablesObject: Record<string, ActionVariable> = {};
-  messageVariables?.forEach((variable) => {
-    messageVariablesObject[variable.name] = variable;
+  const templatesObject: Record<string, Template> = {};
+  templates?.forEach((template) => {
+    templatesObject[template.name] = template;
   });
 
-  const optionsToShow = messageVariables?.map((variable) => ({
-    label: variable.name,
+  const optionsToShow = templates?.map((template) => ({
+    label: template.name,
     data: {
-      description: variable.description,
+      description: template.description,
     },
-    'data-test-subj': `${variable.name}-selectableOption`,
+    'data-test-subj': `${template.name}-selectableOption`,
   }));
 
-  const addTemplateButtonTitle = buttonTitle ?? i18n.SELECT_TEMPLATES_TITLE;
-
   const Button = useMemo(
-    () =>
-      showButtonTitle ? (
-        <EuiButtonEmpty
-          id={`${paramsProperty}AddVariableButton`}
-          data-test-subj={`${paramsProperty}TemplateSelectButton-Title`}
-          size="xs"
-          onClick={() => setIsVariablesPopoverOpen(!isVariablesPopoverOpen)}
-          aria-label={i18n.SELECT_TEMPLATES_POPOVER_BUTTON}
-        >
-          {addTemplateButtonTitle}
-        </EuiButtonEmpty>
-      ) : (
-        <EuiButtonIcon
-          id={`${paramsProperty}AddVariableButton`}
-          data-test-subj={`${paramsProperty}TemplateSelectButton`}
-          title={addTemplateButtonTitle}
-          onClick={() => setIsVariablesPopoverOpen(!isVariablesPopoverOpen)}
-          iconType="documents"
-          aria-label={i18n.SELECT_TEMPLATES_POPOVER_BUTTON}
-        />
-      ),
-    [addTemplateButtonTitle, isVariablesPopoverOpen, paramsProperty, showButtonTitle]
+    () => (
+      <EuiButtonIcon
+        id={`${paramsProperty}AddVariableButton`}
+        data-test-subj={`${paramsProperty}TemplateSelectButton`}
+        title={buttonTitle}
+        onClick={() => setIsTemplatesPopoverOpen(!isTemplatesPopoverOpen)}
+        iconType="documents"
+        aria-label={buttonTitle}
+      />
+    ),
+    [buttonTitle, isTemplatesPopoverOpen, paramsProperty]
   );
 
   const ToolTipContent = ({ description, label }: { description: string; label: string }) => {
@@ -160,15 +143,15 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
   return (
     <EuiPopover
       button={Button}
-      isOpen={isVariablesPopoverOpen}
-      closePopover={() => setIsVariablesPopoverOpen(false)}
+      isOpen={isTemplatesPopoverOpen}
+      closePopover={() => setIsTemplatesPopoverOpen(false)}
       panelPaddingSize="s"
       anchorPosition="upLeft"
       panelStyle={{ minWidth: 350 }}
     >
       <EuiSelectable
         height={300}
-        data-test-subj={'bodyTemplateSelectableList'}
+        data-test-subj={`${paramsProperty}TemplateSelectableList`}
         isLoading={false}
         options={optionsToShow}
         listProps={{
@@ -178,13 +161,13 @@ export const TemplateVariables: React.FunctionComponent<Props> = ({
           textWrap: 'wrap',
         }}
         renderOption={renderOption}
-        onChange={(variables) => {
-          variables.map((variable) => {
-            if (variable.checked === 'on' && messageVariablesObject) {
-              onSelectEventHandler(messageVariablesObject[variable.label]);
+        onChange={(templateList) => {
+          templateList.map((template) => {
+            if (template.checked === 'on' && templatesObject) {
+              onSelectEventHandler(templatesObject[template.label]);
             }
           });
-          setIsVariablesPopoverOpen(false);
+          setIsTemplatesPopoverOpen(false);
         }}
         singleSelection
       >

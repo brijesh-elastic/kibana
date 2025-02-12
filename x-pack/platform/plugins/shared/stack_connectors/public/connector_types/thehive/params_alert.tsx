@@ -14,8 +14,7 @@ import {
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, EuiComboBox, EuiSwitch } from '@elastic/eui';
-import { ActionVariable } from '@kbn/alerting-plugin/common';
-import { TemplateVariables } from './template_component';
+import { TemplateOptions, Template } from './template_component';
 import { TheHiveSeverity, TheHiveTemplate } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import {
@@ -43,7 +42,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         tlp: 2,
         severity: 2,
         tags: [],
-        template: TheHiveTemplate.CUSTOM_TEMPLATE,
         body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
@@ -58,6 +56,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(
     alert.severity === TheHiveSeverity.RULE_SEVERITY ? true : false
   );
+  const [selectedTemplate, setSelectedTemplate] = useState('');
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
@@ -73,16 +72,16 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
     );
   };
 
-  const onSelectMessageVariable = (variable: ActionVariable) => {
+  const onSelectMessageVariable = (template: Template) => {
     editAction(
       'subActionParams',
       {
         ...alert,
-        body: isTest ? testBodyOption[variable.name] : bodyOption[variable.name],
-        template: variable.name,
+        body: isTest ? testBodyOption[template.name] : bodyOption[template.name],
       },
       index
     );
+    setSelectedTemplate(template.name);
   };
 
   return (
@@ -183,27 +182,25 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
       {!isTest && (
         <EuiFormRow fullWidth>
           <EuiSwitch
-            label="Enable to use severity from rule"
+            label={translations.IS_RULE_SEVERITY_LABEL}
             checked={isRuleSeverity}
             compressed={true}
             data-test-subj="rule-severity-toggle"
             onChange={(e) => {
               setIsRuleSeverity(e.target.checked);
-              if (e.target.checked) {
-                setSeverity(TheHiveSeverity.RULE_SEVERITY);
-                editAction(
-                  'subActionParams',
-                  { ...alert, severity: TheHiveSeverity.RULE_SEVERITY },
-                  index
-                );
-              } else {
-                setSeverity(TheHiveSeverity.MEDIUM);
-                editAction(
-                  'subActionParams',
-                  { ...alert, severity: TheHiveSeverity.MEDIUM },
-                  index
-                );
-              }
+              setSeverity(
+                e.target.checked ? TheHiveSeverity.RULE_SEVERITY : TheHiveSeverity.MEDIUM
+              );
+              editAction(
+                'subActionParams',
+                {
+                  ...alert,
+                  severity: e.target.checked
+                    ? TheHiveSeverity.RULE_SEVERITY
+                    : TheHiveSeverity.MEDIUM,
+                },
+                index
+              );
             }}
           />
         </EuiFormRow>
@@ -250,7 +247,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         />
       </EuiFormRow>
       <JsonEditorWithMessageVariables
-        key={alert.template}
+        key={selectedTemplate}
         messageVariables={messageVariables}
         paramsProperty={'body'}
         inputTargetValue={alert.body}
@@ -261,7 +258,8 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         label={
           <>
             {translations.BODY_LABEL}
-            <TemplateVariables
+            <TemplateOptions
+              buttonTitle={translations.SELECT_BODY_TEMPLATE_POPOVER_BUTTON}
               paramsProperty="body"
               onSelectEventHandler={onSelectMessageVariable}
             />

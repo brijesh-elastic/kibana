@@ -23,7 +23,6 @@ describe('TheHiveParamsFields renders', () => {
     source: 'source test',
     type: 'sourceType test',
     sourceRef: 'sourceRef test',
-    template: TheHiveTemplate.CUSTOM_TEMPLATE,
     body: null,
   };
   const actionParams: ExecutorParams = {
@@ -91,12 +90,12 @@ describe('TheHiveParamsFields renders', () => {
     expect(screen.queryByTestId('severitySelectInput')).not.toBeInTheDocument();
   });
 
-  it('changes the content of json editor when template is selected', () => {
+  it('changes the content of json editor when template is selected', async () => {
     const { getByTestId } = render(<TheHiveParamsAlertFields {...defaultProps} />);
     const templateSelectButton = getByTestId('bodyTemplateSelectButton');
 
     fireEvent.click(templateSelectButton);
-    let templateToSelect = getByTestId('Compromised User Account Investigation-selectableOption');
+    const templateToSelect = getByTestId('Compromised User Account Investigation-selectableOption');
 
     fireEvent.click(templateToSelect, {
       target: { value: TheHiveTemplate.COMPROMISED_USER_ACCOUNT_INVESTIGATION },
@@ -107,24 +106,6 @@ describe('TheHiveParamsFields renders', () => {
       {
         ...subActionParams,
         body: bodyOption[TheHiveTemplate.COMPROMISED_USER_ACCOUNT_INVESTIGATION],
-        template: TheHiveTemplate.COMPROMISED_USER_ACCOUNT_INVESTIGATION,
-      },
-      0
-    );
-
-    fireEvent.click(templateSelectButton);
-    templateToSelect = getByTestId('Malicious File Analysis-selectableOption');
-
-    fireEvent.click(templateToSelect, {
-      target: { value: TheHiveTemplate.MALICIOUS_FILE_ANALYSIS },
-    });
-    expect(editAction).toHaveBeenNthCalledWith(
-      2,
-      'subActionParams',
-      {
-        ...subActionParams,
-        body: bodyOption[TheHiveTemplate.MALICIOUS_FILE_ANALYSIS],
-        template: TheHiveTemplate.MALICIOUS_FILE_ANALYSIS,
       },
       0
     );

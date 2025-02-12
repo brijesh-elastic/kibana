@@ -83,7 +83,6 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             severity: isTest ? TheHiveSeverity.MEDIUM : TheHiveSeverity.RULE_SEVERITY,
             tags: [],
             sourceRef: isTest ? undefined : '{{alert.uuid}}',
-            template: TheHiveTemplate.CUSTOM_TEMPLATE,
             body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],
           }
         : {
