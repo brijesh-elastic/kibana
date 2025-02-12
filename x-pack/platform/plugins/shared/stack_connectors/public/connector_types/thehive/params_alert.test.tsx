@@ -90,7 +90,7 @@ describe('TheHiveParamsFields renders', () => {
     expect(screen.queryByTestId('severitySelectInput')).not.toBeInTheDocument();
   });
 
-  it('changes the content of json editor when template is selected', async () => {
+  it('changes the content of json editor when template is selected', () => {
     const { getByTestId } = render(<TheHiveParamsAlertFields {...defaultProps} />);
     const templateSelectButton = getByTestId('bodyTemplateSelectButton');
 
