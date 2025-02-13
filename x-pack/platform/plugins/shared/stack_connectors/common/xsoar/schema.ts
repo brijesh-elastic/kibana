@@ -50,4 +50,8 @@ export const ExecutorParamsSchema = schema.oneOf([
     subAction: schema.literal(SUB_ACTION.RUN),
     subActionParams: XSOARRunActionParamsSchema,
   }),
+  schema.object({
+    subAction: schema.literal(SUB_ACTION.TEST),
+    subActionParams: XSOARRunActionParamsSchema,
+  }),
 ]);

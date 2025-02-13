@@ -6,6 +6,13 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  TextFieldWithMessageVariables,
+  TextAreaWithMessageVariables,
+  ActionParamsProps,
+  JsonEditorWithMessageVariables,
+  ActionConnectorMode,
+} from '@kbn/triggers-actions-ui-plugin/public';
 import { ActionParamsProps, ActionConnectorMode } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect } from '@elastic/eui';
 import { SUB_ACTION } from '../../../common/xsoar/constants';
@@ -21,11 +28,7 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   messageVariables,
   executionMode,
 }) => {
-  const [eventAction, setEventAction] = useState(
-    actionParams.subAction ?? SUB_ACTION.RUN
-  );
   const actionConnectorRef = useRef(actionConnector?.id ?? '');
-  const isTest = useMemo(() => executionMode === ActionConnectorMode.Test, [executionMode]);
 
   useEffect(() => {
     if (actionConnector != null && actionConnectorRef.current !== actionConnector.id) {
@@ -67,36 +70,35 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionParams]);
 
-  useEffect(() => {
-    editAction('subAction', eventAction, index);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventAction]);
-
-  const setEventActionType = (eventActionType: SUB_ACTION) => {
-    const subActionParams =
-      eventActionType === SUB_ACTION.TEST
-        ? {
-          tlp: 2,
-          severity: 2,
-          tags: [],
-          sourceRef: isTest ? undefined : '{{alert.uuid}}',
-        }
-        : {
-          incident: {
-            tlp: 2,
-            severity: 2,
-            tags: [],
-          },
-          comments: [],
-        };
-
-    // setEventAction(eventActionType);
-    editAction('subActionParams', subActionParams, index);
-  };
-
   return (
     <>
-      {eventAction === SUB_ACTION.RUN ? "hii" : "loll"}
+      <JsonEditorWithMessageVariables
+        key={selectedTemplate}
+        messageVariables={messageVariables}
+        paramsProperty={'body'}
+        inputTargetValue={alert.body}
+        label={
+          <>
+            {translations.BODY_LABEL}
+            <TemplateOptions
+              buttonTitle={translations.SELECT_BODY_TEMPLATE_POPOVER_BUTTON}
+              paramsProperty="body"
+              onSelectEventHandler={onSelectMessageVariable}
+            />
+          </>
+        }
+        ariaLabel={translations.BODY_DESCRIPTION}
+        errors={errors.body as string[]}
+        onDocumentsChange={(json: string) =>
+          editAction('subActionParams', { ...alert, body: json }, index)
+        }
+        dataTestSubj="thehive-body"
+        onBlur={() => {
+          if (!alert.body) {
+            editAction('subActionParams', { ...alert, body: null }, index);
+          }
+        }}
+      />
     </>
   );
 };

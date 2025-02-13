@@ -16,8 +16,8 @@ import {
 import {
   URL_LABEL,
   API_KEY_LABEL,
-  ORGANISATION_LABEL,
-  ORGANISATION_HELP_TEXT,
+  API_KEY_ID_LABEL,
+  API_KEY_ID_HELP_TEXT,
 } from './translations';
 
 const configFormSchema: ConfigFieldSchema[] = [
@@ -26,7 +26,7 @@ const configFormSchema: ConfigFieldSchema[] = [
 
 const secretsFormSchema: SecretsFieldSchema[] = [
   { id: 'apiKey', label: API_KEY_LABEL, isPasswordField: true },
-  { id: 'apiKeyID', label: API_KEY_LABEL, isPasswordField: true, isRequired: false, helpText: ORGANISATION_HELP_TEXT },
+  { id: 'apiKeyID', label: API_KEY_ID_LABEL, isPasswordField: true, isRequired: false, helpText: API_KEY_ID_HELP_TEXT },
 ];
 
 const XSOARConnectorFields: React.FC<ActionConnectorFieldsProps> = ({ readOnly, isEdit }) => {

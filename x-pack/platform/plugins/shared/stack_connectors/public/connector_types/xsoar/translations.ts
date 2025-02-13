@@ -7,28 +7,73 @@
 
 import { i18n } from '@kbn/i18n';
 
-export const URL_LABEL = i18n.translate('xpack.stackConnectors.components.thehive.urlFieldLabel', {
-  defaultMessage: 'URL',
-});
-
-export const ORGANISATION_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.organisationFieldLabel',
+export const URL_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.urlFieldLabel',
   {
-    defaultMessage: 'Organisation',
-  }
-);
-
-export const ORGANISATION_HELP_TEXT = i18n.translate(
-  'xpack.stackConnectors.components.thehive.organisationFieldHelpText',
-  {
-    defaultMessage: 'By default, it uses the default organisation of the API key owner.',
+    defaultMessage: 'URL',
   }
 );
 
 export const API_KEY_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.apiKeyFieldLabel',
+  'xpack.stackConnectors.components.xsoar.apiKeyFieldLabel',
   {
     defaultMessage: 'API key',
+  }
+);
+
+export const API_KEY_ID_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.apiKeyIDFieldLabel',
+  {
+    defaultMessage: 'API key ID',
+  }
+);
+
+export const API_KEY_ID_HELP_TEXT = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.apiKeyIDFieldHelpText',
+  {
+    defaultMessage: 'For the cloud instance, the API Key ID is required, that is your unique token used to authenticate the API Key.',
+  }
+);
+
+export const ACTION_REQUIRED = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.requiredActionText',
+  {
+    defaultMessage: 'Action is required.',
+  }
+);
+
+export const INVALID_ACTION = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.invalidActionText',
+  {
+    defaultMessage: 'Invalid action name.',
+  }
+);
+
+export const BODY_REQUIRED = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.requiredBodyText',
+  {
+    defaultMessage: 'Body is required.',
+  }
+);
+
+export const BODY_INVALID = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.invalidBodyText',
+  {
+    defaultMessage: 'Body does not have a valid JSON format.',
+  }
+);
+
+export const PLAYBOOK_ID_PRESENT_IN_BODY = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.playbookIdPresentInBodyText',
+  {
+    defaultMessage: 'playbookId field should not be present in the body.',
+  }
+);
+
+export const NAME_KEY_REQUIRED = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.requiredNameKeyText',
+  {
+    defaultMessage: 'Name key is required.',
   }
 );
 
@@ -169,40 +214,6 @@ export const DOCUMENTATION = i18n.translate(
   'xpack.stackConnectors.components.bedrock.documentation',
   {
     defaultMessage: 'documentation',
-  }
-);
-
-// export const URL_LABEL = i18n.translate(
-//   'xpack.stackConnectors.components.bedrock.urlTextFieldLabel',
-//   {
-//     defaultMessage: 'URL',
-//   }
-// );
-
-export const BODY_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.bedrock.error.requiredBedrockBodyText',
-  {
-    defaultMessage: 'Body is required.',
-  }
-);
-export const BODY_INVALID = i18n.translate(
-  'xpack.stackConnectors.security.bedrock.params.error.invalidBodyText',
-  {
-    defaultMessage: 'Body does not have a valid JSON format.',
-  }
-);
-
-export const ACTION_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.security.bedrock.params.error.requiredActionText',
-  {
-    defaultMessage: 'Action is required.',
-  }
-);
-
-export const INVALID_ACTION = i18n.translate(
-  'xpack.stackConnectors.security.bedrock.params.error.invalidActionText',
-  {
-    defaultMessage: 'Invalid action name.',
   }
 );
 
