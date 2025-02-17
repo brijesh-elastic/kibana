@@ -7,10 +7,14 @@
 
 import { i18n } from '@kbn/i18n';
 
-export const URL_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.urlFieldLabel',
+export const URL_LABEL = i18n.translate('xpack.stackConnectors.components.xsoar.urlFieldLabel', {
+  defaultMessage: 'URL',
+});
+
+export const SELECT_MESSAGE = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.selectMessageText',
   {
-    defaultMessage: 'URL',
+    defaultMessage: 'Create incidents in XSOAR',
   }
 );
 
@@ -31,7 +35,8 @@ export const API_KEY_ID_LABEL = i18n.translate(
 export const API_KEY_ID_HELP_TEXT = i18n.translate(
   'xpack.stackConnectors.components.xsoar.apiKeyIDFieldHelpText',
   {
-    defaultMessage: 'For the cloud instance, the API Key ID is required, that is your unique token used to authenticate the API Key.',
+    defaultMessage:
+      'For the cloud instance, the API Key ID is required, that is your unique token used to authenticate the API Key.',
   }
 );
 
@@ -46,6 +51,13 @@ export const INVALID_ACTION = i18n.translate(
   'xpack.stackConnectors.components.xsoar.params.error.invalidActionText',
   {
     defaultMessage: 'Invalid action name.',
+  }
+);
+
+export const PLAYBOOK_REQUIRED = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.requiredPlaybookSelection',
+  {
+    defaultMessage: 'Playbook selection is required.',
   }
 );
 
@@ -77,156 +89,59 @@ export const NAME_KEY_REQUIRED = i18n.translate(
   }
 );
 
-export const EVENT_ACTION_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.eventActionSelectFieldLabel',
+export const PLAYBOOKS_ERROR = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.componentError.playbooksRequestFailed',
   {
-    defaultMessage: 'Event action',
+    defaultMessage: 'Error retrieving playbooks from XSOAR',
   }
 );
 
-export const TITLE_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.titleFieldLabel',
+export const PLAYBOOK_NOT_FOUND_WARNING = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.componentWarning.playbookNotFound',
   {
-    defaultMessage: 'Title',
+    defaultMessage:
+      'Cannot find the saved playbook. Please select a valid playbook from the selector',
   }
 );
 
-export const DESCRIPTION_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.descriptionFieldLabel',
+export const BODY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.bodyFieldLabel',
   {
-    defaultMessage: 'Description',
+    defaultMessage: 'Body',
   }
 );
 
-export const TLP_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.tlpSelectFieldLabel',
-  {
-    defaultMessage: 'TLP',
-  }
-);
-
-export const SEVERITY_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.severitySelectFieldLabel',
-  {
-    defaultMessage: 'Severity',
-  }
-);
-
-export const TAGS_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.TagsMultiSelectFieldLabel',
-  {
-    defaultMessage: 'Tags',
-  }
-);
-
-export const COMMENTS_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.commentsTextAreaFieldLabel',
-  {
-    defaultMessage: 'Additional comments',
-  }
-);
-
-export const TYPE_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.typeFieldLabel',
-  {
-    defaultMessage: 'Type',
-  }
-);
-
-export const SOURCE_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.sourceFieldLabel',
-  {
-    defaultMessage: 'Source',
-  }
-);
-
-export const SOURCE_REF_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.thehive.sourceRefFieldLabel',
-  {
-    defaultMessage: 'Source reference',
-  }
-);
-
-export const TITLE_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.thehive.requiredTitleText',
-  {
-    defaultMessage: 'Title is required.',
-  }
-);
-
-export const DESCRIPTION_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.thehive.requiredDescriptionText',
-  {
-    defaultMessage: 'Description is required.',
-  }
-);
-
-export const TYPE_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.thehive.requiredTypeText',
-  {
-    defaultMessage: 'Type is required.',
-  }
-);
-
-export const SOURCE_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.thehive.requiredSourceText',
-  {
-    defaultMessage: 'Source is required.',
-  }
-);
-
-export const SOURCE_REF_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.thehive.requiredSourceRefText',
-  {
-    defaultMessage: 'Source reference is required.',
-  }
-);
-
-export const API_URL_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.bedrock.apiUrlTextFieldLabel',
-  {
-    defaultMessage: 'URL',
-  }
-);
-
-export const ACCESS_KEY_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.bedrock.accessKeySecret',
-  {
-    defaultMessage: 'Access Key',
-  }
-);
-export const DEFAULT_MODEL_LABEL = i18n.translate(
-  'xpack.stackConnectors.components.bedrock.defaultModelTextFieldLabel',
-  {
-    defaultMessage: 'Default model',
-  }
-);
-
-export const SECRET = i18n.translate('xpack.stackConnectors.components.bedrock.secret', {
-  defaultMessage: 'Secret',
-});
-
-export const BEDROCK = i18n.translate('xpack.stackConnectors.components.bedrock.title', {
-  defaultMessage: 'Amazon Bedrock',
-});
-
-export const DOCUMENTATION = i18n.translate(
-  'xpack.stackConnectors.components.bedrock.documentation',
-  {
-    defaultMessage: 'documentation',
-  }
-);
-
-export const BODY = i18n.translate('xpack.stackConnectors.components.bedrock.bodyFieldLabel', {
-  defaultMessage: 'Body',
-});
 export const BODY_DESCRIPTION = i18n.translate(
-  'xpack.stackConnectors.components.bedrock.bodyCodeEditorAriaLabel',
+  'xpack.stackConnectors.components.xsoar.params.bodyCodeEditorAriaLabel',
   {
     defaultMessage: 'Code editor',
   }
 );
 
-export const MODEL = i18n.translate('xpack.stackConnectors.components.bedrock.model', {
-  defaultMessage: 'Model',
-});
+export const PLAYBOOK_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.playbookFieldLabel',
+  {
+    defaultMessage: 'XSOAR Playbooks',
+  }
+);
+
+export const PLAYBOOK_HELP = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.playbookHelp',
+  {
+    defaultMessage: 'The XSOAR playbook to associate with incident.',
+  }
+);
+
+export const PLAYBOOK_PLACEHOLDER = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.playbookPlaceholder',
+  {
+    defaultMessage: 'Select a playbook',
+  }
+);
+
+export const PLAYBOOK_ARIA_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.playbookFieldAriaLabel',
+  {
+    defaultMessage: 'Select a XSOAR playbook',
+  }
+);

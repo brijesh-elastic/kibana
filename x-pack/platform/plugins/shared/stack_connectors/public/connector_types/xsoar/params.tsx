@@ -5,19 +5,53 @@
  * 2.0.
  */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  TextFieldWithMessageVariables,
-  TextAreaWithMessageVariables,
+  useSubAction,
+  useKibana,
   ActionParamsProps,
   JsonEditorWithMessageVariables,
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
-import { ActionParamsProps, ActionConnectorMode } from '@kbn/triggers-actions-ui-plugin/public';
-import { EuiFormRow, EuiSelect } from '@elastic/eui';
+import {
+  EuiFormRow,
+  EuiComboBoxOptionOption,
+  EuiComboBox,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHighlight,
+} from '@elastic/eui';
 import { SUB_ACTION } from '../../../common/xsoar/constants';
-import { ExecutorParams } from '../../../common/xsoar/types';
+import {
+  ExecutorParams,
+  XSOARRunActionParams,
+  XSOARPlaybooksActionResponse,
+  XSOARPlaybooksActionParams,
+  XSOARPlaybooksObject,
+} from '../../../common/xsoar/types';
 import * as translations from './translations';
+
+type PlaybookOption = EuiComboBoxOptionOption<XSOARPlaybooksObject>;
+
+const createOption = (
+  playbook: XSOARPlaybooksObject
+): EuiComboBoxOptionOption<XSOARPlaybooksObject> => ({
+  key: playbook.id,
+  value: playbook,
+  label: playbook.name,
+});
+
+const renderPlaybook = (
+  { label }: PlaybookOption,
+  searchValue: string,
+  contentClassName: string
+) => (
+  <EuiFlexGroup className={contentClassName} direction="row" alignItems="center">
+    <EuiFlexItem grow={false}>
+      <EuiHighlight search={searchValue}>{label}</EuiHighlight>
+    </EuiFlexItem>
+  </EuiFlexGroup>
+);
 
 const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParams>> = ({
   actionConnector,
@@ -28,74 +62,111 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   messageVariables,
   executionMode,
 }) => {
-  const actionConnectorRef = useRef(actionConnector?.id ?? '');
+  const { toasts } = useKibana().notifications;
+  const { subAction, subActionParams } = actionParams;
+  const { body, playbookId } = (subActionParams as XSOARRunActionParams) ?? {};
+
+  const [connectorId, setConnectorId] = useState<string | undefined>(actionConnector?.id);
+  const [selectedPlaybookOption, setSelectedPlaybookOption] = useState<
+    PlaybookOption | null | undefined
+  >();
+  // const actionConnectorRef = useRef(actionConnector?.id ?? '');
+
+  const isTest = useMemo(() => executionMode === ActionConnectorMode.Test, [executionMode]);
 
   useEffect(() => {
-    if (actionConnector != null && actionConnectorRef.current !== actionConnector.id) {
-      actionConnectorRef.current = actionConnector.id;
-      editAction(
-        'subActionParams',
-        {
-          incident: {
-            tlp: 2,
-            severity: 2,
-            tags: [],
-          },
-          comments: [],
-        },
-        index
-      );
+    if (!subAction) {
+      editAction('subAction', isTest ? SUB_ACTION.TEST : SUB_ACTION.RUN, index);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionConnector]);
+  }, [editAction, index, isTest, subAction]);
+
+  if (connectorId !== actionConnector?.id) {
+    // Playbook reset needed before requesting with a different connectorId
+    setSelectedPlaybookOption(null);
+    setConnectorId(actionConnector?.id);
+  }
+
+  const {
+    response: { playbooks } = {},
+    isLoading: isLoadingPlaybooks,
+    error: playbooksError,
+  } = useSubAction<XSOARPlaybooksActionParams, XSOARPlaybooksActionResponse>({
+    connectorId,
+    subAction: 'getPlaybooks',
+  });
+
+  const playbooksOptions = useMemo(() => playbooks?.map(createOption) ?? [], [playbooks]);
 
   useEffect(() => {
-    if (!actionParams.subAction) {
-      editAction('subAction', SUB_ACTION.TEST, index);
+    if (playbooksError) {
+      toasts.danger({ title: translations.PLAYBOOKS_ERROR, body: playbooksError.message });
     }
-    if (!actionParams.subActionParams) {
-      editAction(
-        'subActionParams',
-        {
-          incident: {
-            tlp: 2,
-            severity: 2,
-            tags: [],
-          },
-          comments: [],
-        },
-        index
-      );
+  }, [toasts, playbooksError]);
+
+  useEffect(() => {
+    if (selectedPlaybookOption === undefined && playbookId && playbooks) {
+      // Set the initial selected story option from saved storyId when stories are loaded
+      const selectedPlaybook = playbooks.find(({ id }) => id === playbookId);
+      if (selectedPlaybook) {
+        setSelectedPlaybookOption(createOption(selectedPlaybook));
+      } else {
+        toasts.warning({ title: translations.PLAYBOOK_NOT_FOUND_WARNING });
+        editAction('subActionParams', { body, playbookId: undefined }, index);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionParams]);
+
+    if (selectedPlaybookOption !== undefined && selectedPlaybookOption?.value?.id !== playbookId) {
+      // Selected playbook changed, update playbookId param
+      editAction('subActionParams', { body, playbookId: selectedPlaybookOption?.value?.id }, index);
+    }
+  }, [selectedPlaybookOption, playbookId, playbooks, toasts, editAction, body, index]);
+
+  const selectedPlaybookOptions = useMemo(
+    () => (selectedPlaybookOption ? [selectedPlaybookOption] : []),
+    [selectedPlaybookOption]
+  );
+
+  const onChangePlaybook = useCallback(([selected]: PlaybookOption[]) => {
+    setSelectedPlaybookOption(selected ?? null);
+  }, []);
 
   return (
     <>
+      <EuiFormRow
+        fullWidth
+        error={errors.playbook as string[]}
+        isInvalid={!!errors.playbook?.length && selectedPlaybookOption !== undefined}
+        label={translations.PLAYBOOK_LABEL}
+        helpText={translations.PLAYBOOK_HELP}
+      >
+        <EuiComboBox
+          aria-label={translations.PLAYBOOK_ARIA_LABEL}
+          placeholder={translations.PLAYBOOK_PLACEHOLDER}
+          singleSelection={{ asPlainText: true }}
+          options={playbooksOptions}
+          selectedOptions={selectedPlaybookOptions}
+          onChange={onChangePlaybook}
+          isDisabled={isLoadingPlaybooks}
+          isLoading={isLoadingPlaybooks}
+          renderOption={renderPlaybook}
+          fullWidth
+          data-test-subj="xsoar-playbookSelector"
+        />
+      </EuiFormRow>
       <JsonEditorWithMessageVariables
-        key={selectedTemplate}
         messageVariables={messageVariables}
         paramsProperty={'body'}
-        inputTargetValue={alert.body}
-        label={
-          <>
-            {translations.BODY_LABEL}
-            <TemplateOptions
-              buttonTitle={translations.SELECT_BODY_TEMPLATE_POPOVER_BUTTON}
-              paramsProperty="body"
-              onSelectEventHandler={onSelectMessageVariable}
-            />
-          </>
-        }
+        inputTargetValue={body}
+        label={translations.BODY_LABEL}
         ariaLabel={translations.BODY_DESCRIPTION}
         errors={errors.body as string[]}
         onDocumentsChange={(json: string) =>
-          editAction('subActionParams', { ...alert, body: json }, index)
+          editAction('subActionParams', { ...subActionParams, body: json }, index)
         }
-        dataTestSubj="thehive-body"
+        dataTestSubj="xsoar-body"
         onBlur={() => {
-          if (!alert.body) {
-            editAction('subActionParams', { ...alert, body: null }, index);
+          if (!body) {
+            editAction('subActionParams', { ...subActionParams, body: null }, index);
           }
         }}
       />

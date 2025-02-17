@@ -11,7 +11,6 @@ import {
   SecretsSchema,
   XSOARRunActionParamsSchema,
   XSOARRunActionResponseSchema,
-  XSOARPlaybooksActionParamsSchema,
   XSOARPlaybooksObjectSchema,
   XSOARPlaybooksActionResponseSchema,
   ExecutorParamsSchema,

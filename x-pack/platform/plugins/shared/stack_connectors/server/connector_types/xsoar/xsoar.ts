@@ -9,15 +9,11 @@ import { i18n } from '@kbn/i18n';
 import { ServiceParams, SubActionConnector } from '@kbn/actions-plugin/server';
 import { ConnectorUsageCollector } from '@kbn/actions-plugin/server/types';
 import type { AxiosError } from 'axios';
-import { SubActionRequestParams } from '@kbn/actions-plugin/server/sub_action_framework/types';
 
 import type {
   Config,
   Secrets,
   XSOARRunActionParams,
-  XSOARRunActionResponse,
-  XSOARPlaybooksActionParams,
-  XSOARPlaybooksObject,
   XSOARPlaybooksActionResponse,
 } from '../../../common/xsoar/types';
 import {
@@ -42,7 +38,7 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
   constructor(params: ServiceParams<Config, Secrets>) {
     super(params);
 
-    this.isCloud = this.secrets.apiKeyID != null && this.secrets.apiKeyID != "";
+    this.isCloud = this.secrets.apiKeyID !== null && this.secrets.apiKeyID !== '';
     this.urls = {
       playbooks: this.isCloud
         ? `${this.config.url}${CLOUD_API_PATH}${PLAYBOOKS_PATH}`
@@ -76,7 +72,9 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
   }
 
   private getAuthHeaders() {
-    return this.isCloud ? { 'Authorization': this.secrets.apiKey, 'x-xdr-auth-id': this.secrets.apiKeyID } : { 'Authorization': this.secrets.apiKey };
+    return this.isCloud
+      ? { Authorization: this.secrets.apiKey, 'x-xdr-auth-id': this.secrets.apiKeyID }
+      : { Authorization: this.secrets.apiKey };
   }
 
   protected getResponseErrorMessage(error: AxiosError): string {
@@ -90,7 +88,7 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
     try {
       const { body, playbookId } = incident;
       const bodyJson = JSON.parse(body ?? '{}');
-      const mergedIncidentBody = { ...bodyJson, playbookId: playbookId };
+      const mergedIncidentBody = { ...bodyJson, playbookId };
 
       return mergedIncidentBody;
     } catch (err) {
@@ -110,8 +108,7 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
     connectorUsageCollector: ConnectorUsageCollector
   ) {
     const mergedIncidentBody = this.formatIncidentBody(incident);
-    console.log("fbhe enjod");
-    console.log(mergedIncidentBody);
+
     await this.request(
       {
         method: 'post',

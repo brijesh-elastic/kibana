@@ -6,26 +6,23 @@
  */
 
 import { lazy } from 'react';
-import { i18n } from '@kbn/i18n';
 import { GenericValidationResult } from '@kbn/triggers-actions-ui-plugin/public/types';
 import { XSOARConnector } from './types';
 import { XSOAR_CONNECTOR_ID, SUB_ACTION, XSOAR_TITLE } from '../../../common/xsoar/constants';
-import {
-  ExecutorParams,
-} from '../../../common/xsoar/types';
+import { ExecutorParams } from '../../../common/xsoar/types';
+import * as i18n from './translations';
 
 interface ValidationErrors {
   subAction: string[];
   body: string[];
+  playbook: string[];
 }
 
 export function getConnectorType(): XSOARConnector {
   return {
     id: XSOAR_CONNECTOR_ID,
     iconClass: lazy(() => import('./logo')),
-    selectMessage: i18n.translate('xpack.stackConnectors.components.xsoar.descriptionText', {
-      defaultMessage: 'Create incidents in XSOAR',
-    }),
+    selectMessage: i18n.SELECT_MESSAGE,
     actionTypeTitle: XSOAR_TITLE,
     validateParams: async (
       actionParams: ExecutorParams
@@ -34,10 +31,14 @@ export function getConnectorType(): XSOARConnector {
       const errors: ValidationErrors = {
         subAction: [],
         body: [],
+        playbook: [],
       };
       const { subAction, subActionParams } = actionParams;
 
-      if (subAction === SUB_ACTION.RUN) {
+      if (subAction === SUB_ACTION.TEST) {
+        if (!subActionParams?.playbookId?.length) {
+          errors.playbook.push(translations.PLAYBOOK_REQUIRED);
+        }
         if (!subActionParams?.body?.length) {
           errors.body.push(translations.BODY_REQUIRED);
         } else {
@@ -55,15 +56,12 @@ export function getConnectorType(): XSOARConnector {
         }
       }
 
-      if (subAction === SUB_ACTION.TEST) {
+      if (subAction === SUB_ACTION.RUN) {
+        if (!subActionParams?.playbookId?.length) {
+          errors.playbook.push(translations.PLAYBOOK_REQUIRED);
+        }
         if (!subActionParams?.body?.length) {
           errors.body.push(translations.BODY_REQUIRED);
-        } else {
-          try {
-            JSON.parse(subActionParams.body);
-          } catch {
-            errors.body.push(translations.BODY_INVALID);
-          }
         }
       }
 

@@ -27,6 +27,6 @@ export const getConnectorType = (): SubActionConnectorType<Config, Secrets> => (
   },
   validators: [{ type: ValidatorType.CONFIG, validator: urlAllowListValidator('url') }],
   supportedFeatureIds: [SecurityConnectorFeatureId],
-  minimumLicenseRequired: 'gold' as const,
+  minimumLicenseRequired: 'gold',
   renderParameterTemplates,
 });
