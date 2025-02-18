@@ -11,7 +11,6 @@ import {
   useKibana,
   ActionParamsProps,
   JsonEditorWithMessageVariables,
-  ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import {
   EuiFormRow,
@@ -60,7 +59,6 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   index,
   errors,
   messageVariables,
-  executionMode,
 }) => {
   const { toasts } = useKibana().notifications;
   const { subAction, subActionParams } = actionParams;
@@ -70,19 +68,16 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   const [selectedPlaybookOption, setSelectedPlaybookOption] = useState<
     PlaybookOption | null | undefined
   >();
-  // const actionConnectorRef = useRef(actionConnector?.id ?? '');
-
-  const isTest = useMemo(() => executionMode === ActionConnectorMode.Test, [executionMode]);
 
   useEffect(() => {
     if (!subAction) {
-      editAction('subAction', isTest ? SUB_ACTION.TEST : SUB_ACTION.RUN, index);
+      editAction('subAction', SUB_ACTION.RUN, index);
     }
-  }, [editAction, index, isTest, subAction]);
+  }, [editAction, index, subAction]);
 
   if (connectorId !== actionConnector?.id) {
-    // Playbook reset needed before requesting with a different connectorId
     setSelectedPlaybookOption(null);
+    // editAction('subActionParams', { body: undefined, playbookId: undefined }, index);
     setConnectorId(actionConnector?.id);
   }
 
@@ -105,7 +100,6 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
 
   useEffect(() => {
     if (selectedPlaybookOption === undefined && playbookId && playbooks) {
-      // Set the initial selected story option from saved storyId when stories are loaded
       const selectedPlaybook = playbooks.find(({ id }) => id === playbookId);
       if (selectedPlaybook) {
         setSelectedPlaybookOption(createOption(selectedPlaybook));
@@ -116,7 +110,6 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
     }
 
     if (selectedPlaybookOption !== undefined && selectedPlaybookOption?.value?.id !== playbookId) {
-      // Selected playbook changed, update playbookId param
       editAction('subActionParams', { body, playbookId: selectedPlaybookOption?.value?.id }, index);
     }
   }, [selectedPlaybookOption, playbookId, playbooks, toasts, editAction, body, index]);

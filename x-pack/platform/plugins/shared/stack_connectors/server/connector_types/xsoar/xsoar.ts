@@ -63,12 +63,6 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
       method: 'run',
       schema: XSOARRunActionParamsSchema,
     });
-
-    this.registerSubAction({
-      name: SUB_ACTION.TEST,
-      method: 'run',
-      schema: XSOARRunActionParamsSchema,
-    });
   }
 
   private getAuthHeaders() {

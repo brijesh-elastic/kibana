@@ -5,10 +5,16 @@
  * 2.0.
  */
 
-export const XSOAR_TITLE = 'XSOAR';
+import { i18n } from '@kbn/i18n';
+
+export const XSOAR_TITLE = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.connectorTypeTitle',
+  {
+    defaultMessage: 'XSOAR',
+  }
+);
 export const XSOAR_CONNECTOR_ID = '.xsoar';
 export enum SUB_ACTION {
   PLAYBOOKS = 'getPlaybooks',
   RUN = 'run',
-  TEST = 'test',
 }

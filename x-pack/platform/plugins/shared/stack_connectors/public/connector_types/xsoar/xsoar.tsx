@@ -35,27 +35,6 @@ export function getConnectorType(): XSOARConnector {
       };
       const { subAction, subActionParams } = actionParams;
 
-      if (subAction === SUB_ACTION.TEST) {
-        if (!subActionParams?.playbookId?.length) {
-          errors.playbook.push(translations.PLAYBOOK_REQUIRED);
-        }
-        if (!subActionParams?.body?.length) {
-          errors.body.push(translations.BODY_REQUIRED);
-        } else {
-          try {
-            const body = JSON.parse(subActionParams.body);
-            if (body.hasOwnProperty('playbookId')) {
-              errors.body.push(translations.PLAYBOOK_ID_PRESENT_IN_BODY);
-            }
-            if (!body.hasOwnProperty('name')) {
-              errors.body.push(translations.NAME_KEY_REQUIRED);
-            }
-          } catch {
-            errors.body.push(translations.BODY_INVALID);
-          }
-        }
-      }
-
       if (subAction === SUB_ACTION.RUN) {
         if (!subActionParams?.playbookId?.length) {
           errors.playbook.push(translations.PLAYBOOK_REQUIRED);
@@ -67,10 +46,9 @@ export function getConnectorType(): XSOARConnector {
 
       if (errors.body.length) return { errors };
 
-      // The internal "subAction" param should always be valid, ensure it is only if "subActionParams" are valid
       if (!subAction) {
         errors.subAction.push(translations.ACTION_REQUIRED);
-      } else if (subAction !== SUB_ACTION.RUN && subAction !== SUB_ACTION.TEST) {
+      } else if (subAction !== SUB_ACTION.RUN) {
         errors.subAction.push(translations.INVALID_ACTION);
       }
       return { errors };
