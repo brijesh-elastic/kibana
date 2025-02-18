@@ -34,6 +34,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   errors,
   messageVariables,
   executionMode,
+  producerId,
 }) => {
   const alert = useMemo(
     () =>
@@ -179,7 +180,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         }}
         errors={errors['createAlertParam.sourceRef'] as string[]}
       />
-      {!isTest && (
+      {!isTest && producerId === 'siem' && (
         <EuiFormRow fullWidth>
           <EuiSwitch
             label={translations.IS_RULE_SEVERITY_LABEL}

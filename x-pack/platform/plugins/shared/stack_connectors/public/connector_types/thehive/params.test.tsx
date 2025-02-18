@@ -47,6 +47,7 @@ describe('TheHiveParamsFields renders', () => {
     errors: { 'subActionParams.incident.title': [] },
     index: 0,
     messageVariables: [],
+    producerId: 'siem',
   };
 
   beforeEach(() => {

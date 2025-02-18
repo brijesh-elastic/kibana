@@ -23,6 +23,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
   errors,
   messageVariables,
   executionMode,
+  producerId,
 }) => {
   const [eventAction, setEventAction] = useState(
     actionParams.subAction ?? SUB_ACTION.PUSH_TO_SERVICE
@@ -80,7 +81,10 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
       eventActionType === SUB_ACTION.CREATE_ALERT
         ? {
             tlp: 2,
-            severity: isTest ? TheHiveSeverity.MEDIUM : TheHiveSeverity.RULE_SEVERITY,
+            severity:
+              isTest || producerId !== 'siem'
+                ? TheHiveSeverity.MEDIUM
+                : TheHiveSeverity.RULE_SEVERITY,
             tags: [],
             sourceRef: isTest ? undefined : '{{alert.uuid}}',
             body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],
@@ -125,6 +129,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
           errors={errors}
           messageVariables={messageVariables}
           executionMode={executionMode}
+          producerId={producerId}
         />
       )}
     </>
