@@ -18,3 +18,13 @@ export enum SUB_ACTION {
   PLAYBOOKS = 'getPlaybooks',
   RUN = 'run',
 }
+export enum XSOARSeverity {
+  INFORMATIONAL = 0.5,
+  UNKNOWN = 0,
+  LOW = 1,
+  MEDIUM = 2,
+  HIGH = 3,
+  CRITICAL = 4,
+  RULE_SEVERITY = 5
+}
+

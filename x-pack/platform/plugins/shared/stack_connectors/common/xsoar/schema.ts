@@ -33,8 +33,11 @@ export const XSOARPlaybooksActionResponseSchema = schema.object(
 );
 
 export const XSOARRunActionParamsSchema = schema.object({
-  playbookId: schema.string(),
-  body: schema.string(),
+  name: schema.string(),
+  playbookId: schema.nullable(schema.string()),
+  createInvestigation: schema.boolean(),
+  severity: schema.number(),
+  body: schema.nullable(schema.string()),
 });
 export const XSOARRunActionResponseSchema = schema.object({}, { unknowns: 'ignore' });
 

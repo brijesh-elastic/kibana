@@ -13,9 +13,7 @@ import { ExecutorParams } from '../../../common/xsoar/types';
 import * as i18n from './translations';
 
 interface ValidationErrors {
-  subAction: string[];
-  body: string[];
-  playbook: string[];
+  name: string[];
 }
 
 export function getConnectorType(): XSOARConnector {
@@ -29,27 +27,14 @@ export function getConnectorType(): XSOARConnector {
     ): Promise<GenericValidationResult<ValidationErrors>> => {
       const translations = await import('./translations');
       const errors: ValidationErrors = {
-        subAction: [],
-        body: [],
-        playbook: [],
+        name: [],
       };
       const { subAction, subActionParams } = actionParams;
 
       if (subAction === SUB_ACTION.RUN) {
-        if (!subActionParams?.playbookId?.length) {
-          errors.playbook.push(translations.PLAYBOOK_REQUIRED);
+        if (!subActionParams?.name?.length) {
+          errors.name.push(translations.NAME_REQUIRED);
         }
-        if (!subActionParams?.body?.length) {
-          errors.body.push(translations.BODY_REQUIRED);
-        }
-      }
-
-      if (errors.body.length) return { errors };
-
-      if (!subAction) {
-        errors.subAction.push(translations.ACTION_REQUIRED);
-      } else if (subAction !== SUB_ACTION.RUN) {
-        errors.subAction.push(translations.INVALID_ACTION);
       }
       return { errors };
     },
