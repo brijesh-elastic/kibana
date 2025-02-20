@@ -7,7 +7,7 @@ export const severityOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.xsoar.eventSelectSeverityUnknownOptionLabel',
       {
-        defaultMessage: 'UNKNOWN',
+        defaultMessage: 'Unknown',
       }
     ),
   },
@@ -16,7 +16,7 @@ export const severityOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.xsoar.eventSelectSeverityInformationalOptionLabel',
       {
-        defaultMessage: 'INFORMATIONAL',
+        defaultMessage: 'Informational',
       }
     ),
   },
@@ -25,7 +25,7 @@ export const severityOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.xsoar.eventSelectSeverityLowOptionLabel',
       {
-        defaultMessage: 'LOW',
+        defaultMessage: 'Low',
       }
     ),
   },
@@ -34,7 +34,7 @@ export const severityOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.xsoar.eventSelectSeverityMediumOptionLabel',
       {
-        defaultMessage: 'MEDIUM',
+        defaultMessage: 'Medium',
       }
     ),
   },
@@ -43,7 +43,7 @@ export const severityOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.xsoar.eventSelectSeverityHighOptionLabel',
       {
-        defaultMessage: 'HIGH',
+        defaultMessage: 'High',
       }
     ),
   },
@@ -52,7 +52,7 @@ export const severityOptions = [
     text: i18n.translate(
       'xpack.stackConnectors.components.xsoar.eventSelectSeverityCriticalOptionLabel',
       {
-        defaultMessage: 'CRITICAL',
+        defaultMessage: 'Critical',
       }
     ),
   },
