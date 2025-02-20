@@ -86,6 +86,23 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   );
 
   useEffect(() => {
+    if (actionConnector != null && connectorId !== actionConnector.id) {
+      setConnectorId(actionConnector?.id);
+      setSelectedPlaybookOption(null);
+      setIsRuleSeverity(isTest ? false : true);
+      editAction(
+        'subActionParams',
+        {
+          severity: isTest ? XSOARSeverity.UNKNOWN : XSOARSeverity.RULE_SEVERITY,
+          createInvestigation: false,
+        },
+        index
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actionConnector]);
+
+  useEffect(() => {
     if (!actionParams.subAction) {
       editAction('subAction', SUB_ACTION.RUN, index);
     }
@@ -93,11 +110,6 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
       editAction('subActionParams', incident, index);
     }
   }, [actionParams]);
-
-  if (connectorId !== actionConnector?.id) {
-    setSelectedPlaybookOption(null);
-    setConnectorId(actionConnector?.id);
-  }
 
   const {
     response: { playbooks } = {},
@@ -188,7 +200,7 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
       {selectedPlaybookOption && (
         <EuiFormRow fullWidth>
           <EuiSwitch
-            label={translations.CREATE_INVESTIGATION_LABEL}
+            label={translations.START_INVESTIGATION_LABEL}
             checked={incident.createInvestigation}
             data-test-subj="createInvestigation-toggle"
             onChange={(e) => {
@@ -245,6 +257,7 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
         </EuiFormRow>
       )}
       <JsonEditorWithMessageVariables
+        key={connectorId}
         messageVariables={messageVariables}
         paramsProperty={'body'}
         inputTargetValue={incident.body}

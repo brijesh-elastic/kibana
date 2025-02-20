@@ -61,7 +61,7 @@ export const BODY_REQUIRED = i18n.translate(
   }
 );
 
-export const CREATE_INVESTIGATION_LABEL = i18n.translate(
+export const START_INVESTIGATION_LABEL = i18n.translate(
   'xpack.stackConnectors.components.xsoar.params.startInvestigationToggleLabel',
   {
     defaultMessage: 'Start investigation',
