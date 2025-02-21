@@ -50,7 +50,7 @@ export const NAME_LABEL = i18n.translate(
 export const NAME_REQUIRED = i18n.translate(
   'xpack.stackConnectors.components.xsoar.params.error.requiredNameText',
   {
-    defaultMessage: 'Name is required.',
+    defaultMessage: 'Incident name is required.',
   }
 );
 
