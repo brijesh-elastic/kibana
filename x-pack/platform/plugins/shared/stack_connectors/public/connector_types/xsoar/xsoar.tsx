@@ -13,9 +13,7 @@ import { ExecutorParams } from '../../../common/xsoar/types';
 import * as i18n from './translations';
 
 interface ValidationErrors {
-  subAction: string[];
-  body: string[];
-  playbook: string[];
+  name: string[];
 }
 
 export function getConnectorType(): XSOARConnector {
@@ -29,49 +27,14 @@ export function getConnectorType(): XSOARConnector {
     ): Promise<GenericValidationResult<ValidationErrors>> => {
       const translations = await import('./translations');
       const errors: ValidationErrors = {
-        subAction: [],
-        body: [],
-        playbook: [],
+        name: [],
       };
       const { subAction, subActionParams } = actionParams;
 
-      if (subAction === SUB_ACTION.TEST) {
-        if (!subActionParams?.playbookId?.length) {
-          errors.playbook.push(translations.PLAYBOOK_REQUIRED);
-        }
-        if (!subActionParams?.body?.length) {
-          errors.body.push(translations.BODY_REQUIRED);
-        } else {
-          try {
-            const body = JSON.parse(subActionParams.body);
-            if (body.hasOwnProperty('playbookId')) {
-              errors.body.push(translations.PLAYBOOK_ID_PRESENT_IN_BODY);
-            }
-            if (!body.hasOwnProperty('name')) {
-              errors.body.push(translations.NAME_KEY_REQUIRED);
-            }
-          } catch {
-            errors.body.push(translations.BODY_INVALID);
-          }
-        }
-      }
-
       if (subAction === SUB_ACTION.RUN) {
-        if (!subActionParams?.playbookId?.length) {
-          errors.playbook.push(translations.PLAYBOOK_REQUIRED);
+        if (!subActionParams?.name?.length) {
+          errors.name.push(translations.NAME_REQUIRED);
         }
-        if (!subActionParams?.body?.length) {
-          errors.body.push(translations.BODY_REQUIRED);
-        }
-      }
-
-      if (errors.body.length) return { errors };
-
-      // The internal "subAction" param should always be valid, ensure it is only if "subActionParams" are valid
-      if (!subAction) {
-        errors.subAction.push(translations.ACTION_REQUIRED);
-      } else if (subAction !== SUB_ACTION.RUN && subAction !== SUB_ACTION.TEST) {
-        errors.subAction.push(translations.INVALID_ACTION);
       }
       return { errors };
     },

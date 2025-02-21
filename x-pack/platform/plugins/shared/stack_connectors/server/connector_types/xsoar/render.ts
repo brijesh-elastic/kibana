@@ -6,22 +6,42 @@
  */
 
 import { ExecutorParams } from '@kbn/actions-plugin/server/sub_action_framework/types';
-import { renderMustacheString } from '@kbn/actions-plugin/server/lib/mustache_renderer';
+import {
+  renderMustacheObject,
+  renderMustacheString,
+} from '@kbn/actions-plugin/server/lib/mustache_renderer';
 import { RenderParameterTemplates } from '@kbn/actions-plugin/server/types';
-import { SUB_ACTION } from '../../../common/xsoar/constants';
+
+function mapSeverity(severity: string): number {
+  switch (severity) {
+    case 'low':
+      return 1;
+    case 'medium':
+      return 2;
+    case 'high':
+      return 3;
+    case 'critical':
+      return 4;
+    default:
+      return 0;
+  }
+}
 
 export const renderParameterTemplates: RenderParameterTemplates<ExecutorParams> = (
   logger,
   params,
   variables
 ) => {
-  if (params?.subAction !== SUB_ACTION.RUN && params?.subAction !== SUB_ACTION.TEST) return params;
-
   return {
     ...params,
     subActionParams: {
-      ...params.subActionParams,
-      body: renderMustacheString(logger, params.subActionParams.body as string, variables, 'json'),
+      ...renderMustacheObject(logger, params.subActionParams, variables),
+      severity:
+        params.subActionParams.severity === 5
+          ? mapSeverity(
+            renderMustacheString(logger, '{{context.rule.severity}}', variables, 'json')
+          )
+          : params.subActionParams.severity,
     },
   };
-};
+}

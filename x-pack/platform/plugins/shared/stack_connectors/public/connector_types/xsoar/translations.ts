@@ -14,7 +14,7 @@ export const URL_LABEL = i18n.translate('xpack.stackConnectors.components.xsoar.
 export const SELECT_MESSAGE = i18n.translate(
   'xpack.stackConnectors.components.xsoar.selectMessageText',
   {
-    defaultMessage: 'Create incidents in XSOAR',
+    defaultMessage: 'Create an incident in XSOAR',
   }
 );
 
@@ -40,24 +40,17 @@ export const API_KEY_ID_HELP_TEXT = i18n.translate(
   }
 );
 
-export const ACTION_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.params.error.requiredActionText',
+export const NAME_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.nameFieldLabel',
   {
-    defaultMessage: 'Action is required.',
+    defaultMessage: 'Name',
   }
 );
 
-export const INVALID_ACTION = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.params.error.invalidActionText',
+export const NAME_REQUIRED = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.error.requiredNameText',
   {
-    defaultMessage: 'Invalid action name.',
-  }
-);
-
-export const PLAYBOOK_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.params.error.requiredPlaybookSelection',
-  {
-    defaultMessage: 'Playbook selection is required.',
+    defaultMessage: 'Name is required.',
   }
 );
 
@@ -68,24 +61,24 @@ export const BODY_REQUIRED = i18n.translate(
   }
 );
 
-export const BODY_INVALID = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.params.error.invalidBodyText',
+export const START_INVESTIGATION_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.startInvestigationToggleLabel',
   {
-    defaultMessage: 'Body does not have a valid JSON format.',
+    defaultMessage: 'Start investigation',
   }
 );
 
-export const PLAYBOOK_ID_PRESENT_IN_BODY = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.params.error.playbookIdPresentInBodyText',
+export const SEVERITY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.severitySelectInputLabel',
   {
-    defaultMessage: 'playbookId field should not be present in the body.',
+    defaultMessage: 'Severity',
   }
 );
 
-export const NAME_KEY_REQUIRED = i18n.translate(
-  'xpack.stackConnectors.components.xsoar.params.error.requiredNameKeyText',
+export const IS_RULE_SEVERITY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.xsoar.params.isRuleSeverityToggleLabel',
   {
-    defaultMessage: 'Name key is required.',
+    defaultMessage: 'Keep severity from rule',
   }
 );
 

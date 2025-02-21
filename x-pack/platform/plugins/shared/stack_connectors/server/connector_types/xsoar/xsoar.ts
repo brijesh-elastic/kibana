@@ -63,12 +63,6 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
       method: 'run',
       schema: XSOARRunActionParamsSchema,
     });
-
-    this.registerSubAction({
-      name: SUB_ACTION.TEST,
-      method: 'run',
-      schema: XSOARRunActionParamsSchema,
-    });
   }
 
   private getAuthHeaders() {
@@ -86,15 +80,15 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
 
   private formatIncidentBody(incident: XSOARRunActionParams) {
     try {
-      const { body, playbookId } = incident;
+      const { body, ...incidentWithoutBody } = incident;
       const bodyJson = JSON.parse(body ?? '{}');
-      const mergedIncidentBody = { ...bodyJson, playbookId };
+      const mergedIncident = { ...bodyJson, ...incidentWithoutBody };
 
-      return mergedIncidentBody;
+      return mergedIncident;
     } catch (err) {
       throw new Error(
-        i18n.translate('xpack.stackConnectors.thehive.alertBodyParsingError', {
-          defaultMessage: 'Error parsing alert body for thehive: {err}',
+        i18n.translate('xpack.stackConnectors.xsoar.alertBodyParsingError', {
+          defaultMessage: 'Error parsing alert body for xSOAR: {err}',
           values: {
             err: err.toString(),
           },
@@ -107,13 +101,12 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
     incident: XSOARRunActionParams,
     connectorUsageCollector: ConnectorUsageCollector
   ) {
-    const mergedIncidentBody = this.formatIncidentBody(incident);
-
+    const mergedIncident = this.formatIncidentBody(incident);
     await this.request(
       {
         method: 'post',
         url: `${this.urls.incident}`,
-        data: mergedIncidentBody,
+        data: mergedIncident,
         headers: this.getAuthHeaders(),
         responseSchema: XSOARRunActionResponseSchema,
       },

@@ -17,16 +17,20 @@ import { Config, Secrets } from '../../../common/xsoar/types';
 import { XSOARConnector } from './xsoar';
 import { renderParameterTemplates } from './render';
 
-export const getConnectorType = (): SubActionConnectorType<Config, Secrets> => ({
-  id: XSOAR_CONNECTOR_ID,
-  name: XSOAR_TITLE,
-  getService: (params) => new XSOARConnector(params),
-  schema: {
-    config: ConfigSchema,
-    secrets: SecretsSchema,
-  },
-  validators: [{ type: ValidatorType.CONFIG, validator: urlAllowListValidator('url') }],
-  supportedFeatureIds: [SecurityConnectorFeatureId],
-  minimumLicenseRequired: 'gold',
-  renderParameterTemplates,
-});
+export type XSOARConnectorType = SubActionConnectorType<Config, Secrets>;
+
+export function getConnectorType(): XSOARConnectorType {
+  return {
+    id: XSOAR_CONNECTOR_ID,
+    minimumLicenseRequired: 'platinum',
+    name: XSOAR_TITLE,
+    getService: (params) => new XSOARConnector(params),
+    supportedFeatureIds: [SecurityConnectorFeatureId],
+    schema: {
+      config: ConfigSchema,
+      secrets: SecretsSchema,
+    },
+    renderParameterTemplates,
+    validators: [{ type: ValidatorType.CONFIG, validator: urlAllowListValidator('url') }],
+  };
+}

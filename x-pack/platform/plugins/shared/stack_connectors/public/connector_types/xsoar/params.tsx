@@ -11,6 +11,7 @@ import {
   useKibana,
   ActionParamsProps,
   JsonEditorWithMessageVariables,
+  TextFieldWithMessageVariables,
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import {
@@ -20,8 +21,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiHighlight,
+  EuiSwitch,
+  EuiSelect,
 } from '@elastic/eui';
-import { SUB_ACTION } from '../../../common/xsoar/constants';
+import { SUB_ACTION, XSOARSeverity } from '../../../common/xsoar/constants';
 import {
   ExecutorParams,
   XSOARRunActionParams,
@@ -30,14 +33,14 @@ import {
   XSOARPlaybooksObject,
 } from '../../../common/xsoar/types';
 import * as translations from './translations';
+import { severityOptions } from './constants';
 
 type PlaybookOption = EuiComboBoxOptionOption<XSOARPlaybooksObject>;
 
 const createOption = (
   playbook: XSOARPlaybooksObject
-): EuiComboBoxOptionOption<XSOARPlaybooksObject> => ({
+): PlaybookOption => ({
   key: playbook.id,
-  value: playbook,
   label: playbook.name,
 });
 
@@ -63,28 +66,50 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   executionMode,
 }) => {
   const { toasts } = useKibana().notifications;
-  const { subAction, subActionParams } = actionParams;
-  const { body, playbookId } = (subActionParams as XSOARRunActionParams) ?? {};
+  const isTest = executionMode === ActionConnectorMode.Test;
+  const incident = useMemo(
+    () =>
+      (actionParams.subActionParams as XSOARRunActionParams) ??
+      ({
+        severity: isTest ? XSOARSeverity.UNKNOWN : XSOARSeverity.RULE_SEVERITY,
+        createInvestigation: false,
+      } as unknown as XSOARRunActionParams),
+    [actionParams.subActionParams]
+  );
 
   const [connectorId, setConnectorId] = useState<string | undefined>(actionConnector?.id);
   const [selectedPlaybookOption, setSelectedPlaybookOption] = useState<
     PlaybookOption | null | undefined
   >();
-  // const actionConnectorRef = useRef(actionConnector?.id ?? '');
-
-  const isTest = useMemo(() => executionMode === ActionConnectorMode.Test, [executionMode]);
+  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(
+    incident.severity === XSOARSeverity.RULE_SEVERITY ? true : false
+  );
 
   useEffect(() => {
-    if (!subAction) {
-      editAction('subAction', isTest ? SUB_ACTION.TEST : SUB_ACTION.RUN, index);
+    if (actionConnector != null && connectorId !== actionConnector.id) {
+      setConnectorId(actionConnector?.id);
+      setSelectedPlaybookOption(null);
+      setIsRuleSeverity(isTest ? false : true);
+      editAction(
+        'subActionParams',
+        {
+          severity: isTest ? XSOARSeverity.UNKNOWN : XSOARSeverity.RULE_SEVERITY,
+          createInvestigation: false,
+        },
+        index
+      );
     }
-  }, [editAction, index, isTest, subAction]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actionConnector]);
 
-  if (connectorId !== actionConnector?.id) {
-    // Playbook reset needed before requesting with a different connectorId
-    setSelectedPlaybookOption(null);
-    setConnectorId(actionConnector?.id);
-  }
+  useEffect(() => {
+    if (!actionParams.subAction) {
+      editAction('subAction', SUB_ACTION.RUN, index);
+    }
+    if (!actionParams.subActionParams) {
+      editAction('subActionParams', incident, index);
+    }
+  }, [actionParams]);
 
   const {
     response: { playbooks } = {},
@@ -104,22 +129,20 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   }, [toasts, playbooksError]);
 
   useEffect(() => {
-    if (selectedPlaybookOption === undefined && playbookId && playbooks) {
-      // Set the initial selected story option from saved storyId when stories are loaded
-      const selectedPlaybook = playbooks.find(({ id }) => id === playbookId);
+    if (selectedPlaybookOption === undefined && incident.playbookId && playbooks) {
+      const selectedPlaybook = playbooks.find(({ id }) => id === incident.playbookId);
       if (selectedPlaybook) {
         setSelectedPlaybookOption(createOption(selectedPlaybook));
       } else {
         toasts.warning({ title: translations.PLAYBOOK_NOT_FOUND_WARNING });
-        editAction('subActionParams', { body, playbookId: undefined }, index);
+        editAction('subActionParams', { ...incident, playbookId: undefined, createInvestigation: false }, index);
       }
     }
 
-    if (selectedPlaybookOption !== undefined && selectedPlaybookOption?.value?.id !== playbookId) {
-      // Selected playbook changed, update playbookId param
-      editAction('subActionParams', { body, playbookId: selectedPlaybookOption?.value?.id }, index);
+    if (selectedPlaybookOption !== undefined && selectedPlaybookOption?.key !== incident.playbookId) {
+      editAction('subActionParams', { ...incident, playbookId: selectedPlaybookOption?.key, createInvestigation: selectedPlaybookOption === null ? false : incident.createInvestigation }, index);
     }
-  }, [selectedPlaybookOption, playbookId, playbooks, toasts, editAction, body, index]);
+  }, [selectedPlaybookOption, incident.playbookId, playbooks, toasts, editAction, index]);
 
   const selectedPlaybookOptions = useMemo(
     () => (selectedPlaybookOption ? [selectedPlaybookOption] : []),
@@ -132,6 +155,27 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
 
   return (
     <>
+      <TextFieldWithMessageVariables
+        index={index}
+        editAction={(key, value) => {
+          editAction('subActionParams', { ...incident, [key]: value }, index);
+        }}
+        messageVariables={messageVariables}
+        paramsProperty={'name'}
+        inputTargetValue={incident.name}
+        wrapField={true}
+        formRowProps={{
+          label: translations.NAME_LABEL,
+          fullWidth: true,
+          helpText: '',
+          isInvalid:
+            errors.name !== undefined &&
+            Number(errors.name.length) > 0 &&
+            incident.name !== undefined,
+          error: errors.name as string,
+        }}
+        errors={errors.name as string[]}
+      />
       <EuiFormRow
         fullWidth
         error={errors.playbook as string[]}
@@ -153,20 +197,79 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
           data-test-subj="xsoar-playbookSelector"
         />
       </EuiFormRow>
+      {selectedPlaybookOption && (
+        <EuiFormRow fullWidth>
+          <EuiSwitch
+            label={translations.START_INVESTIGATION_LABEL}
+            checked={incident.createInvestigation}
+            data-test-subj="createInvestigation-toggle"
+            onChange={(e) => {
+              editAction(
+                'subActionParams',
+                {
+                  ...incident,
+                  createInvestigation: e.target.checked
+                },
+                index
+              );
+            }}
+          />
+        </EuiFormRow>
+      )}
+      {!isTest && (
+        <EuiFormRow fullWidth>
+          <EuiSwitch
+            label={translations.IS_RULE_SEVERITY_LABEL}
+            checked={isRuleSeverity}
+            data-test-subj="rule-severity-toggle"
+            onChange={(e) => {
+              setIsRuleSeverity(e.target.checked);
+              editAction(
+                'subActionParams',
+                {
+                  ...incident,
+                  severity: e.target.checked
+                    ? XSOARSeverity.RULE_SEVERITY
+                    : XSOARSeverity.UNKNOWN,
+                },
+                index
+              );
+            }}
+          />
+        </EuiFormRow>
+      )}
+      {!isRuleSeverity && (
+        <EuiFormRow fullWidth label={translations.SEVERITY_LABEL}>
+          <EuiSelect
+            fullWidth
+            data-test-subj="severitySelectInput"
+            disabled={isRuleSeverity}
+            value={incident.severity ?? severityOptions[0].value}
+            options={severityOptions}
+            onChange={(e) => {
+              editAction(
+                'subActionParams',
+                { ...incident, severity: parseFloat(e.target.value) },
+                index
+              );
+            }}
+          />
+        </EuiFormRow>
+      )}
       <JsonEditorWithMessageVariables
+        key={connectorId}
         messageVariables={messageVariables}
         paramsProperty={'body'}
-        inputTargetValue={body}
+        inputTargetValue={incident.body}
         label={translations.BODY_LABEL}
         ariaLabel={translations.BODY_DESCRIPTION}
-        errors={errors.body as string[]}
         onDocumentsChange={(json: string) =>
-          editAction('subActionParams', { ...subActionParams, body: json }, index)
+          editAction('subActionParams', { ...incident, body: json }, index)
         }
         dataTestSubj="xsoar-body"
         onBlur={() => {
-          if (!body) {
-            editAction('subActionParams', { ...subActionParams, body: null }, index);
+          if (!incident.body) {
+            editAction('subActionParams', { ...incident, body: null }, index);
           }
         }}
       />
@@ -174,5 +277,4 @@ const XSOARParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorParam
   );
 };
 
-// eslint-disable-next-line import/no-default-export
 export { XSOARParamsFields as default };

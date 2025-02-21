@@ -8,7 +8,6 @@
 import { schema } from '@kbn/config-schema';
 import { SUB_ACTION } from './constants';
 
-// Connector schema
 export const ConfigSchema = schema.object({
   url: schema.string(),
 });
@@ -18,7 +17,6 @@ export const SecretsSchema = schema.object({
   apiKeyID: schema.nullable(schema.string()),
 });
 
-// Stories action schema
 export const XSOARPlaybooksActionParamsSchema = null;
 export const XSOARPlaybooksObjectSchema = schema.object(
   {
@@ -34,10 +32,12 @@ export const XSOARPlaybooksActionResponseSchema = schema.object(
   { unknowns: 'ignore' }
 );
 
-// Run action schema
 export const XSOARRunActionParamsSchema = schema.object({
-  playbookId: schema.string(),
-  body: schema.string(),
+  name: schema.string(),
+  playbookId: schema.nullable(schema.string()),
+  createInvestigation: schema.boolean(),
+  severity: schema.number(),
+  body: schema.nullable(schema.string()),
 });
 export const XSOARRunActionResponseSchema = schema.object({}, { unknowns: 'ignore' });
 
@@ -48,10 +48,6 @@ export const ExecutorParamsSchema = schema.oneOf([
   }),
   schema.object({
     subAction: schema.literal(SUB_ACTION.RUN),
-    subActionParams: XSOARRunActionParamsSchema,
-  }),
-  schema.object({
-    subAction: schema.literal(SUB_ACTION.TEST),
     subActionParams: XSOARRunActionParamsSchema,
   }),
 ]);
