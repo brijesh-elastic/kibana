@@ -14,7 +14,7 @@ export const URL_LABEL = i18n.translate('xpack.stackConnectors.components.xsoar.
 export const SELECT_MESSAGE = i18n.translate(
   'xpack.stackConnectors.components.xsoar.selectMessageText',
   {
-    defaultMessage: 'Create incidents in XSOAR',
+    defaultMessage: 'Create an incident in XSOAR',
   }
 );
 

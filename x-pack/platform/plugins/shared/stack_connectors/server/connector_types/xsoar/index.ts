@@ -22,7 +22,7 @@ export type XSOARConnectorType = SubActionConnectorType<Config, Secrets>;
 export function getConnectorType(): XSOARConnectorType {
   return {
     id: XSOAR_CONNECTOR_ID,
-    minimumLicenseRequired: 'gold',
+    minimumLicenseRequired: 'platinum',
     name: XSOAR_TITLE,
     getService: (params) => new XSOARConnector(params),
     supportedFeatureIds: [SecurityConnectorFeatureId],
