@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ActionParamsProps, ActionConnectorMode } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect } from '@elastic/eui';
-import { eventActionOptions } from './constants';
+import { bodyOptions, eventActionOptions, testBodyOptions } from './constants';
 import { SUB_ACTION } from '../../../common/thehive/constants';
 import { ExecutorParams } from '../../../common/thehive/types';
 import { TheHiveParamsAlertFields } from './params_alert';
@@ -83,6 +83,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
             severity: 2,
             tags: [],
             sourceRef: isTest ? undefined : '{{alert.uuid}}',
+            body: isTest ? testBodyOptions[0] : bodyOptions[0],
           }
         : {
             incident: {

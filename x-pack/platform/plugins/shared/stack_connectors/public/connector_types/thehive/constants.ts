@@ -112,3 +112,70 @@ export const tlpOptions = [
     }),
   },
 ];
+
+export const templateOptions = [
+  {
+    value: 0,
+    text: i18n.translate(
+      'xpack.stackConnectors.components.thehive.eventSelectTemplate1OptionLabel',
+      {
+        defaultMessage: 'Template1',
+      }
+    ),
+  },
+  {
+    value: 1,
+    text: i18n.translate(
+      'xpack.stackConnectors.components.thehive.eventSelectTemplate2OptionLabel',
+      {
+        defaultMessage: 'Template2',
+      }
+    ),
+  },
+];
+
+export const bodyOptions = [
+  '{"observables":[{"dataType":"ip","data":"{{#context.alerts}}{{source.ip}}12{{/context.alerts}}","tags":["source.ip"]},{"dataType":"hostname","data":"{{#context.alerts}}{{host.hostname}}34{{/context.alerts}}","tags":["Fortigate-FW"]}],"procedures":[{{#context.rule.threat}}{"patternId":"{{technique.0.id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{#technique.0.subtechnique}},{"patternId":"{{id}}","occurDate":"{{#context.alerts}}{{#signal.original_time}}{{#FormatDate}} {{{signal.original_time}}} ; ; x {{/FormatDate}}{{/signal.original_time}}{{^signal.original_time}}1640000000000{{/signal.original_time}}{{/context.alerts}}","tactic":"{{tactic.name}}"}{{/technique.0.subtechnique}}{{^technique.0.subtechnique}}{{^@last}},{{/@last}}{{/technique.0.subtechnique}}{{/context.rule.threat}}]}',
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'hostname',
+          data: '{{#context.alerts}}{{host.hostname}}{{/context.alerts}}',
+          tags: ['Fortigate-FW'],
+        },
+      ],
+    },
+    null,
+    2
+  ),
+];
+
+export const testBodyOptions = [
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'ip',
+          data: '127.0.0.1',
+          tags: ['source.ip'],
+        },
+      ],
+    },
+    null,
+    2
+  ),
+  JSON.stringify(
+    {
+      observables: [
+        {
+          dataType: 'hostname',
+          data: '{{#context.alerts}}{{host.hostname}}{{/context.alerts}}',
+          tags: ['Fortigate-FW'],
+        },
+      ],
+    },
+    null,
+    2
+  ),
+];

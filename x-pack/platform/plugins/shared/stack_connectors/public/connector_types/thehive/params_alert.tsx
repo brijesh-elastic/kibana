@@ -10,10 +10,17 @@ import {
   TextFieldWithMessageVariables,
   TextAreaWithMessageVariables,
   ActionParamsProps,
+  JsonEditorWithMessageVariables,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, EuiComboBox } from '@elastic/eui';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
-import { severityOptions, tlpOptions } from './constants';
+import {
+  severityOptions,
+  tlpOptions,
+  templateOptions,
+  bodyOptions,
+  testBodyOptions,
+} from './constants';
 import * as translations from './translations';
 
 export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams>> = ({
@@ -30,6 +37,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         tlp: 2,
         severity: 2,
         tags: [],
+        body: testBodyOptions[0],
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
@@ -39,6 +47,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>(
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
+  const [template, setTemplate] = useState(templateOptions[0].value);
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
@@ -54,6 +63,8 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
     );
   };
 
+  // eslint-disable-next-line no-console
+  console.log({ alert });
   return (
     <>
       <TextFieldWithMessageVariables
@@ -187,6 +198,51 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           noSuggestions
         />
       </EuiFormRow>
+      <EuiFormRow fullWidth label="Observable Template">
+        <EuiSelect
+          fullWidth
+          data-test-subj="templateSelectInput"
+          value={template}
+          options={templateOptions}
+          onChange={(e) => {
+            editAction(
+              'subActionParams',
+              { ...alert, body: testBodyOptions[parseInt(e.target.value, 10)] },
+              index
+            );
+            setTemplate(parseInt(e.target.value, 10));
+          }}
+        />
+        {/* below text area is just to show that alert object is changed and component is re-rendered */}
+      </EuiFormRow>
+      <TextAreaWithMessageVariables
+        index={index}
+        label="Other Body"
+        editAction={(key, value) => {
+          editAction('subActionParams', { ...alert, [key]: value }, index);
+        }}
+        messageVariables={messageVariables}
+        paramsProperty={'body'}
+        inputTargetValue={JSON.stringify(alert.body, null, 2)}
+        errors={errors['createAlertParam.body'] as string[]}
+      />
+      <JsonEditorWithMessageVariables
+        messageVariables={messageVariables}
+        paramsProperty={'body'}
+        inputTargetValue={alert.body}
+        label={translations.BODY_LABEL}
+        ariaLabel={translations.BODY_DESCRIPTION}
+        errors={errors.body as string[]}
+        onDocumentsChange={(json: string) =>
+          editAction('subActionParams', { ...alert, body: json }, index)
+        }
+        dataTestSubj="thehive-bodyJsonEditor"
+        onBlur={() => {
+          if (!alert.body) {
+            editAction('subActionParams', { ...alert, body: '' }, index);
+          }
+        }}
+      />
     </>
   );
 };

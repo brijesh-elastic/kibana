@@ -102,6 +102,20 @@ export const SOURCE_REF_LABEL = i18n.translate(
   }
 );
 
+export const BODY_LABEL = i18n.translate(
+  'xpack.stackConnectors.components.thehive.sourceRefFieldLabel',
+  {
+    defaultMessage: 'Body',
+  }
+);
+
+export const BODY_DESCRIPTION = i18n.translate(
+  'xpack.stackConnectors.components.thehive.sourceRefFieldLabel',
+  {
+    defaultMessage: 'Code Editor',
+  }
+);
+
 export const TITLE_REQUIRED = i18n.translate(
   'xpack.stackConnectors.components.thehive.requiredTitleText',
   {
