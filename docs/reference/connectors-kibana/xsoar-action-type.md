@@ -26,13 +26,17 @@ Name
 :   The name of the connector.
 
 URL
-:   The instance URL of XSOAR.
+:   The XSOAR instance URL.
 
 API key
-:   The API key for authentication in XSOAR.
+:   The XSOAR API key for authentication.
+
+    ::::{note}
+    If you do not have an API key, refer to [Create a new API key](https://cortex-panw.stoplight.io/docs/cortex-xsoar-8/t09y7hrb5d14m-create-a-new-api-key) to make one for your XSOAR instance.
+    ::::
 
 API key id
-:   The API key id for authentication in XSOAR. It is mandatory for cloud instance users.
+:   The XSOAR API key ID for authentication. (Mandatory for cloud instance users.)
 
 
 ## Test connectors [xsoar-action-configuration]
@@ -45,23 +49,23 @@ You can test connectors as you’re creating or editing the connector in {{kib}}
 XSOAR actions have the following configuration properties.
 
 Name
-:   The name of the incident.
+:   The incident name.
 
 Playbook
-:   The playbook to associate with the incident.
+:   The playbook associated with the incident.
 
 Start investigation
-:   Indicates whether to start the investigation process automatically upon creating the new incident.
+:   If turned on, will automatically start the investigation process after the incident is created.
 
 Severity
-:   The severity of the incident: `Unknown`, `Informational`, `Low`, `Medium`, `High` or `Critical`.
+:   The severity of the incident. Can be `Unknown`, `Informational`, `Low`, `Medium`, `High` or `Critical`.
 
     ::::{note}
-    Use the `Keep severity from rule` toggle to create an incident with the rule's severity.
+    Turn on `Keep severity from rule` to create an incident that inherits the rule's severity.
     ::::
 
 Body
-:   A JSON payload that includes additional parameters to to be included in the API request.
+:   A JSON payload that includes additional parameters to be included in the API request.
 
     ```json
     {
