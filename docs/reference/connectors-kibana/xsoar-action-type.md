@@ -52,7 +52,7 @@ Name
 :   The incident name.
 
 Playbook
-:   The playbook associated with the incident.
+:   The playbook to associate with the incident.
 
 Start investigation
 :   If turned on, will automatically start the investigation process after the incident is created.

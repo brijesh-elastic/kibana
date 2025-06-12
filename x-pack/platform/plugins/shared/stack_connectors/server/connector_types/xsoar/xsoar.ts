@@ -112,12 +112,15 @@ export class XSOARConnector extends SubActionConnector<Config, Secrets> {
     incident: XSOARRunActionParams,
     connectorUsageCollector: ConnectorUsageCollector
   ) {
-    const mergedIncident = this.formatIncidentBody(incident);
+    const res = this.formatIncidentBody(incident);
+    if (res?.status === 'error') {
+      return res;
+    }
     await this.request(
       {
         method: 'post',
         url: `${this.urls.incident}`,
-        data: mergedIncident,
+        data: res,
         headers: this.getAuthHeaders(),
         responseSchema: XSOARRunActionResponseSchema,
       },

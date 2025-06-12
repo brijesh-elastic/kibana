@@ -517,9 +517,9 @@ describe('XSOARConnector', () => {
     });
 
     it('error when malformed incident is passed', async () => {
-      await expect(connector.run(malformedIncident, connectorUsageCollector)).rejects.toThrowError(
-        'Error parsing incident body for xSOAR'
-      );
+      const res = await connector.run(malformedIncident, connectorUsageCollector);
+      expect(res.status).toBe('error');
+      expect(res.message).toBe('error triggering XSOAR workflow, parsing body');
     });
   });
 });
