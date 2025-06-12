@@ -9,8 +9,6 @@
 
 import { camelCase } from 'lodash';
 import type { IndexAutocompleteItem } from '@kbn/esql-types';
-import { InferenceTaskType } from '@elastic/elasticsearch/lib/api/types';
-import { InferenceEndpointAutocompleteItem } from '@kbn/esql-types';
 import { ESQLFieldWithMetadata } from '../validation/types';
 import { fieldTypes } from '../definitions/types';
 import { ESQLCallbacks } from '../shared/types';
@@ -105,13 +103,6 @@ export const editorExtensions = [
   },
 ];
 
-export const inferenceEndpoints: InferenceEndpointAutocompleteItem[] = [
-  {
-    inference_id: 'inference_1',
-    task_type: 'completion',
-  },
-];
-
 export function getCallbackMocks(): ESQLCallbacks {
   return {
     getColumnsFor: jest.fn(async ({ query } = {}) => {
@@ -150,6 +141,5 @@ export function getCallbackMocks(): ESQLCallbacks {
       }
       return [];
     }),
-    getInferenceEndpoints: jest.fn(async (taskType: InferenceTaskType) => ({ inferenceEndpoints })),
   };
 }

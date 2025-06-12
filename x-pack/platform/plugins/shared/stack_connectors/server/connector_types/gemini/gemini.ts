@@ -16,6 +16,7 @@ import type {
   ConnectorUsageCollector,
   ConnectorTokenClientContract,
 } from '@kbn/actions-plugin/server/types';
+
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import {
   RunActionParamsSchema,
@@ -329,12 +330,7 @@ export class GeminiConnector extends SubActionConnector<Config, Secrets> {
     const res = await this.runApi(
       {
         body: JSON.stringify({
-          ...formatGeminiPayload({
-            maxOutputTokens,
-            messages,
-            temperature,
-            systemInstruction,
-          }),
+          ...formatGeminiPayload({ maxOutputTokens, messages, temperature, systemInstruction }),
           tools,
         }),
         model,
@@ -459,6 +455,5 @@ const formatGeminiPayload = ({
     }
     previousRole = correctRole;
   }
-
   return payload;
 };

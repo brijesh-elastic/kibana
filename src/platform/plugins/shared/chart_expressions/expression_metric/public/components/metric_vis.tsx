@@ -184,13 +184,14 @@ export const MetricVis = ({
         title: String(title),
         subtitle,
         icon: config.metric?.icon ? getIcon(config.metric?.icon) : undefined,
-        extra: ({ color }) => (
+        extra: ({ fontSize, color }) => (
           <SecondaryMetric
             row={row}
             config={config}
             columns={data.columns}
             getMetricFormatter={getMetricFormatter}
             color={config.metric.secondaryColor}
+            fontSize={fontSize}
             trendConfig={
               hasDynamicColoring && trendConfig
                 ? { ...trendConfig, borderColor: color }
@@ -211,13 +212,14 @@ export const MetricVis = ({
       title: String(title),
       subtitle,
       icon: config.metric?.icon ? getIcon(config.metric?.icon) : undefined,
-      extra: ({ color }) => (
+      extra: ({ fontSize, color }) => (
         <SecondaryMetric
           row={row}
           config={config}
           columns={data.columns}
           getMetricFormatter={getMetricFormatter}
           color={config.metric.secondaryColor}
+          fontSize={fontSize}
           trendConfig={
             hasDynamicColoring && trendConfig ? { ...trendConfig, borderColor: color } : trendConfig
           }

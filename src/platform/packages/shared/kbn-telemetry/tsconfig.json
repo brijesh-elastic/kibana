@@ -16,6 +16,5 @@
   "kbn_references": [
     "@kbn/apm-config-loader",
     "@kbn/tracing",
-    "@kbn/logging",
   ]
 }

@@ -100,10 +100,8 @@ function Waterfall(props: WaterfallProps) {
       {({ registerChild }) => (
         <AutoSizer disableHeight>
           {({ width }) => (
-            <div
-              data-test-subj="waterfall"
-              ref={registerChild as unknown as React.Ref<HTMLDivElement>}
-            >
+            // @ts-expect-error @types/react@18 Type 'HTMLDivElement' is not assignable to type 'ReactNode'
+            <div data-test-subj="waterfall" ref={registerChild}>
               <List
                 ref={listRef}
                 style={{ height: '100%' }}

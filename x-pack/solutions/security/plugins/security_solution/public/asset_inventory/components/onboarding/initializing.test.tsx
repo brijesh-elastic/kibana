@@ -7,14 +7,11 @@
 import React from 'react';
 import { renderWithTestProvider } from '../../test/test_provider';
 import { Initializing } from './initializing';
-import { screen } from '@testing-library/react';
-
-import { mockUseAddIntegrationPath } from './hooks/use_add_integration_path.mock';
-import { useAddIntegrationPath } from './hooks/use_add_integration_path';
-
-jest.mock('./hooks/use_add_integration_path');
+import { userEvent } from '@testing-library/user-event';
+import { screen } from '@testing-library/dom';
 
 const mockNavigateToApp = jest.fn();
+
 jest.mock('../../../common/lib/kibana', () => ({
   useKibana: () => ({
     services: {
@@ -26,33 +23,13 @@ jest.mock('../../../common/lib/kibana', () => ({
 }));
 
 describe('Initializing', () => {
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
-
-  it('should render and have the correct add integration link href and enabled state', () => {
-    (useAddIntegrationPath as jest.Mock).mockReturnValue(
-      mockUseAddIntegrationPath({ addIntegrationPath: '/test-integration-path', isLoading: false })
-    );
-
+  it('should navigate to the integrations page when clicking "Add integration" button', async () => {
     renderWithTestProvider(<Initializing />);
 
     expect(screen.getByRole('heading', { name: /discovering your assets/i })).toBeInTheDocument();
 
-    const addLink = screen.getByRole('link', { name: /add integration/i });
-    expect(addLink).toBeInTheDocument();
-    expect(addLink).toHaveAttribute('href', '/test-integration-path');
-    expect(addLink).not.toBeDisabled();
-  });
+    await userEvent.click(screen.getByRole('button', { name: /add integration/i }));
 
-  it('should disable the add integration button when loading', () => {
-    (useAddIntegrationPath as jest.Mock).mockReturnValue(
-      mockUseAddIntegrationPath({ isLoading: true })
-    );
-
-    renderWithTestProvider(<Initializing />);
-
-    const addButton = screen.getByRole('button', { name: /add integration/i });
-    expect(addButton).toBeDisabled();
+    expect(mockNavigateToApp).toHaveBeenCalledWith('integrations');
   });
 });

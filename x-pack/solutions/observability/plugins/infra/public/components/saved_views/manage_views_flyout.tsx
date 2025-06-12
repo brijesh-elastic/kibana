@@ -33,7 +33,6 @@ export interface ManageViewsFlyoutProps<TSavedViewState extends SavedViewItem> {
   onMakeDefaultView: SavedViewOperations<TSavedViewState>['setDefaultViewById'];
   onSwitchView: SavedViewOperations<TSavedViewState>['switchViewById'];
   onDeleteView: SavedViewOperations<TSavedViewState>['deleteViewById'];
-  triggerRef: React.RefObject<HTMLButtonElement>;
 }
 
 interface DeleteConfimationProps {
@@ -52,7 +51,6 @@ export function ManageViewsFlyout<TSavedViewState extends SavedViewItem>({
   onMakeDefaultView,
   onDeleteView,
   loading,
-  triggerRef,
 }: ManageViewsFlyoutProps<TSavedViewState>) {
   // Add name as top level property to allow in memory search
   const namedViews = useMemo(() => views.map(addOwnName), [views]);
@@ -103,13 +101,6 @@ export function ManageViewsFlyout<TSavedViewState extends SavedViewItem>({
     );
   };
 
-  const handleCloseFlyout = () => {
-    onClose();
-    requestAnimationFrame(() => {
-      triggerRef.current?.focus();
-    });
-  };
-
   const columns: Array<EuiBasicTableColumn<SavedViewItem>> = [
     {
       field: 'name',
@@ -137,7 +128,7 @@ export function ManageViewsFlyout<TSavedViewState extends SavedViewItem>({
   return (
     <EuiPortal>
       <EuiFlyout
-        onClose={handleCloseFlyout}
+        onClose={onClose}
         data-test-subj="loadViewsFlyout"
         aria-label={i18n.translate('xpack.infra.openView.flyout.ariaLabel', {
           defaultMessage: 'Manage saved views dialog',

@@ -12,6 +12,7 @@ import {
   TooltipSpec,
   TooltipType,
 } from '@elastic/charts';
+import { EuiErrorBoundary } from '@elastic/eui';
 import React from 'react';
 import { i18n } from '@kbn/i18n';
 import { useFormContext } from 'react-hook-form';
@@ -54,7 +55,7 @@ export function ObservabilityAnnotations({
   ];
 
   return (
-    <>
+    <EuiErrorBoundary>
       <Tooltip {...(tooltipSpecs ?? {})} actions={actions} type={TooltipType.VerticalCursor} />
       {annotations?.map((annotation, index) => (
         <ObsAnnotation annotation={annotation} key={annotation.id ?? index} />
@@ -62,7 +63,7 @@ export function ObservabilityAnnotations({
 
       <NewLineAnnotation slo={slo} isCreateOpen={isCreateOpen} />
       <NewRectAnnotation slo={slo} isCreateOpen={isCreateOpen} />
-    </>
+    </EuiErrorBoundary>
   );
 }
 

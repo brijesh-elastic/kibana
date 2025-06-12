@@ -8,11 +8,10 @@
 import type { Logger } from '@kbn/logging';
 import type { KibanaRequest } from '@kbn/core-http-server';
 import type { PluginStartContract as ActionsPluginStart } from '@kbn/actions-plugin/server';
-import { InferenceClient } from '@kbn/inference-common';
+import type { InferenceClient } from './types';
 import { createChatCompleteApi } from '../chat_complete';
 import { createOutputApi } from '../../common/output/create_output_api';
 import { getConnectorById } from '../util/get_connector_by_id';
-import { createPromptApi } from '../prompt';
 
 export function createInferenceClient({
   request,
@@ -26,7 +25,6 @@ export function createInferenceClient({
   const chatComplete = createChatCompleteApi({ request, actions, logger });
   return {
     chatComplete,
-    prompt: createPromptApi({ request, actions, logger }),
     output: createOutputApi(chatComplete),
     getConnectorById: async (connectorId: string) => {
       const actionsClient = await actions.getActionsClientWithRequest(request);

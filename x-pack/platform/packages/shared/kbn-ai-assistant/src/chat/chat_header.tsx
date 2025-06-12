@@ -22,12 +22,6 @@ import { i18n } from '@kbn/i18n';
 import { css } from '@emotion/css';
 import { AssistantIcon } from '@kbn/ai-assistant-icon';
 import { Conversation, ConversationAccess } from '@kbn/observability-ai-assistant-plugin/common';
-import {
-  ElasticLlmTourCallout,
-  getElasticManagedLlmConnector,
-  ElasticLlmCalloutKey,
-  useElasticLlmCalloutDismissed,
-} from '@kbn/observability-ai-assistant-plugin/public';
 import { ChatActionsMenu } from './chat_actions_menu';
 import type { UseGenAIConnectorsResult } from '../hooks/use_genai_connectors';
 import { FlyoutPositionMode } from './chat_flyout';
@@ -63,7 +57,6 @@ export function ChatHeader({
   loading,
   title,
   isConversationOwnedByCurrentUser,
-  isConversationApp,
   onDuplicateConversation,
   onSaveTitle,
   onToggleFlyoutPositionMode,
@@ -83,7 +76,6 @@ export function ChatHeader({
   loading: boolean;
   title: string;
   isConversationOwnedByCurrentUser: boolean;
-  isConversationApp: boolean;
   onDuplicateConversation: () => void;
   onSaveTitle: (title: string) => void;
   onToggleFlyoutPositionMode?: (newFlyoutPositionMode: FlyoutPositionMode) => void;
@@ -113,12 +105,6 @@ export function ChatHeader({
       );
     }
   };
-
-  const elasticManagedLlm = getElasticManagedLlmConnector(connectors.connectors);
-  const [tourCalloutDismissed, setTourCalloutDismissed] = useElasticLlmCalloutDismissed(
-    ElasticLlmCalloutKey.TOUR_CALLOUT,
-    false
-  );
 
   return (
     <EuiPanel
@@ -281,16 +267,7 @@ export function ChatHeader({
               ) : null}
 
               <EuiFlexItem grow={false}>
-                {!!elasticManagedLlm && !tourCalloutDismissed ? (
-                  <ElasticLlmTourCallout
-                    zIndex={isConversationApp ? 999 : undefined}
-                    dismissTour={() => setTourCalloutDismissed(true)}
-                  >
-                    <ChatActionsMenu connectors={connectors} disabled={licenseInvalid} />
-                  </ElasticLlmTourCallout>
-                ) : (
-                  <ChatActionsMenu connectors={connectors} disabled={licenseInvalid} />
-                )}
+                <ChatActionsMenu connectors={connectors} disabled={licenseInvalid} />
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>

@@ -19,7 +19,6 @@ export default function alertingTests({ loadTestFile, getService }: FtrProviderC
       await tearDown(getService);
     });
 
-    loadTestFile(require.resolve('./alert_deletion'));
     loadTestFile(require.resolve('./aggregate'));
     loadTestFile(require.resolve('./mute_all'));
     loadTestFile(require.resolve('./mute_instance'));

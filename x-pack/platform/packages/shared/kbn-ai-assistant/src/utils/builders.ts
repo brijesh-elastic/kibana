@@ -20,7 +20,6 @@ type BuildMessageProps = DeepPartial<Message> & {
       name: string;
       trigger: MessageRole.Assistant | MessageRole.User | MessageRole.Elastic;
     };
-    unredactions?: Message['message']['unredactions'];
   };
 };
 

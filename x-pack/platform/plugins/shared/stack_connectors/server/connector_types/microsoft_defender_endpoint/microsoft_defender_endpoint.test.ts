@@ -29,7 +29,6 @@ describe('Microsoft Defender for Endpoint Connector', () => {
           'API call to Machine Isolate was successful',
           'API call to Machine Release was successful',
           'API call to Machine Actions was successful',
-          'API call to Machine RunScript was successful',
         ],
       });
 

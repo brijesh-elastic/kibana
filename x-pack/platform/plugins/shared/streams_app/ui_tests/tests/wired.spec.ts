@@ -8,7 +8,7 @@
 import { expect } from '@kbn/scout';
 import { testData, test } from '../fixtures';
 
-test.describe.skip('Wired Streams', { tag: ['@ess'] }, () => {
+test.describe('Wired Streams', { tag: ['@ess', '@svlOblt'] }, () => {
   test.beforeEach(async ({ apiServices, kbnClient, browserAuth, pageObjects }) => {
     await kbnClient.importExport.load(testData.KBN_ARCHIVES.DASHBOARD);
     await apiServices.streams.enable();
@@ -77,9 +77,6 @@ test.describe.skip('Wired Streams', { tag: ['@ess'] }, () => {
     await actionsButtons.focus();
     await actionsButtons.click();
 
-    await expect(
-      page.getByTestId('contextMenuPanelTitle').getByText('Field actions')
-    ).toBeVisible();
     await page.getByRole('button', { name: 'Map field' }).click();
     await page.getByRole('combobox').selectOption('keyword');
     await page.getByRole('button', { name: 'Save changes' }).click();

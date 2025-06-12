@@ -13,7 +13,7 @@ const _allowedExperimentalValues = {
   enableAutomaticAgentUpgrades: true,
   enableSyncIntegrationsOnRemote: true,
   enableSSLSecrets: false,
-  installedIntegrationsTabularUI: true,
+  installedIntegrationsTabularUI: false,
   enabledUpgradeAgentlessDeploymentsTask: true,
 };
 

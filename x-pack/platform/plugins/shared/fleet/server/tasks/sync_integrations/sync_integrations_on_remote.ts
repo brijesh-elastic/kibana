@@ -26,10 +26,6 @@ import { getInstallation, removeInstallation } from '../../services/epm/packages
 
 import { PACKAGES_SAVED_OBJECT_TYPE } from '../../constants';
 
-import { createOrUpdateFailedInstallStatus } from '../../services/epm/packages/install_errors_helpers';
-
-import type { InstallSource } from '../../types';
-
 import { installCustomAsset } from './custom_assets';
 import type { CustomAssetsData, SyncIntegrationsData } from './model';
 
@@ -97,8 +93,7 @@ async function getSyncIntegrationsEnabled(
 }
 
 async function installPackageIfNotInstalled(
-  savedObjectsClient: SavedObjectsClientContract,
-  pkg: { package_name: string; package_version: string; install_source?: InstallSource },
+  pkg: { package_name: string; package_version: string },
   packageClient: PackageClient,
   logger: Logger,
   abortController: AbortController
@@ -128,13 +123,12 @@ async function installPackageIfNotInstalled(
     }
     const lastRetryAttemptTime = installation.latest_install_failed_attempts?.[0].created_at;
     // retry install if backoff time has passed since the last attempt
-    // excluding custom and upload packages from retries
     const shouldRetryInstall =
       attempt > 0 &&
       lastRetryAttemptTime &&
       Date.now() - Date.parse(lastRetryAttemptTime) >
-        RETRY_BACKOFF_MINUTES[attempt - 1] * 60 * 1000 &&
-      (pkg.install_source === 'registry' || pkg.install_source === 'bundled');
+        RETRY_BACKOFF_MINUTES[attempt - 1] * 60 * 1000;
+
     if (!shouldRetryInstall) {
       return;
     }
@@ -171,16 +165,6 @@ async function installPackageIfNotInstalled(
     logger.error(
       `Failed to install package ${pkg.package_name} with version ${pkg.package_version}, error: ${error}`
     );
-    if (error instanceof PackageNotFoundError && error.message.includes('not found in registry')) {
-      await createOrUpdateFailedInstallStatus({
-        logger,
-        savedObjectsClient,
-        pkgName: pkg.package_name,
-        pkgVersion: pkg.package_version,
-        error,
-        installSource: pkg?.install_source,
-      });
-    }
   }
 }
 
@@ -247,7 +231,7 @@ export const syncIntegrationsOnRemote = async (
     if (abortController.signal.aborted) {
       throw new Error('Task was aborted');
     }
-    await installPackageIfNotInstalled(soClient, pkg, packageClient, logger, abortController);
+    await installPackageIfNotInstalled(pkg, packageClient, logger, abortController);
   }
 
   const uninstalledIntegrations =

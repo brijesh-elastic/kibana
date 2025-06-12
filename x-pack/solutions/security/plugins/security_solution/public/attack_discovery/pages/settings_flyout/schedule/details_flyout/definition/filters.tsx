@@ -11,32 +11,25 @@ import { mapAndFlattenFilters } from '@kbn/data-plugin/public';
 import type { Filter } from '@kbn/es-query';
 import { FilterItems } from '@kbn/unified-search-plugin/public';
 
-import { useDataView } from '../../../../../../data_view_manager/hooks/use_data_view';
 import { SourcererScopeName } from '../../../../../../sourcerer/store/model';
 import { useSourcererDataView } from '../../../../../../sourcerer/containers';
-import { useCreateDataView } from '../../../../../../common/hooks/use_create_data_view';
-import { useIsExperimentalFeatureEnabled } from '../../../../../../common/hooks/use_experimental_features';
+import { useDataView } from '../../../alert_selection/use_data_view';
 
 interface FiltersProps {
   filters: Filter[];
 }
 
 export const Filters: React.FC<FiltersProps> = React.memo(({ filters }) => {
-  const newDataViewPickerEnabled = useIsExperimentalFeatureEnabled('newDataViewPickerEnabled');
-  const { dataView: experimentalDataView } = useDataView(SourcererScopeName.detections);
-
   // get the sourcerer `DataViewSpec` for alerts:
-  const { sourcererDataView: oldSourcererDataView, loading: oldIsLoadingIndexPattern } =
-    useSourcererDataView(SourcererScopeName.detections);
+  const { sourcererDataView, loading: isLoadingIndexPattern } = useSourcererDataView(
+    SourcererScopeName.detections
+  );
 
   // create a `DataView` from the `DataViewSpec`:
-  const { dataView: oldDataView } = useCreateDataView({
-    dataViewSpec: oldSourcererDataView,
-    loading: oldIsLoadingIndexPattern,
-    skip: newDataViewPickerEnabled,
+  const alertsDataView = useDataView({
+    dataViewSpec: sourcererDataView,
+    loading: isLoadingIndexPattern,
   });
-
-  const alertsDataView = newDataViewPickerEnabled ? experimentalDataView : oldDataView;
 
   const isEsql = filters.some((filter) => filter?.query?.language === 'esql');
   const searchBarFilters = useMemo(() => {

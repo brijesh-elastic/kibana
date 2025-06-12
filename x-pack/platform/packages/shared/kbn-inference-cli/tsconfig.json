@@ -22,9 +22,5 @@
     "@kbn/dev-cli-runner",
     "@kbn/inference-langchain",
     "@kbn/repo-info",
-    "@kbn/core",
-    "@kbn/telemetry",
-    "@kbn/inference-tracing",
-    "@kbn/logging",
   ]
 }

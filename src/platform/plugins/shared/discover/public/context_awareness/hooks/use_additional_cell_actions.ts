@@ -88,10 +88,9 @@ export const createCellAction = (
         return false;
       }
 
-      const fieldSpec = data[0]?.field;
-      const field = fieldSpec?.name ? metadata.dataView?.fields.create(fieldSpec) : undefined;
+      const field = data[0]?.field;
 
-      if (!field) {
+      if (!field || !metadata.dataView?.getFieldByName(field.name)) {
         return false;
       }
 

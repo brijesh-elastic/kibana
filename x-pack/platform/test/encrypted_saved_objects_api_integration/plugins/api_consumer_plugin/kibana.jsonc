@@ -2,8 +2,6 @@
   "type": "plugin",
   "id": "@kbn/eso-plugin",
   "owner": "@elastic/kibana-security",
-  "group": "platform",
-  "visibility": "private",
   "plugin": {
     "id": "eso",
     "server": true,

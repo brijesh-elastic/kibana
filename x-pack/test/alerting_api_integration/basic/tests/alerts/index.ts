@@ -12,6 +12,5 @@ export default function alertingTests({ loadTestFile }: FtrProviderContext) {
   describe('Alerts', () => {
     loadTestFile(require.resolve('./gold_noop_alert_type'));
     loadTestFile(require.resolve('./basic_noop_alert_type'));
-    loadTestFile(require.resolve('./enabled_rule_types'));
   });
 }

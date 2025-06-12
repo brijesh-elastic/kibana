@@ -20,4 +20,3 @@ export * from './rule_type_types';
 export * from './rule_types';
 export * from './rule_settings';
 export * from './search_strategy_types';
-export * from './alert_delete_types';

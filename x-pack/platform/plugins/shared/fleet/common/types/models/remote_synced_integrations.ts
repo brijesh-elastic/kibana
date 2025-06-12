@@ -21,10 +21,7 @@ export interface RemoteSyncedIntegrationsBase {
 export interface RemoteSyncedIntegrationsStatus extends RemoteSyncedIntegrationsBase {
   sync_status: SyncStatus;
   error?: string;
-  warning?: {
-    title: string;
-    message?: string;
-  };
+  warning?: string;
   updated_at?: string;
   install_status: {
     main: string;

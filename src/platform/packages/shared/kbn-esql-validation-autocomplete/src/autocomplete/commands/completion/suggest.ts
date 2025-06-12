@@ -9,7 +9,6 @@
 
 import { i18n } from '@kbn/i18n';
 import { ESQLAstCompletionCommand } from '@kbn/esql-ast/src/types';
-import { InferenceEndpointAutocompleteItem } from '@kbn/esql-types';
 import { uniqBy } from 'lodash';
 import { findFinalWord, getFunctionDefinition } from '../../../shared/helpers';
 import { TRIGGER_SUGGESTION_COMMAND } from '../../factories';
@@ -54,7 +53,7 @@ function getPosition(params: CommandSuggestParams<'completion'>): CompletionPosi
   const expressionRoot = prompt?.text !== EDITOR_MARKER ? prompt : undefined;
   const expressionType = getExpressionType(expressionRoot);
 
-  if (isExpressionComplete(expressionType, innerText)) {
+  if (isExpressionComplete(expressionType, innerText) && inferenceId.incomplete) {
     return CompletionPosition.AFTER_PROMPT;
   }
 
@@ -68,7 +67,7 @@ function getPosition(params: CommandSuggestParams<'completion'>): CompletionPosi
 export async function suggest(
   params: CommandSuggestParams<'completion'>
 ): Promise<SuggestionRawDefinition[]> {
-  const { references, innerText, columnExists, getColumnsByType, callbacks } = params;
+  const { references, innerText, columnExists, getColumnsByType } = params;
 
   const position = getPosition(params);
 
@@ -114,8 +113,8 @@ export async function suggest(
       return [withCompletionItem];
 
     case CompletionPosition.AFTER_WITH:
-      const result = await callbacks?.getInferenceEndpoints?.('completion');
-      return result?.inferenceEndpoints?.map(inferenceEndpointToCompletionItem) || [];
+      // Must fetch inference endpoints from API.
+      return [];
 
     case CompletionPosition.AFTER_INFERENCE_ID:
       return [asCompletionItem, pipeCompleteItem];
@@ -148,7 +147,6 @@ const withCompletionItem: SuggestionRawDefinition = {
   label: 'WITH',
   sortText: '1',
   text: 'WITH ',
-  command: TRIGGER_SUGGESTION_COMMAND,
 };
 
 const asCompletionItem: SuggestionRawDefinition = {
@@ -175,21 +173,3 @@ const targetIdCompletionItem: SuggestionRawDefinition = {
   sortText: '1',
   text: 'completion ',
 };
-
-function inferenceEndpointToCompletionItem(
-  inferenceEndpoint: InferenceEndpointAutocompleteItem
-): SuggestionRawDefinition {
-  return {
-    detail: i18n.translate(
-      'kbn-esql-validation-autocomplete.esql.definitions.completionInferenceIdDoc',
-      {
-        defaultMessage: 'Inference endpoint used for the completion',
-      }
-    ),
-    kind: 'Reference',
-    label: inferenceEndpoint.inference_id,
-    sortText: '1',
-    text: `\`${inferenceEndpoint.inference_id}\` `,
-    command: TRIGGER_SUGGESTION_COMMAND,
-  };
-}

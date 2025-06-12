@@ -8,14 +8,11 @@
 import moment from 'moment';
 import { Frequency } from '@kbn/rrule';
 import { has } from 'lodash';
-import { getInitialByWeekday } from '@kbn/response-ops-recurring-schedule-form/utils/get_initial_by_weekday';
-import type {
-  RecurrenceFrequency,
-  RecurringSchedule,
-} from '@kbn/response-ops-recurring-schedule-form/types';
-import { RecurrenceEnd } from '@kbn/response-ops-recurring-schedule-form/constants';
-import type { FormProps } from '../components/schema';
+import type { FormProps, RecurringScheduleFormProps } from '../components/schema';
 import type { RRuleParams, MaintenanceWindow } from '../../../../common';
+import type { MaintenanceWindowFrequency } from '../constants';
+import { EndsOptions } from '../constants';
+import { getInitialByWeekday } from './get_initial_by_weekday';
 
 export const convertFromMaintenanceWindowToForm = (
   maintenanceWindow: MaintenanceWindow
@@ -41,14 +38,14 @@ export const convertFromMaintenanceWindowToForm = (
 
   const rRule = maintenanceWindow.rRule;
   const isCustomFrequency = isCustom(rRule);
-  const frequency = rRule.freq as RecurrenceFrequency;
+  const frequency = rRule.freq as MaintenanceWindowFrequency;
   const ends = rRule.until
-    ? RecurrenceEnd.ON_DATE
+    ? EndsOptions.ON_DATE
     : rRule.count
-    ? RecurrenceEnd.AFTER_X
-    : RecurrenceEnd.NEVER;
+    ? EndsOptions.AFTER_X
+    : EndsOptions.NEVER;
 
-  const recurringSchedule: RecurringSchedule = {
+  const recurringSchedule: RecurringScheduleFormProps = {
     frequency: isCustomFrequency ? 'CUSTOM' : frequency,
     interval: rRule.interval,
     ends,

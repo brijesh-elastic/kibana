@@ -14,7 +14,7 @@ import {
   API_KEYS,
 } from '../screens/fleet';
 import { LOADING_SPINNER } from '../screens/navigation';
-import { getIntegrationTableIntegrationName } from '../screens/integrations';
+import { getIntegrationCard } from '../screens/integrations';
 
 export function createAgentPolicy() {
   cy.intercept({
@@ -62,5 +62,5 @@ export function verifyPolicy(name: string, integrations: string[]) {
 
 export function verifyAgentPackage() {
   cy.visit('/app/integrations/installed');
-  cy.getBySel(getIntegrationTableIntegrationName('elastic_agent'));
+  cy.getBySel(getIntegrationCard('elastic_agent'));
 }

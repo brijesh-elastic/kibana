@@ -8,7 +8,6 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import { isSingleItem } from '../../../..';
 import { CommandSuggestParams } from '../../../definitions/types';
 
 import type { SuggestionRawDefinition } from '../../types';
@@ -19,12 +18,9 @@ import { pipeCompleteItem } from '../../complete_items';
 export async function suggest({
   command,
   getColumnsByType,
-  innerText,
 }: CommandSuggestParams<'grok'>): Promise<SuggestionRawDefinition[]> {
-  const commandArgs = command.args.filter((arg) => isSingleItem(arg) && arg.type !== 'unknown');
-
   // GROK field /
-  if (commandArgs.length === 1 && /\s$/.test(innerText)) {
+  if (command.args.length === 1) {
     return buildConstantsDefinitions(
       ['"%{WORD:firstWord}"'],
       i18n.translate('kbn-esql-validation-autocomplete.esql.autocomplete.aPatternString', {
@@ -37,7 +33,7 @@ export async function suggest({
     );
   }
   // GROK field pattern /
-  else if (commandArgs.length === 2) {
+  else if (command.args.length === 2) {
     return [{ ...pipeCompleteItem, command: TRIGGER_SUGGESTION_COMMAND }];
   }
 

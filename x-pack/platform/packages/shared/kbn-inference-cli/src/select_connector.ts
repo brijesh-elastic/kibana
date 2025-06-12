@@ -36,10 +36,6 @@ export async function selectConnector({
     log.warning(`Could not find connector ${preferredConnectorId}`);
   }
 
-  if (connector) {
-    return connector;
-  }
-
   const firstConnector = connectors[0];
 
   const onlyOneConnector = connectors.length === 1;

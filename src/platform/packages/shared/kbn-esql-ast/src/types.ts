@@ -298,15 +298,14 @@ export interface ESQLSource extends ESQLAstBaseItem {
   sourceType: 'index' | 'policy';
 
   /**
-   * Represents the prefix part of the source identifier. Empty string if not
-   * present. Used in index pattern as the cluster identifier or as "mode" in
-   * enrich policy.
+   * Represents the cluster part of the source identifier. Empty string if not
+   * present.
    *
    * ```
-   * FROM [<prefix>:]<index>
+   * FROM [<cluster>:]<index>
    * ```
    */
-  prefix?: ESQLStringLiteral | undefined;
+  cluster?: ESQLStringLiteral | undefined;
 
   /**
    * Represents the index part of the source identifier. Unescaped and unquoted.

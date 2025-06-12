@@ -16,7 +16,7 @@ import {
   MessageOf,
   MessageRole,
 } from '@kbn/inference-common';
-import { InferenceClient } from '@kbn/inference-common';
+import { InferenceClient } from '@kbn/inference-plugin/server';
 import { Logger } from '@kbn/logging';
 import {
   defer,

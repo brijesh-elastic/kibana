@@ -233,7 +233,6 @@ export function XYChart({
     splitRowAccessor,
     singleTable,
     annotations,
-    pointVisibility,
   } = args;
 
   const chartRef = useRef<Chart>(null);
@@ -1023,7 +1022,6 @@ export function XYChart({
                 uiState={uiState}
                 singleTable={singleTable}
                 isDarkMode={darkMode}
-                pointVisibility={pointVisibility}
               />
             )}
             {referenceLineLayers.length ? (

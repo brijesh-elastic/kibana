@@ -81,12 +81,15 @@ export const KnowledgeBaseInstallationStatusPanel = ({
   switch (knowledgeBase.status.value?.kbState) {
     case KnowledgeBaseState.NOT_INSTALLED:
       return (
-        <EuiFlexItem grow={false}>
-          <SelectModelAndInstallKnowledgeBase
-            onInstall={knowledgeBase.install}
-            isInstalling={knowledgeBase.isInstalling}
-          />
-        </EuiFlexItem>
+        <>
+          <EuiSpacer size="l" />
+          <EuiFlexItem grow={false}>
+            <SelectModelAndInstallKnowledgeBase
+              onInstall={knowledgeBase.install}
+              isInstalling={knowledgeBase.isInstalling}
+            />
+          </EuiFlexItem>
+        </>
       );
     case KnowledgeBaseState.MODEL_PENDING_DEPLOYMENT:
       return <WarmUpModel knowledgeBase={knowledgeBase} pendingDeployment />;

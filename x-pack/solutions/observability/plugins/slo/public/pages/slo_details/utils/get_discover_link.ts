@@ -99,7 +99,6 @@ function createDiscoverLocator({
         alias: i18n.translate('xpack.slo.sloDetails.totalFilterLabel', {
           defaultMessage: 'Total events',
         }),
-        disabled: showGood || showBad,
         value: JSON.stringify(customTotalFilter),
         index: indexId,
       },

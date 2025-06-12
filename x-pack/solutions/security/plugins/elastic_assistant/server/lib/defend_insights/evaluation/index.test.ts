@@ -70,7 +70,6 @@ describe('evaluateDefendInsights', () => {
 
     const mockActionsClient = {} as unknown as PublicMethodsOf<ActionsClient>;
     const mockEsClient = {} as unknown as ElasticsearchClient;
-    const mockEsClientInternalUser = {} as unknown as ElasticsearchClient;
 
     await evaluateDefendInsights({
       actionsClient: mockActionsClient,
@@ -80,7 +79,6 @@ describe('evaluateDefendInsights', () => {
       connectorTimeout: 1000,
       datasetName: 'test-dataset',
       esClient: mockEsClient,
-      esClientInternalUser: mockEsClientInternalUser,
       evaluationId: 'eval-1',
       evaluatorConnectorId: 'eval-connector',
       langSmithApiKey: 'api-key',

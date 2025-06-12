@@ -25,8 +25,6 @@ export const defaultExclusions: DataSourceExclusions = {
   '.internal.alerts*': ['readOnly'],
   '.preview.alerts*': ['readOnly'],
   '.internal.preview.alerts*': ['readOnly'],
-  '.adhoc.alerts*': ['readOnly'],
-  '.internal.adhoc.alerts*': ['readOnly'],
   '.lists-*': ['readOnly'],
   '.items-*': ['readOnly'],
   '.logs-endpoint.actions-*': ['readOnly'],

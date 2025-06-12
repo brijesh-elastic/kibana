@@ -20,7 +20,6 @@ import type {
   IconPosition,
   FillStyle,
   YAxisConfig,
-  PointVisibility,
 } from '@kbn/expression-xy-plugin/common';
 import { EventAnnotationConfig, EventAnnotationGroupConfig } from '@kbn/event-annotation-common';
 import {
@@ -177,7 +176,6 @@ export interface XYState {
   minBarHeight?: number;
   hideEndzones?: boolean;
   showCurrentTimeMarker?: boolean;
-  pointVisibility?: PointVisibility;
 }
 
 export type State = XYState;

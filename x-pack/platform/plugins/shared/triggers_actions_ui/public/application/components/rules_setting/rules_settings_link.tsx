@@ -8,14 +8,10 @@
 import React, { useState } from 'react';
 import { EuiButtonEmpty } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n-react';
-import type { AlertDeleteCategoryIds } from '@kbn/alerting-plugin/common/constants/alert_delete';
 import { RulesSettingsFlyout } from './rules_settings_flyout';
 import { useKibana } from '../../../common/lib/kibana';
 
-export interface RuleSettingsLinkProps {
-  alertDeleteCategoryIds?: AlertDeleteCategoryIds[];
-}
-export const RulesSettingsLink = ({ alertDeleteCategoryIds }: RuleSettingsLinkProps) => {
+export const RulesSettingsLink = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const {
     application: {
@@ -41,11 +37,7 @@ export const RulesSettingsLink = ({ alertDeleteCategoryIds }: RuleSettingsLinkPr
           defaultMessage="Settings"
         />
       </EuiButtonEmpty>
-      <RulesSettingsFlyout
-        isVisible={isVisible}
-        onClose={() => setIsVisible(false)}
-        alertDeleteCategoryIds={alertDeleteCategoryIds}
-      />
+      <RulesSettingsFlyout isVisible={isVisible} onClose={() => setIsVisible(false)} />
     </>
   );
 };

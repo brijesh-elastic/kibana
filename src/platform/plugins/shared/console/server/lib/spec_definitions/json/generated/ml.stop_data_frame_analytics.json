@@ -19,7 +19,7 @@
     "patterns": [
       "_ml/data_frame/analytics/{id}/_stop"
     ],
-    "documentation": "https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-ml-stop-data-frame-analytics",
+    "documentation": "https://www.elastic.co/guide/en/elasticsearch/reference/current/stop-dfanalytics.html",
     "availability": {
       "stack": true,
       "serverless": true

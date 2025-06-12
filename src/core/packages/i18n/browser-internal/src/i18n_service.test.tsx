@@ -7,26 +7,20 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import { render } from '@testing-library/react';
+import { shallow } from 'enzyme';
 
 jest.mock('@elastic/eui', () => {
   return {
-    EuiContext: function MockEuiContext({
-      i18n,
-      children,
-    }: {
-      i18n: any;
-      children: React.ReactNode;
-    }) {
-      return JSON.stringify(i18n, null, 2);
+    EuiContext: function MockEuiContext() {
+      // no-op
     },
   };
 });
 
 jest.mock('@kbn/i18n-react', () => {
   return {
-    I18nProvider: function MockI18nProvider({ children }: { children: React.ReactNode }) {
-      return children;
+    I18nProvider: function MockI18nProvider() {
+      // no-op
     },
   };
 });
@@ -46,6 +40,6 @@ describe('#start()', () => {
 
     const i18n = i18nService.start();
 
-    expect(render(<i18n.Context>content</i18n.Context>).container.innerHTML).toMatchSnapshot();
+    expect(shallow(<i18n.Context>content</i18n.Context>)).toMatchSnapshot();
   });
 });

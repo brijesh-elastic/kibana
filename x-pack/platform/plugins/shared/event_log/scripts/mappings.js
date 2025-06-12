@@ -94,13 +94,6 @@ exports.EcsCustomPropertyMappings = {
             type: 'keyword',
             ignore_above: 1024,
           },
-          deletion: {
-            properties: {
-              num_deleted: {
-                type: 'long',
-              },
-            },
-          },
           rule: {
             properties: {
               consumer: {

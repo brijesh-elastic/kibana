@@ -5,7 +5,6 @@
  * 2.0.
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import {
   replaceAnonymizedValuesWithOriginalValues,
   ATTACK_DISCOVERY_AD_HOC_RULE_TYPE_ID,
@@ -18,7 +17,6 @@ import {
   ALERT_RULE_NAME,
   ALERT_RULE_TYPE_ID,
   ALERT_RULE_UUID,
-  ALERT_URL,
   ALERT_UUID,
 } from '@kbn/rule-data-utils';
 import {
@@ -32,6 +30,7 @@ import {
   ALERT_ATTACK_DISCOVERY_ALERT_IDS,
   ALERT_ATTACK_DISCOVERY_ALERTS_CONTEXT_COUNT,
 } from '../../../schedules/fields/field_names';
+import { v4 as uuidv4 } from 'uuid';
 
 import { transformToAlertDocuments, transformToBaseAlertDocument } from '.';
 import { mockAuthenticatedUser } from '../../../../../__mocks__/mock_authenticated_user';
@@ -296,10 +295,8 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it(`returns the expected ${ALERT_ATTACK_DISCOVERY_ALERT_IDS} field`, () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: attackDiscoveries[0],
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(result[ALERT_ATTACK_DISCOVERY_ALERT_IDS]).toEqual(
@@ -309,13 +306,11 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it(`returns an empty array for ${ALERT_ATTACK_DISCOVERY_ALERT_IDS} if no alertIds are provided`, () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: {
           ...mockCreateAttackDiscoveryAlertsParams.attackDiscoveries[0],
           alertIds: [],
         },
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(result[ALERT_ATTACK_DISCOVERY_ALERT_IDS]).toEqual([]);
@@ -323,10 +318,8 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it(`returns the expected ${ALERT_ATTACK_DISCOVERY_ALERTS_CONTEXT_COUNT} field`, () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: attackDiscoveries[0],
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(result[ALERT_ATTACK_DISCOVERY_ALERTS_CONTEXT_COUNT]).toEqual(
@@ -336,10 +329,8 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it(`returns the expected ${ALERT_RISK_SCORE}`, () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: attackDiscoveries[0],
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(result[ALERT_RISK_SCORE]).toEqual(1316);
@@ -347,10 +338,8 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it(`returns the expected ${ALERT_ATTACK_DISCOVERY_DETAILS_MARKDOWN_WITH_REPLACEMENTS}`, () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: attackDiscoveries[0],
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(result[ALERT_ATTACK_DISCOVERY_DETAILS_MARKDOWN_WITH_REPLACEMENTS]).toEqual(
@@ -364,13 +353,11 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it('handles undefined entitySummaryMarkdown correctly', () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: {
           ...mockCreateAttackDiscoveryAlertsParams.attackDiscoveries[0],
           entitySummaryMarkdown: undefined, // <-- undefined
         },
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(
@@ -380,10 +367,8 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it(`returns the expected ${ALERT_ATTACK_DISCOVERY_REPLACEMENTS}`, () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: attackDiscoveries[0],
         alertsParams,
-        spaceId: 'default',
       });
 
       expect(result[ALERT_ATTACK_DISCOVERY_REPLACEMENTS]).toEqual(
@@ -398,30 +383,14 @@ describe('Transform attack discoveries to alert documents', () => {
 
     it('handles empty replacements correctly', () => {
       const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
         attackDiscovery: attackDiscoveries[0],
         alertsParams: {
           ...alertsParams,
           replacements: {},
         },
-        spaceId: 'default',
       });
 
       expect(result[ALERT_ATTACK_DISCOVERY_REPLACEMENTS]).toBeUndefined();
-    });
-
-    it(`returns the expected ${ALERT_URL}`, () => {
-      const result = transformToBaseAlertDocument({
-        alertId: uuidv4(),
-        attackDiscovery: attackDiscoveries[0],
-        alertsParams,
-        publicBaseUrl: 'http://jest.com/test',
-        spaceId: 'very-nice-space',
-      });
-
-      expect(result[ALERT_URL]).toEqual(
-        'http://jest.com/test/s/very-nice-space/app/security/attack_discovery?id=879B171F-428B-4B23-99C3-EDE33334AB71'
-      );
     });
   });
 });

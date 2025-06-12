@@ -13,8 +13,7 @@ import { SloDisableConfirmationModal } from '../components/slo/disable_confirmat
 import { SloEnableConfirmationModal } from '../components/slo/enable_confirmation_modal/slo_enable_confirmation_modal';
 import { SloResetConfirmationModal } from '../components/slo/reset_confirmation_modal/slo_reset_confirmation_modal';
 import { useCloneSlo } from '../hooks/use_clone_slo';
-import { BulkPurgeConfirmationContainer } from '../components/slo/purge_confirmation_modal/bulk_purge_modal_container';
-import { PurgeConfirmationContainer } from '../components/slo/purge_confirmation_modal/purge_modal_container';
+import { SloBulkPurgeConfirmationModal } from '../components/slo/bulk_purge_confirmation_modal/bulk_purge_confirmation_modal';
 
 type Action = SingleAction | BulkAction;
 
@@ -24,7 +23,7 @@ interface BaseAction {
 }
 
 interface SingleAction extends BaseAction {
-  type: 'clone' | 'delete' | 'reset' | 'enable' | 'disable' | 'purge';
+  type: 'clone' | 'delete' | 'reset' | 'enable' | 'disable';
   item: SLODefinitionResponse | SLOWithSummaryResponse;
 }
 
@@ -92,14 +91,6 @@ export function ActionModalProvider({ children }: { children: ReactNode }) {
             onConfirm={handleOnConfirm}
           />
         );
-      case 'purge':
-        return (
-          <PurgeConfirmationContainer
-            item={action.item}
-            onCancel={handleOnCancel}
-            onConfirm={handleOnConfirm}
-          />
-        );
       case 'bulk_delete':
         return (
           <SloBulkDeleteConfirmationModal
@@ -110,7 +101,7 @@ export function ActionModalProvider({ children }: { children: ReactNode }) {
         );
       case 'bulk_purge':
         return (
-          <BulkPurgeConfirmationContainer
+          <SloBulkPurgeConfirmationModal
             items={action.items}
             onCancel={handleOnCancel}
             onConfirm={handleOnConfirm}

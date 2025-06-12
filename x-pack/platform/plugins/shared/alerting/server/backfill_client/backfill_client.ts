@@ -181,19 +181,12 @@ export class BackfillClient {
       );
     }
 
-    // Bulk create the saved objects in chunks of 10 to manage resource usage
-    const chunkSize = 10;
-    const allSavedObjects: Array<SavedObject<AdHocRunSO>> = [];
+    // Bulk create the saved object
+    const bulkCreateResponse = await unsecuredSavedObjectsClient.bulkCreate<AdHocRunSO>(
+      adHocSOsToCreate
+    );
 
-    for (let i = 0; i < adHocSOsToCreate.length; i += chunkSize) {
-      const chunk = adHocSOsToCreate.slice(i, i + chunkSize);
-      const bulkCreateChunkResponse = await unsecuredSavedObjectsClient.bulkCreate<AdHocRunSO>(
-        chunk
-      );
-      allSavedObjects.push(...bulkCreateChunkResponse.saved_objects);
-    }
-
-    const transformedResponse: ScheduleBackfillResults = allSavedObjects.map(
+    const transformedResponse: ScheduleBackfillResults = bulkCreateResponse.saved_objects.map(
       (so: SavedObject<AdHocRunSO>, index: number) => {
         if (so.error) {
           auditLogger?.log(

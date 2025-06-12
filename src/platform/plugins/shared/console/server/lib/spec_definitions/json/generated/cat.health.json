@@ -4,7 +4,9 @@
       "format": [
         "text"
       ],
+      "h": [],
       "help": "__flag__",
+      "s": [],
       "v": "__flag__",
       "error_trace": "__flag__",
       "filter_path": [],
@@ -19,9 +21,7 @@
         "h",
         "d"
       ],
-      "ts": "__flag__",
-      "h": [],
-      "s": []
+      "ts": "__flag__"
     },
     "methods": [
       "GET"
@@ -29,7 +29,7 @@
     "patterns": [
       "_cat/health"
     ],
-    "documentation": "https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cat-health",
+    "documentation": "https://www.elastic.co/guide/en/elasticsearch/reference/{branch}/cat-health.html",
     "availability": {
       "stack": true,
       "serverless": false

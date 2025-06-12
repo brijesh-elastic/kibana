@@ -397,7 +397,6 @@ export const EvaluationSettings: React.FC = React.memo(() => {
             onCreateOption={onGraphOptionsCreate}
             options={graphOptions}
             selectedOptions={selectedGraphOptions}
-            singleSelection // Remove once post_evaluate support running multiple graphs
             onChange={onGraphOptionsChange}
           />
         </EuiFormRow>

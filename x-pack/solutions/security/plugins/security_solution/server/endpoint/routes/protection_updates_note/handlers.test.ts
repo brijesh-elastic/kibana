@@ -9,7 +9,6 @@ import { EndpointAppContextService } from '../../endpoint_app_context_services';
 import type { KibanaResponseFactory, SavedObjectsClientContract } from '@kbn/core/server';
 
 import {
-  createMockEndpointAppContext,
   createMockEndpointAppContextServiceSetupContract,
   createMockEndpointAppContextServiceStartContract,
   createRouteHandlerContext,
@@ -22,7 +21,6 @@ import {
 } from '@kbn/core/server/mocks';
 import { getProtectionUpdatesNoteHandler, postProtectionUpdatesNoteHandler } from './handlers';
 import { requestContextMock } from '../../../lib/detection_engine/routes/__mocks__';
-import type { EndpointAppContext } from '../../types';
 
 const mockedSOSuccessfulFindResponse = {
   total: 1,
@@ -76,7 +74,6 @@ const mockedSOSuccessfulUpdateResponse = [
 ];
 
 describe('test protection updates note handler', () => {
-  let mockEndpointContext: EndpointAppContext;
   let endpointAppContextService: EndpointAppContextService;
   let mockSavedObjectClient: jest.Mocked<SavedObjectsClientContract>;
   let mockResponse: jest.Mocked<KibanaResponseFactory>;
@@ -84,7 +81,6 @@ describe('test protection updates note handler', () => {
 
   describe('test protection updates note handler', () => {
     beforeEach(() => {
-      mockEndpointContext = createMockEndpointAppContext();
       mockScopedClient = elasticsearchServiceMock.createScopedClusterClient();
       mockSavedObjectClient = savedObjectsClientMock.create();
       mockResponse = httpServerMock.createResponseFactory();
@@ -96,7 +92,7 @@ describe('test protection updates note handler', () => {
     afterEach(() => endpointAppContextService.stop());
 
     it('should create a new note if one does not exist', async () => {
-      const protectionUpdatesNoteHandler = postProtectionUpdatesNoteHandler(mockEndpointContext);
+      const protectionUpdatesNoteHandler = postProtectionUpdatesNoteHandler();
       const mockRequest = httpServerMock.createKibanaRequest({
         params: { policyId: 'id' },
         body: { note: 'note' },
@@ -128,7 +124,7 @@ describe('test protection updates note handler', () => {
     });
 
     it('should update an existing note on post if one exists', async () => {
-      const protectionUpdatesNoteHandler = postProtectionUpdatesNoteHandler(mockEndpointContext);
+      const protectionUpdatesNoteHandler = postProtectionUpdatesNoteHandler();
       const mockRequest = httpServerMock.createKibanaRequest({
         params: { policyId: 'id' },
         body: { note: 'note2' },
@@ -153,7 +149,7 @@ describe('test protection updates note handler', () => {
     });
 
     it('should return the note if one exists', async () => {
-      const protectionUpdatesNoteHandler = getProtectionUpdatesNoteHandler(mockEndpointContext);
+      const protectionUpdatesNoteHandler = getProtectionUpdatesNoteHandler();
       const mockRequest = httpServerMock.createKibanaRequest({
         params: { policyId: 'id' },
       });
@@ -174,7 +170,7 @@ describe('test protection updates note handler', () => {
     });
 
     it('should return notFound if no note exists', async () => {
-      const protectionUpdatesNoteHandler = getProtectionUpdatesNoteHandler(mockEndpointContext);
+      const protectionUpdatesNoteHandler = getProtectionUpdatesNoteHandler();
       const mockRequest = httpServerMock.createKibanaRequest({
         params: { policyId: 'id' },
       });
@@ -190,39 +186,6 @@ describe('test protection updates note handler', () => {
       );
 
       expect(mockResponse.notFound).toBeCalled();
-    });
-
-    describe('with space awareness enabled', () => {
-      beforeEach(() => {
-        // @ts-expect-error write to readonly property
-        mockEndpointContext.experimentalFeatures.endpointManagementSpaceAwarenessEnabled = true;
-      });
-
-      it('should call ensureInCurrentSpace with integration policy id', async () => {
-        const mockEnsureInCurrentSpace = mockEndpointContext.service.getInternalFleetServices()
-          .ensureInCurrentSpace as jest.Mock;
-        const protectionUpdatesNoteHandler = postProtectionUpdatesNoteHandler(mockEndpointContext);
-        const mockRequest = httpServerMock.createKibanaRequest({
-          params: { package_policy_id: 'integration-policy-id' },
-          body: { note: 'this is a very important note' },
-        });
-
-        const mockSOClient = mockEndpointContext.service
-          .getInternalFleetServices()
-          .getSoClient() as jest.Mocked<SavedObjectsClientContract>;
-        mockSOClient.find.mockResolvedValueOnce(mockedSOSuccessfulFindResponseEmpty);
-        mockSOClient.create.mockResolvedValueOnce(createMockedSOSuccessfulCreateResponse('note'));
-        await protectionUpdatesNoteHandler(
-          requestContextMock.convertContext(
-            createRouteHandlerContext(mockScopedClient, mockSavedObjectClient)
-          ),
-          mockRequest,
-          mockResponse
-        );
-        expect(mockEnsureInCurrentSpace).toBeCalledWith({
-          integrationPolicyIds: ['integration-policy-id'],
-        });
-      });
     });
   });
 });

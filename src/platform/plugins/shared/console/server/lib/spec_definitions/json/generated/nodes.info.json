@@ -21,7 +21,7 @@
       "_nodes/{metric}",
       "_nodes/{node_id}/{metric}"
     ],
-    "documentation": "https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-nodes-info",
+    "documentation": "https://www.elastic.co/guide/en/elasticsearch/reference/{branch}/cluster-nodes-info.html",
     "availability": {
       "stack": true,
       "serverless": false

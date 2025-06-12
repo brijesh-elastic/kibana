@@ -5,7 +5,6 @@
  * 2.0.
  */
 
-import { ModelFamily, ModelPlatform, ModelProvider } from '../model_provider';
 import { type InferenceConnector, InferenceConnectorType } from './connectors';
 
 /**
@@ -31,60 +30,15 @@ export const getConnectorDefaultModel = (connector: InferenceConnector): string 
  * Inferred from the type for "legacy" connectors,
  * and from the provider config field for inference connectors.
  */
-export const getConnectorProvider = (connector: InferenceConnector): ModelProvider => {
+export const getConnectorProvider = (connector: InferenceConnector): string => {
   switch (connector.type) {
     case InferenceConnectorType.OpenAI:
-      return ModelProvider.OpenAI;
+      return 'openai';
     case InferenceConnectorType.Gemini:
-      return ModelProvider.Google;
+      return 'gemini';
     case InferenceConnectorType.Bedrock:
-      return ModelProvider.Anthropic;
+      return 'bedrock';
     case InferenceConnectorType.Inference:
-      return ModelProvider.Elastic;
+      return connector.config?.provider ?? 'unknown';
   }
-};
-
-/**
- * Returns the platform for the given connector
- */
-export const getConnectorPlatform = (connector: InferenceConnector): ModelPlatform => {
-  switch (connector.type) {
-    case InferenceConnectorType.OpenAI:
-      return connector.config?.apiProvider === 'OpenAI'
-        ? ModelPlatform.OpenAI
-        : connector.config?.apiProvider === 'Azure OpenAI'
-        ? ModelPlatform.AzureOpenAI
-        : ModelPlatform.Other;
-
-    case InferenceConnectorType.Gemini:
-      return ModelPlatform.GoogleVertex;
-
-    case InferenceConnectorType.Bedrock:
-      return ModelPlatform.AmazonBedrock;
-
-    case InferenceConnectorType.Inference:
-      return ModelPlatform.Elastic;
-  }
-};
-
-export const getConnectorFamily = (
-  connector: InferenceConnector,
-  // use this later to get model family from model name
-  _modelName?: string
-): ModelFamily => {
-  const provider = getConnectorProvider(connector);
-
-  switch (provider) {
-    case ModelProvider.Anthropic:
-    case ModelProvider.Elastic:
-      return ModelFamily.Claude;
-
-    case ModelProvider.Google:
-      return ModelFamily.Gemini;
-
-    case ModelProvider.OpenAI:
-      return ModelFamily.GPT;
-  }
-
-  return ModelFamily.GPT;
 };

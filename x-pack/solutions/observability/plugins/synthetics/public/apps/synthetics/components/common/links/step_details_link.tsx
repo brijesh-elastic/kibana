@@ -30,7 +30,7 @@ export const StepDetailsLinkIcon = ({
   target?: '_self' | '_blank';
 }) => {
   const { basePath } = useSyntheticsSettingsContext();
-  const selectedLocation = useSelectedLocation({ refetchMonitorEnabled: false });
+  const selectedLocation = useSelectedLocation();
 
   const stepDetailsLink = `${basePath}/app/synthetics/monitor/${configId}/test-run/${checkGroup}/step/${stepIndex}?locationId=${selectedLocation?.id}`;
 

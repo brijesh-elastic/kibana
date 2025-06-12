@@ -5,23 +5,15 @@
  * 2.0.
  */
 
-import type {
-  AppUpdater,
-  CoreSetup,
-  CoreStart,
-  Plugin,
-  PluginInitializerContext,
-} from '@kbn/core/public';
-import { BehaviorSubject } from 'rxjs';
-import { AppStatus } from '@kbn/core-application-browser';
+import type { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from '@kbn/core/public';
 
 import { getDashboardsLandingCallout } from './components/dashboards_landing_callout';
-import type { ServerlessSecurityPublicConfig } from '../common/config';
 import type {
   SecuritySolutionServerlessPluginSetup,
   SecuritySolutionServerlessPluginStart,
   SecuritySolutionServerlessPluginSetupDeps,
   SecuritySolutionServerlessPluginStartDeps,
+  ServerlessSecurityPublicConfig,
 } from './types';
 import { registerUpsellings } from './upselling';
 import { createServices } from './common/services/create_services';
@@ -52,21 +44,18 @@ export class SecuritySolutionServerlessPlugin
   }
 
   public setup(
-    core: CoreSetup,
+    _core: CoreSetup,
     setupDeps: SecuritySolutionServerlessPluginSetupDeps
   ): SecuritySolutionServerlessPluginSetup {
     const { securitySolution } = setupDeps;
-    const { productTypes, enableExperimental, inaccessibleApps } = this.config;
+    const { productTypes } = this.config;
 
     this.experimentalFeatures = parseExperimentalConfigValue(
-      enableExperimental,
+      this.config.enableExperimental,
       securitySolution.experimentalFeatures
     ).features;
 
     securitySolution.setProductFeatureKeys(getEnabledProductFeatures(productTypes));
-
-    updateInaccessibleApps(inaccessibleApps, core);
-
     return {};
   }
 
@@ -93,23 +82,3 @@ export class SecuritySolutionServerlessPlugin
 
   public stop() {}
 }
-
-/**
- * Disables apps that are inaccessible based on the provided configuration.
- * It updates the app status to 'inaccessible' for those apps.
- * The apps will still execute their lifecycle methods, but it will remain inaccessible in the UI.
- */
-const updateInaccessibleApps = (inaccessibleApps: string[], core: CoreSetup) => {
-  if (!inaccessibleApps?.length) {
-    return;
-  }
-
-  const inaccessibleAppsSet = new Set(inaccessibleApps);
-  const appUpdater$ = new BehaviorSubject<AppUpdater>((app) => {
-    if (inaccessibleAppsSet.has(app.id)) {
-      return { status: AppStatus.inaccessible };
-    }
-  });
-
-  core.application.registerAppUpdater(appUpdater$);
-};

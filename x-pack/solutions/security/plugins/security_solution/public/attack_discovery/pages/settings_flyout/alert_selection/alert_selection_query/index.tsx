@@ -19,9 +19,9 @@ import { useKibana } from '../../../../../common/lib/kibana';
 import { getCommonTimeRanges } from '../helpers/get_common_time_ranges';
 import { useSourcererDataView } from '../../../../../sourcerer/containers';
 import { SourcererScopeName } from '../../../../../sourcerer/store/model';
-import { useCreateDataView } from '../../../../../common/hooks/use_create_data_view';
+import { useDataView } from '../use_data_view';
 import type { AlertsSelectionSettings } from '../../types';
-import { useDataView } from '../../../../../data_view_manager/hooks/use_data_view';
+import { useDataViewSpec } from '../../../../../data_view_manager/hooks/use_data_view_spec';
 
 export const MAX_ALERTS = 500;
 export const MIN_ALERTS = 50;
@@ -50,24 +50,23 @@ const AlertSelectionQueryComponent: React.FC<Props> = ({
   } = useKibana().services;
   const { euiTheme } = useEuiTheme();
 
-  const newDataViewPickerEnabled = useIsExperimentalFeatureEnabled('newDataViewPickerEnabled');
-  const { dataView: experimentalDataView, status } = useDataView(SourcererScopeName.detections);
-
   // get the sourcerer `DataViewSpec` for alerts:
-  const { sourcererDataView: oldSourcererDataViewSpec, loading: oldIsLoadingIndexPattern } =
+  const { sourcererDataView: oldSourcererDataView, loading: oldIsLoadingIndexPattern } =
     useSourcererDataView(SourcererScopeName.detections);
 
-  // create a `DataView` from the `DataViewSpec`:
-  const { dataView: oldDataView, loading: oldIsLoadingDataView } = useCreateDataView({
-    dataViewSpec: oldSourcererDataViewSpec,
-    loading: oldIsLoadingIndexPattern,
-    skip: newDataViewPickerEnabled, // skip data view creation if the new data view picker is enabled
-  });
+  const newDataViewPickerEnabled = useIsExperimentalFeatureEnabled('newDataViewPickerEnabled');
+  const { dataViewSpec, status } = useDataViewSpec(SourcererScopeName.detections);
 
-  const alertsDataView = newDataViewPickerEnabled ? experimentalDataView : oldDataView;
+  const sourcererDataView = newDataViewPickerEnabled ? dataViewSpec : oldSourcererDataView;
   const isLoadingIndexPattern = newDataViewPickerEnabled
     ? status !== 'ready'
-    : oldIsLoadingDataView;
+    : oldIsLoadingIndexPattern;
+
+  // create a `DataView` from the `DataViewSpec`:
+  const alertsDataView = useDataView({
+    dataViewSpec: sourcererDataView,
+    loading: isLoadingIndexPattern,
+  });
 
   // create a container for the alerts `DataView`, as required by the search bar:
   const indexPatterns: DataView[] = useMemo(

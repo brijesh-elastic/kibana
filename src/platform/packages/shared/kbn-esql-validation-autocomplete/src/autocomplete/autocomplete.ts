@@ -31,6 +31,7 @@ import {
   getAllFunctions,
   isSingleItem,
   getColumnExists,
+  correctQuerySyntax,
   getColumnByName,
   getAllCommands,
   getExpressionType,
@@ -73,7 +74,6 @@ import {
   pushItUpInTheList,
   extractTypeFromASTArg,
   getSuggestionsToRightOfOperatorExpression,
-  correctQuerySyntax,
 } from './helper';
 import {
   FunctionParameter,
@@ -100,7 +100,7 @@ export async function suggest(
 ): Promise<SuggestionRawDefinition[]> {
   // Partition out to inner ast / ast context for the latest command
   const innerText = fullText.substring(0, offset);
-  const correctedQuery = correctQuerySyntax(innerText);
+  const correctedQuery = correctQuerySyntax(innerText, context);
   const { ast, root } = parse(correctedQuery, { withFormatting: true });
   const astContext = getAstContext(innerText, ast, offset);
 
@@ -541,7 +541,7 @@ async function getFunctionArgsSuggestions(
     // inherit that constraint: func1(func2(shouldBeConstantOnly)))
     //
     const constantOnlyParamDefs = typesToSuggestNext.filter(
-      (p) => p.constantOnly || /_duration/.test(p.type as string)
+      (p) => p.constantOnly || /_literal/.test(p.type as string)
     );
 
     const getTypesFromParamDefs = (paramDefs: FunctionParameter[]) => {

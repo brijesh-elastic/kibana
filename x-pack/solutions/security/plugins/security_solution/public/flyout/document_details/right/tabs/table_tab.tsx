@@ -119,7 +119,7 @@ export const TableTab = memo(() => {
     eventId,
     investigationFields,
   } = useDocumentDetailsContext();
-  const { ruleId, isAlert } = useBasicDataFromDetailsData(dataFormattedForFieldBrowser);
+  const { ruleId } = useBasicDataFromDetailsData(dataFormattedForFieldBrowser);
 
   const highlightedFieldsResult = useHighlightedFields({
     dataFormattedForFieldBrowser,
@@ -151,10 +151,9 @@ export const TableTab = memo(() => {
         setTableTabState={setTableTabState}
         isPopoverOpen={isPopoverOpen}
         setIsPopoverOpen={setIsPopoverOpen}
-        isAlert={isAlert}
       />,
     ],
-    [tableTabState, setTableTabState, isPopoverOpen, setIsPopoverOpen, isAlert]
+    [tableTabState, setTableTabState, isPopoverOpen, setIsPopoverOpen]
   );
 
   const [pagination, setPagination] = useState<{ pageIndex: number }>({

@@ -7,7 +7,6 @@
       "pretty": "__flag__",
       "if_primary_term": "",
       "if_seq_no": "",
-      "include_source_on_error": "__flag__",
       "lang": [
         "painless"
       ],
@@ -39,7 +38,7 @@
     "patterns": [
       "{index}/_update/{id}"
     ],
-    "documentation": "https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-update",
+    "documentation": "https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update.html",
     "availability": {
       "stack": true,
       "serverless": true

@@ -13,6 +13,7 @@ import type { EntityType } from '@kbn/timelines-plugin/common';
 import type { SessionsComponentsProps } from './types';
 import { TableId } from '@kbn/securitysolution-data-table';
 import { licenseService } from '../../hooks/use_license';
+import { mount } from 'enzyme';
 import type { EventsViewerProps } from '../events_viewer';
 
 jest.mock('../../lib/kibana');
@@ -105,14 +106,14 @@ mockGetDefaultControlColumn.mockReturnValue([
 
 describe('SessionsView', () => {
   it('renders the session view', async () => {
-    const { getByTestId } = render(
+    const wrapper = mount(
       <TestProviders>
         <SessionsView {...testProps} />
       </TestProviders>
     );
 
     await waitFor(() => {
-      expect(getByTestId(TEST_ID)).toBeTruthy();
+      expect(wrapper.find(`[data-test-subj="${TEST_ID}"]`).exists()).toBeTruthy();
     });
   });
 

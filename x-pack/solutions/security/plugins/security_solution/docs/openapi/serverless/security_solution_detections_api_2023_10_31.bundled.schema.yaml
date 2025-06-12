@@ -4026,12 +4026,6 @@ components:
           enum:
             - delete
           type: string
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
-          type: string
         ids:
           description: >-
             Array of rule IDs. Array of rule IDs to which a bulk action will be
@@ -4051,12 +4045,6 @@ components:
         action:
           enum:
             - disable
-          type: string
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
           type: string
         ids:
           description: >-
@@ -4091,12 +4079,6 @@ components:
           required:
             - include_exceptions
             - include_expired_exceptions
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
-          type: string
         ids:
           description: >-
             Array of rule IDs. Array of rule IDs to which a bulk action will be
@@ -4197,12 +4179,6 @@ components:
             $ref: '#/components/schemas/BulkActionEditPayload'
           minItems: 1
           type: array
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
-          type: string
         ids:
           description: >-
             Array of rule IDs. Array of rule IDs to which a bulk action will be
@@ -4228,12 +4204,6 @@ components:
           enum:
             - enable
           type: string
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
-          type: string
         ids:
           description: >-
             Array of rule IDs. Array of rule IDs to which a bulk action will be
@@ -4256,12 +4226,6 @@ components:
           enum:
             - export
           type: string
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
-          type: string
         ids:
           description: >-
             Array of rule IDs. Array of rule IDs to which a bulk action will be
@@ -4281,12 +4245,6 @@ components:
         action:
           enum:
             - run
-          type: string
-        gaps_range_end:
-          description: Gaps range end, valid only when query is provided
-          type: string
-        gaps_range_start:
-          description: Gaps range start, valid only when query is provided
           type: string
         ids:
           description: >-

@@ -31,12 +31,7 @@ import {
   FunctionReturnType,
   SupportedDataType,
 } from '../../definitions/types';
-import {
-  joinIndices,
-  timeseriesIndices,
-  editorExtensions,
-  inferenceEndpoints,
-} from '../../__tests__/helpers';
+import { joinIndices, timeseriesIndices, editorExtensions } from '../../__tests__/helpers';
 
 export interface Integration {
   name: string;
@@ -260,7 +255,7 @@ export function getFieldNamesByType(
 
 export function getLiteralsByType(_type: SupportedDataType | SupportedDataType[]) {
   const type = Array.isArray(_type) ? _type : [_type];
-  if (type.includes('time_duration')) {
+  if (type.includes('time_literal')) {
     // return only singular
     return timeUnitsToSuggest.map(({ name }) => `1 ${name}`).filter((s) => !/s$/.test(s));
   }
@@ -315,7 +310,6 @@ export function createCustomCallbackMocks(
       }
       return [];
     }),
-    getInferenceEndpoints: jest.fn(async () => ({ inferenceEndpoints })),
   };
 }
 

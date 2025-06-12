@@ -89,7 +89,6 @@ export function useSetupTechnology({
   isEditPage,
   agentPolicies,
   integrationToEnable,
-  hideAgentlessSelector,
 }: {
   setNewAgentPolicy: (policy: NewAgentPolicy) => void;
   newAgentPolicy: NewAgentPolicy;
@@ -100,7 +99,6 @@ export function useSetupTechnology({
   isEditPage?: boolean;
   agentPolicies?: AgentPolicy[];
   integrationToEnable?: string;
-  hideAgentlessSelector?: boolean;
 }) {
   const { isAgentlessEnabled, isAgentlessDefault, isServerless, isCloud } = useAgentless();
 
@@ -123,20 +121,13 @@ export function useSetupTechnology({
   useEffect(() => {
     const shouldBeDefault =
       isAgentlessEnabled &&
-      !hideAgentlessSelector &&
       (isOnlyAgentlessIntegration(packageInfo, integrationToEnable) ||
         isAgentlessSetupDefault(isAgentlessDefault, packageInfo, integrationToEnable))
         ? SetupTechnology.AGENTLESS
         : SetupTechnology.AGENT_BASED;
     setDefaultSetupTechnology(shouldBeDefault);
     setSelectedSetupTechnology(shouldBeDefault);
-  }, [
-    isAgentlessEnabled,
-    isAgentlessDefault,
-    packageInfo,
-    integrationToEnable,
-    hideAgentlessSelector,
-  ]);
+  }, [isAgentlessEnabled, isAgentlessDefault, packageInfo, integrationToEnable]);
 
   const agentlessPolicyName = getAgentlessAgentPolicyNameFromPackagePolicyName(packagePolicy.name);
   const [agentlessPolicyOutputId, setAgentlessPolicyOutputId] = useState<string | undefined>();

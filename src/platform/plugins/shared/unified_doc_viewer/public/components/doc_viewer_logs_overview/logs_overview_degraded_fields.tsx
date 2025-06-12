@@ -30,7 +30,6 @@ import {
   DataQualityDetailsLocatorParams,
 } from '@kbn/deeplinks-observability';
 import { BrowserUrlService } from '@kbn/share-plugin/public';
-import { isCCSRemoteIndexName } from '@kbn/es-query';
 import { getUnifiedDocViewerServices } from '../../plugin';
 import {
   ScrollableSectionWrapper,
@@ -129,8 +128,6 @@ export const LogsOverviewDegradedFields = forwardRef<
     prefix: qualityIssuesAccordionTitle,
   });
 
-  const isCCSRemoteIndex = isCCSRemoteIndexName(rawDoc._index ?? '');
-
   const [tableOptions, setTableOptions] = useState<TableOptions>(DEFAULT_TABLE_OPTIONS);
 
   const onTableChange = (options: {
@@ -205,11 +202,7 @@ export const LogsOverviewDegradedFields = forwardRef<
             paddingSize="m"
             forceState={forceState}
             onToggle={onToggle}
-            extraAction={
-              !isCCSRemoteIndex && (
-                <DatasetQualityLink urlService={urlService} dataStream={dataStream} />
-              )
-            }
+            extraAction={<DatasetQualityLink urlService={urlService} dataStream={dataStream} />}
             data-test-subj="unifiedDocViewLogsOverviewDegradedFieldsAccordion"
           >
             <EuiBasicTable

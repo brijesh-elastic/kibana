@@ -25,7 +25,7 @@ describe('source nodes', () => {
             index: {
               valueUnquoted: 'index',
             },
-            prefix: {
+            cluster: {
               type: 'literal',
               literalType: 'keyword',
               valueUnquoted: 'cluster',
@@ -55,7 +55,7 @@ describe('source nodes', () => {
           {
             type: 'source',
             name: '<logs-{now/d}>',
-            prefix: undefined,
+            cluster: undefined,
             index: {
               valueUnquoted: '<logs-{now/d}>',
             },
@@ -79,7 +79,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a',
               },
@@ -102,7 +102,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a/b',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a/b',
               },
@@ -125,7 +125,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a.b-*',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a.b-*',
               },
@@ -150,7 +150,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a',
               },
@@ -173,7 +173,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: expect.any(String),
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a " \r \n \t \\ b',
               },
@@ -198,7 +198,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a',
               },
@@ -221,7 +221,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a"b',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a"b',
               },
@@ -244,7 +244,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a:\\/b',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a:\\/b',
               },
@@ -266,7 +266,7 @@ describe('source nodes', () => {
             {
               type: 'source',
               name: 'a👍b',
-              prefix: undefined,
+              cluster: undefined,
               index: {
                 valueUnquoted: 'a👍b',
               },
@@ -293,7 +293,7 @@ describe('source nodes', () => {
               index: {
                 valueUnquoted: 'a',
               },
-              prefix: {
+              cluster: {
                 type: 'literal',
                 literalType: 'keyword',
                 valueUnquoted: 'cluster',

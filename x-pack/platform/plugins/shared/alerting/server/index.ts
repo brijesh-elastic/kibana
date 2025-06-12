@@ -86,7 +86,6 @@ export const config: PluginConfigDescriptor<AlertingConfig> = {
     rulesSettings: { enabled: true },
     maintenanceWindow: { enabled: true },
     disabledRuleTypes: true,
-    enabledRuleTypes: true,
   },
   deprecations: ({ renameFromRoot, deprecate }) => [
     deprecate('maxEphemeralActionsPerAlert', '9.0.0', {

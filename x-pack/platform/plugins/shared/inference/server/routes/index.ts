@@ -10,7 +10,6 @@ import type { CoreSetup, IRouter } from '@kbn/core/server';
 import type { InferenceServerStart, InferenceStartDependencies } from '../types';
 import { registerChatCompleteRoute } from './chat_complete';
 import { registerConnectorsRoute } from './connectors';
-import { registerPromptRoute } from './prompt';
 
 export const registerRoutes = ({
   router,
@@ -22,6 +21,5 @@ export const registerRoutes = ({
   coreSetup: CoreSetup<InferenceStartDependencies, InferenceServerStart>;
 }) => {
   registerChatCompleteRoute({ router, coreSetup, logger: logger.get('chatComplete') });
-  registerPromptRoute({ router, coreSetup, logger: logger.get('prompt') });
   registerConnectorsRoute({ router, coreSetup });
 };

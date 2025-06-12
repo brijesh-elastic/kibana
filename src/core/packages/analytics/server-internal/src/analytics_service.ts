@@ -8,7 +8,6 @@
  */
 
 import { of } from 'rxjs';
-import apm from 'elastic-apm-node';
 import type { AnalyticsClient } from '@elastic/ebt/client';
 import { createAnalytics } from '@elastic/ebt/client';
 import { registerPerformanceMetricEventType } from '@kbn/ebt-tools';
@@ -26,9 +25,6 @@ export class AnalyticsService {
     this.analyticsClient = createAnalytics({
       isDev: core.env.mode.dev,
       logger: core.logger.get('analytics'),
-      getTraceContext: () => ({
-        id: apm.currentTraceIds?.['trace.id'],
-      }),
     });
 
     this.registerBuildInfoAnalyticsContext(core);

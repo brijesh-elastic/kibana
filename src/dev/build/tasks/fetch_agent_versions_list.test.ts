@@ -10,17 +10,48 @@
 import fetch from 'node-fetch';
 import pRetry from 'p-retry';
 
+import { REPO_ROOT } from '@kbn/repo-info';
 import { ToolingLog } from '@kbn/tooling-log';
 
 import { FetchAgentVersionsList } from './fetch_agent_versions_list';
-import { Build, write } from '../lib';
-import { getMockConfig } from '../lib/__mocks__/get_config';
+import { Build, Config, write } from '../lib';
 
 jest.mock('node-fetch');
 jest.mock('p-retry');
 jest.mock('../lib');
 
-const config = getMockConfig();
+const config = new Config(
+  true,
+  false,
+  {
+    version: '8.0.0',
+    engines: {
+      node: '*',
+    },
+    workspaces: {
+      packages: [],
+    },
+  } as any,
+  '1.2.3',
+  REPO_ROOT,
+  {
+    buildNumber: 1234,
+    buildSha: 'abcd1234',
+    buildShaShort: 'abcd',
+    buildVersion: '8.0.0',
+    buildDate: '2023-05-15T23:12:09.000Z',
+  },
+  false,
+  false,
+  null,
+  '',
+  '',
+  false,
+  true,
+  true,
+  {},
+  {}
+);
 
 const mockedFetch = fetch as jest.MockedFunction<typeof fetch>;
 const mockedPRetry = pRetry as jest.MockedFunction<typeof pRetry>;

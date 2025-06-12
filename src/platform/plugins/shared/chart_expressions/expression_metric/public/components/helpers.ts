@@ -16,16 +16,7 @@ import { getColumnByAccessor, getFormatByAccessor } from '@kbn/visualizations-pl
 import { getFormatService, getPaletteService } from '../services';
 import { getDataBoundsForPalette } from '../utils';
 
-export interface FormatOverrides {
-  number?: { alwaysShowSign?: boolean };
-  percent?: { alwaysShowSign?: boolean };
-  bytes?: { alwaysShowSign?: boolean };
-}
-
-function enhanceFieldFormat(
-  serializedFieldFormat: SerializedFieldFormat | undefined,
-  formatOverrides: FormatOverrides | undefined
-): SerializedFieldFormat {
+function enhanceFieldFormat(serializedFieldFormat: SerializedFieldFormat | undefined) {
   const formatId = serializedFieldFormat?.id || 'number';
   if (formatId === 'duration' && !serializedFieldFormat?.params?.formatOverride) {
     return {
@@ -40,28 +31,17 @@ function enhanceFieldFormat(
       },
     };
   }
-  if (formatOverrides && formatId in formatOverrides) {
-    return {
-      ...serializedFieldFormat,
-      params: {
-        ...serializedFieldFormat?.params,
-        ...formatOverrides[formatId as keyof FormatOverrides],
-      },
-    };
-  }
-
   return serializedFieldFormat ?? { id: formatId };
 }
 
 export const getMetricFormatter = (
   accessor: ExpressionValueVisDimension | string,
-  columns: Datatable['columns'],
-  formatOverrides?: FormatOverrides | undefined
+  columns: Datatable['columns']
 ) => {
   const type = getColumnByAccessor(accessor, columns)?.meta.type;
   const defaultFormat = type ? { id: type } : undefined;
   const serializedFieldFormat = getFormatByAccessor(accessor, columns, defaultFormat);
-  const enhancedFieldFormat = enhanceFieldFormat(serializedFieldFormat, formatOverrides);
+  const enhancedFieldFormat = enhanceFieldFormat(serializedFieldFormat);
   return getFormatService().deserialize(enhancedFieldFormat).getConverterFor('text');
 };
 

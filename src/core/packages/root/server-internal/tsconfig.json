@@ -79,7 +79,6 @@
     "@kbn/core-feature-flags-server-internal",
     "@kbn/core-http-rate-limiter-internal",
     "@kbn/projects-solutions-groups",
-    "@kbn/telemetry",
     "@kbn/core-pricing-server-internal",
   ],
   "exclude": [

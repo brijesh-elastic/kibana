@@ -14,7 +14,7 @@ describe('getVariablesHoverContent', () => {
   test('should return empty array if no variables are used in the query', async () => {
     const node = {
       type: 'source',
-      prefix: undefined,
+      cluster: undefined,
       index: {
         valueUnquoted: 'logst*',
       },
@@ -42,7 +42,7 @@ describe('getVariablesHoverContent', () => {
   test('should return empty array if no variables are given', () => {
     const node = {
       type: 'source',
-      prefix: undefined,
+      cluster: undefined,
       index: {
         valueUnquoted: 'logst*',
       },

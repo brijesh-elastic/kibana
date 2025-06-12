@@ -490,7 +490,7 @@ export const commandDefinitions: Array<CommandDefinition<any>> = [
     validate: (command: ESQLCommand, { policies }) => {
       const messages: ESQLMessage[] = [];
       const source = command.args[0] as ESQLSource;
-      const cluster = source.prefix;
+      const cluster = source.cluster;
       const index = source.index;
 
       if (index) {

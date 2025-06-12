@@ -65,16 +65,7 @@ import { DebugPage } from './sections/debug';
 
 const FEEDBACK_URL = 'https://ela.st/fleet-feedback';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      networkMode: 'always',
-    },
-    mutations: {
-      networkMode: 'always',
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 export const WithPermissionsAndSetup = memo<{ children?: React.ReactNode }>(({ children }) => {
   useBreadcrumbs('base');

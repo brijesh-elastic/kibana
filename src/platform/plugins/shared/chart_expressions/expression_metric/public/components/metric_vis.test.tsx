@@ -9,7 +9,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Datatable, DatatableColumn } from '@kbn/expressions-plugin/common';
 import { MetricVis, MetricVisComponentProps } from './metric_vis';
 import { MetricWTrend } from '@elastic/charts';
@@ -238,12 +238,8 @@ describe('MetricVisComponent', function () {
   });
 
   async function waitForChartToRender(renderComplete: MetricVisComponentProps['renderComplete']) {
-    // Interestingly we have to wrap this into an act() call to avoid
-    // issues with the React scheduling when testing
-    await act(async () => {
-      // wait for 1 rAF tick (~16ms)
-      jest.advanceTimersByTime(30);
-    });
+    // wait for 1 rAF tick (~16ms)
+    jest.advanceTimersByTime(30);
     // wait for render complete callback
     await waitFor(() => expect(renderComplete).toHaveBeenCalled());
   }

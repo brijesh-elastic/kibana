@@ -7,3 +7,4 @@
 
 export { createClient } from './create_client';
 export { createChatModel } from './create_chat_model';
+export type { InferenceClient, BoundInferenceClient } from './types';

@@ -72,9 +72,9 @@ export const collectDecorations = (
     const token = list[i];
     const { channel, text } = token;
     const min = pos;
-    const max = min + text.length - 1; // -1 because max is inclusive
+    const max = min + text.length;
 
-    pos = max + 1;
+    pos = max;
 
     const isContentToken = channel !== HIDDEN_CHANNEL;
 
@@ -106,14 +106,9 @@ export const collectDecorations = (
       continue;
     }
 
-    // The lexer rule for single-line comments matches the newline character,
-    // but we don't consider it part of the comment, so we remove it from the
-    // text and the location range.
     const cleanText =
       subtype === 'single-line' ? trimRightNewline(text.slice(2)) : text.slice(2, -2);
-    const maxOffset = text[text.length - 1] === '\n' && subtype === 'single-line' ? 1 : 0;
-
-    const node = Builder.comment(subtype, cleanText, { min, max: max - maxOffset });
+    const node = Builder.comment(subtype, cleanText, { min, max });
     const comment: ParsedFormattingCommentDecoration = {
       type: 'comment',
       hasContentToLeft,
@@ -183,7 +178,7 @@ const attachCommentDecoration = (
   }
 
   if (commentConsumesWholeLine) {
-    const node = Visitor.findNodeAtOrAfter(ast, comment.node.location.max);
+    const node = Visitor.findNodeAtOrAfter(ast, comment.node.location.max - 1);
 
     if (!node) {
       // No node after the comment found, it is probably at the end of the file.
@@ -201,7 +196,7 @@ const attachCommentDecoration = (
   }
 
   if (comment.hasContentToRight && comment.node.subtype === 'multi-line') {
-    const nodeToRight = Visitor.findNodeAtOrAfter(ast, comment.node.location.max);
+    const nodeToRight = Visitor.findNodeAtOrAfter(ast, comment.node.location.max - 1);
 
     if (!nodeToRight) {
       const nodeToLeft = Visitor.findNodeAtOrBefore(ast, comment.node.location.min);
@@ -222,7 +217,7 @@ const attachCommentDecoration = (
 
     const visibleTokenBetweenCommentAndNodeToRight = findVisibleToken(
       tokens,
-      comment.node.location.max + 1,
+      comment.node.location.max,
       nodeToRight.location.min - 1
     );
 

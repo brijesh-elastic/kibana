@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { i18n } from '@kbn/i18n';
 import { EuiButton, EuiPopover, EuiListGroup, EuiListGroupItem } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n-react';
@@ -100,8 +100,6 @@ export function SavedViewsToolbarControls<TSingleSavedViewState extends SavedVie
     onUpdateView({ id: currentView.id, attributes }).then(closeUpdateModal);
   };
 
-  const openPopoverButtonRef = useRef<HTMLButtonElement>(null);
-
   return (
     <>
       <EuiPopover
@@ -110,7 +108,6 @@ export function SavedViewsToolbarControls<TSingleSavedViewState extends SavedVie
           <EuiButton
             onClick={togglePopoverAndLoad}
             data-test-subj="savedViews-openPopover"
-            buttonRef={openPopoverButtonRef}
             iconType="arrowDown"
             iconSide="right"
             color="text"
@@ -185,7 +182,6 @@ export function SavedViewsToolbarControls<TSingleSavedViewState extends SavedVie
       )}
       {isManageFlyoutOpen && (
         <ManageViewsFlyout
-          triggerRef={openPopoverButtonRef}
           loading={isFetchingViews}
           views={views}
           onMakeDefaultView={onSetDefaultView}

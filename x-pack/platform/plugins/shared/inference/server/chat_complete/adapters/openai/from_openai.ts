@@ -41,7 +41,6 @@ export function tokenCountFromOpenAI(
       completion: completionUsage.completion_tokens,
       prompt: completionUsage.prompt_tokens,
       total: completionUsage.total_tokens,
-      cached: completionUsage.prompt_tokens_details?.cached_tokens,
     },
   };
 }

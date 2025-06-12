@@ -5,11 +5,12 @@
  * 2.0.
  */
 
-import { ShortIdTable, Tokenizer } from '@kbn/inference-common';
+import { Tokenizer } from '@kbn/inference-common';
+import { ShortIdTable } from '@kbn/observability-utils-common/llm/short_id_table';
 import { chunk, partition } from 'lodash';
 import pLimit from 'p-limit';
 import { FetchResponseError } from '@kbn/kibana-api-cli';
-import { runRecipe } from '@kbn/inference-cli';
+import { runRecipe } from '../utils/run_recipe';
 
 /**
  * This recipe classifies prompts from user telemetry for the

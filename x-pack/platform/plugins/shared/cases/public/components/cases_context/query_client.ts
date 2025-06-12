@@ -7,13 +7,4 @@
 
 import { QueryClient } from '@tanstack/react-query';
 
-export const casesQueryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      networkMode: 'always',
-    },
-    mutations: {
-      networkMode: 'always',
-    },
-  },
-});
+export const casesQueryClient = new QueryClient();

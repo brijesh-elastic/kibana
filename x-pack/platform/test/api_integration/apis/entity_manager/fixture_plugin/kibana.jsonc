@@ -2,8 +2,6 @@
   "type": "plugin",
   "id": "@kbn/entity-manager-fixture-plugin",
   "owner": "@elastic/obs-entities",
-  "group": "platform",
-  "visibility": "private",
   "plugin": {
     "id": "entityManagerFixture",
     "server": true,

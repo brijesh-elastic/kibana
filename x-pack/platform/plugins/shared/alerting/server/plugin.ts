@@ -109,10 +109,9 @@ import type { ConnectorAdapter, ConnectorAdapterParams } from './connector_adapt
 import type { DataStreamAdapter } from './alerts_service/lib/data_stream_adapter';
 import { getDataStreamAdapter } from './alerts_service/lib/data_stream_adapter';
 import type { GetAlertIndicesAlias } from './lib';
-import { createGetAlertIndicesAliasFn, spaceIdToNamespace } from './lib';
+import { createGetAlertIndicesAliasFn } from './lib';
 import { BackfillClient } from './backfill_client/backfill_client';
 import { MaintenanceWindowsService } from './task_runner/maintenance_windows';
-import { AlertDeletionClient } from './alert_deletion';
 
 export const EVENT_LOG_PROVIDER = 'alerting';
 export const EVENT_LOG_ACTIONS = {
@@ -126,7 +125,6 @@ export const EVENT_LOG_ACTIONS = {
   executeTimeout: 'execute-timeout',
   untrackedInstance: 'untracked-instance',
   gap: 'gap',
-  deleteAlerts: 'delete-alerts',
 };
 export const LEGACY_EVENT_LOG_ACTIONS = {
   resolvedInstance: 'resolved-instance',
@@ -231,12 +229,10 @@ export class AlertingPlugin {
   private pluginStop$: Subject<void>;
   private dataStreamAdapter?: DataStreamAdapter;
   private backfillClient?: BackfillClient;
-  private alertDeletionClient?: AlertDeletionClient;
   private readonly isServerless: boolean;
   private nodeRoles: PluginInitializerContext['node']['roles'];
   private readonly connectorAdapterRegistry = new ConnectorAdapterRegistry();
   private readonly disabledRuleTypes: Set<string>;
-  private readonly enabledRuleTypes: Set<string> | null = null;
 
   constructor(initializerContext: PluginInitializerContext) {
     this.config = initializerContext.config.get();
@@ -254,8 +250,6 @@ export class AlertingPlugin {
     this.pluginStop$ = new ReplaySubject(1);
     this.isServerless = initializerContext.env.packageInfo.buildFlavor === 'serverless';
     this.disabledRuleTypes = new Set(this.config.disabledRuleTypes || []);
-    this.enabledRuleTypes =
-      this.config.enabledRuleTypes != null ? new Set(this.config.enabledRuleTypes) : null;
   }
 
   public setup(
@@ -292,12 +286,6 @@ export class AlertingPlugin {
     if (this.config.cancelAlertsOnRuleTimeout === false) {
       this.logger.warn(
         `Setting xpack.alerting.cancelAlertsOnRuleTimeout=false can lead to unexpected behavior for certain rule types. This setting will be deprecated in a future version and will be ignored for rule types that do not support it.`
-      );
-    }
-
-    if (this.config.enabledRuleTypes && this.config.enabledRuleTypes.length === 0) {
-      this.logger.warn(
-        `xpack.alerting.enabledRuleTypes is empty. No rule types will be enabled in the configuration.`
       );
     }
 
@@ -350,7 +338,7 @@ export class AlertingPlugin {
       }
     }
 
-    const ruleTypeRegistry: RuleTypeRegistry = new RuleTypeRegistry({
+    const ruleTypeRegistry = new RuleTypeRegistry({
       config: this.config,
       logger: this.logger,
       taskManager: plugins.taskManager,
@@ -362,21 +350,6 @@ export class AlertingPlugin {
       inMemoryMetrics: this.inMemoryMetrics,
     });
     this.ruleTypeRegistry = ruleTypeRegistry;
-
-    this.alertDeletionClient = new AlertDeletionClient({
-      auditService: plugins.security?.audit,
-      elasticsearchClientPromise: core
-        .getStartServices()
-        .then(([{ elasticsearch }]) => elasticsearch.client.asInternalUser),
-      eventLogger: this.eventLogger,
-      getAlertIndicesAlias: createGetAlertIndicesAliasFn(this.ruleTypeRegistry!),
-      logger: this.logger,
-      ruleTypeRegistry: this.ruleTypeRegistry!,
-      securityService: core.getStartServices().then(([{ security }]) => security),
-      spacesService: core.getStartServices().then(([_, { spaces }]) => spaces?.spacesService),
-      taskManagerSetup: plugins.taskManager,
-      taskManagerStartPromise,
-    });
 
     const usageCollection = plugins.usageCollection;
     if (usageCollection) {
@@ -444,7 +417,6 @@ export class AlertingPlugin {
       isServerless: this.isServerless,
       docLinks: core.docLinks,
       alertingConfig: this.config,
-      core,
     });
 
     return {
@@ -479,65 +451,45 @@ export class AlertingPlugin {
       ) => {
         if (this.disabledRuleTypes.has(ruleType.id)) {
           this.logger.info(`rule type "${ruleType.id}" disabled by configuration`);
-
-          if (this.enabledRuleTypes && this.enabledRuleTypes.has(ruleType.id)) {
-            this.logger.warn(
-              `rule type "${ruleType.id}" is both disabled and enabled allow-list. rule type will be disabled.`
-            );
-          }
           return;
         }
 
-        if (
-          this.enabledRuleTypes &&
-          this.enabledRuleTypes.size > 0 &&
-          !this.enabledRuleTypes.has(ruleType.id)
-        ) {
-          this.logger.info(`rule type "${ruleType.id}" is not enabled in configuration`);
+        if (!(ruleType.minimumLicenseRequired in LICENSE_TYPE)) {
+          throw new Error(`"${ruleType.minimumLicenseRequired}" is not a valid license type`);
         }
 
-        // Register the rule type if enabledRuleTypes is not defined or if it is defined and it contains the rule type id
+        // validate cancelAlertsOnTimeout if set explicitly on the rule type definition
         if (
-          this.enabledRuleTypes == null ||
-          (this.enabledRuleTypes.size > 0 && this.enabledRuleTypes.has(ruleType.id))
+          ruleType.cancelAlertsOnRuleTimeout === false &&
+          (ruleType.autoRecoverAlerts == null || ruleType.autoRecoverAlerts === true)
         ) {
-          if (!(ruleType.minimumLicenseRequired in LICENSE_TYPE)) {
-            throw new Error(`"${ruleType.minimumLicenseRequired}" is not a valid license type`);
-          }
-
-          // validate cancelAlertsOnTimeout if set explicitly on the rule type definition
-          if (
-            ruleType.cancelAlertsOnRuleTimeout === false &&
-            (ruleType.autoRecoverAlerts == null || ruleType.autoRecoverAlerts === true)
-          ) {
-            throw new Error(
-              `Rule type "${ruleType.id}" cannot have both cancelAlertsOnRuleTimeout set to false and autoRecoverAlerts set to true.`
-            );
-          }
-
-          ruleType.ruleTaskTimeout = getRuleTaskTimeout({
-            config: this.config.rules,
-            ruleTaskTimeout: ruleType.ruleTaskTimeout,
-            ruleTypeId: ruleType.id,
-          });
-          ruleType.doesSetRecoveryContext = ruleType.doesSetRecoveryContext ?? false;
-          ruleType.autoRecoverAlerts = ruleType.autoRecoverAlerts ?? true;
-
-          if (
-            ruleType.autoRecoverAlerts === true &&
-            this.config.cancelAlertsOnRuleTimeout === false
-          ) {
-            this.logger.debug(
-              `Setting xpack.alerting.cancelAlertsOnRuleTimeout=false is incompatible with rule type "${ruleType.id}" and will be ignored.`
-            );
-            ruleType.cancelAlertsOnRuleTimeout = true;
-          } else {
-            ruleType.cancelAlertsOnRuleTimeout =
-              ruleType.cancelAlertsOnRuleTimeout ?? this.config.cancelAlertsOnRuleTimeout;
-          }
-
-          ruleTypeRegistry.register(ruleType);
+          throw new Error(
+            `Rule type "${ruleType.id}" cannot have both cancelAlertsOnRuleTimeout set to false and autoRecoverAlerts set to true.`
+          );
         }
+
+        ruleType.ruleTaskTimeout = getRuleTaskTimeout({
+          config: this.config.rules,
+          ruleTaskTimeout: ruleType.ruleTaskTimeout,
+          ruleTypeId: ruleType.id,
+        });
+        ruleType.doesSetRecoveryContext = ruleType.doesSetRecoveryContext ?? false;
+        ruleType.autoRecoverAlerts = ruleType.autoRecoverAlerts ?? true;
+
+        if (
+          ruleType.autoRecoverAlerts === true &&
+          this.config.cancelAlertsOnRuleTimeout === false
+        ) {
+          this.logger.debug(
+            `Setting xpack.alerting.cancelAlertsOnRuleTimeout=false is incompatible with rule type "${ruleType.id}" and will be ignored.`
+          );
+          ruleType.cancelAlertsOnRuleTimeout = true;
+        } else {
+          ruleType.cancelAlertsOnRuleTimeout =
+            ruleType.cancelAlertsOnRuleTimeout ?? this.config.cancelAlertsOnRuleTimeout;
+        }
+
+        ruleTypeRegistry.register(ruleType);
       },
       getSecurityHealth: async () => {
         return await getSecurityHealth(
@@ -591,6 +543,12 @@ export class AlertingPlugin {
       includedHiddenTypes: [RULE_SAVED_OBJECT_TYPE, AD_HOC_RUN_SAVED_OBJECT_TYPE],
     });
 
+    const spaceIdToNamespace = (spaceId?: string) => {
+      return plugins.spaces && spaceId
+        ? plugins.spaces.spacesService.spaceIdToNamespace(spaceId)
+        : undefined;
+    };
+
     alertingAuthorizationClientFactory.initialize({
       ruleTypeRegistry: ruleTypeRegistry!,
       securityPluginStart: plugins.security,
@@ -614,7 +572,7 @@ export class AlertingPlugin {
         AD_HOC_RUN_SAVED_OBJECT_TYPE,
       ]),
       encryptedSavedObjectsClient,
-      spaceIdToNamespace: (spaceId?: string) => spaceIdToNamespace(plugins.spaces, spaceId),
+      spaceIdToNamespace,
       getSpaceId(request: KibanaRequest) {
         return plugins.spaces?.spacesService.getSpaceId(request) ?? DEFAULT_SPACE_ID;
       },
@@ -699,7 +657,7 @@ export class AlertingPlugin {
       }),
       savedObjects: core.savedObjects,
       share: plugins.share,
-      spaceIdToNamespace: (spaceId?: string) => spaceIdToNamespace(plugins.spaces, spaceId),
+      spaceIdToNamespace,
       uiSettings: core.uiSettings,
       usageCounter: this.usageCounter,
       getEventLogClient: (request: KibanaRequest) => plugins.eventLog.getClient(request),
@@ -743,7 +701,6 @@ export class AlertingPlugin {
     core: CoreSetup<AlertingPluginsStart, unknown>
   ): IContextProvider<AlertingRequestHandlerContext, 'alerting'> => {
     const {
-      alertDeletionClient,
       ruleTypeRegistry,
       rulesClientFactory,
       rulesSettingsClientFactory,
@@ -752,9 +709,6 @@ export class AlertingPlugin {
     return async function alertsRouteHandlerContext(context, request) {
       const [{ savedObjects }] = await core.getStartServices();
       return {
-        getAlertDeletionClient: () => {
-          return alertDeletionClient!;
-        },
         getRulesClient: () => {
           return rulesClientFactory!.create(request, savedObjects);
         },

@@ -12,18 +12,10 @@ import { useSelectedMonitor } from './use_selected_monitor';
 import { selectSelectedLocationId, setMonitorDetailsLocationAction } from '../../../state';
 import { useUrlParams, useLocations } from '../../../hooks';
 
-interface UseSelectedLocationOptions {
-  updateUrl?: boolean;
-  refetchMonitorEnabled?: boolean;
-}
-
-export const useSelectedLocation = ({
-  updateUrl = true,
-  refetchMonitorEnabled = true,
-}: UseSelectedLocationOptions = {}) => {
+export const useSelectedLocation = (updateUrl = true) => {
   const [getUrlParams, updateUrlParams] = useUrlParams();
   const { locations } = useLocations();
-  const { monitor } = useSelectedMonitor({ refetchMonitorEnabled });
+  const { monitor } = useSelectedMonitor();
   const selectedLocationId = useSelector(selectSelectedLocationId);
   const dispatch = useDispatch();
 

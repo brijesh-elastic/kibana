@@ -122,8 +122,8 @@ function createStartMock(): TriggersAndActionsUIPublicPluginStart {
     getRuleSnoozeModal: (props) => {
       return getRuleSnoozeModalLazy(props);
     },
-    getRulesSettingsLink: (props) => {
-      return getRulesSettingsLinkLazy(props);
+    getRulesSettingsLink: () => {
+      return getRulesSettingsLinkLazy();
     },
     getUntrackModal: (props) => {
       return getUntrackModalLazy(props);

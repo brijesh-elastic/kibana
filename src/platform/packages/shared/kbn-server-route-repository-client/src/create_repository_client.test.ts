@@ -19,10 +19,10 @@ const disabledAuthz = {
 };
 
 describe('createRepositoryClient', () => {
-  const fetchMock = jest.fn();
+  const getMock = jest.fn();
   const coreSetupMock = {
     http: {
-      fetch: fetchMock,
+      get: getMock,
     },
   } as unknown as CoreSetup;
 
@@ -42,9 +42,8 @@ describe('createRepositoryClient', () => {
 
     fetch('GET /internal/handler');
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
-      method: 'GET',
+    expect(getMock).toHaveBeenCalledTimes(1);
+    expect(getMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
       body: undefined,
       query: undefined,
       version: undefined,
@@ -63,9 +62,8 @@ describe('createRepositoryClient', () => {
 
     fetch('GET /api/handler 2024-08-05');
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/handler', {
-      method: 'GET',
+    expect(getMock).toHaveBeenCalledTimes(1);
+    expect(getMock).toHaveBeenNthCalledWith(1, '/api/handler', {
       body: undefined,
       query: undefined,
       version: '2024-08-05',
@@ -88,9 +86,8 @@ describe('createRepositoryClient', () => {
       },
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
-      method: 'GET',
+    expect(getMock).toHaveBeenCalledTimes(1);
+    expect(getMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
       headers: {
         some_header: 'header_value',
       },
@@ -123,9 +120,8 @@ describe('createRepositoryClient', () => {
       },
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/internal/handler/param_value', {
-      method: 'GET',
+    expect(getMock).toHaveBeenCalledTimes(1);
+    expect(getMock).toHaveBeenNthCalledWith(1, '/internal/handler/param_value', {
       body: undefined,
       query: undefined,
       version: undefined,
@@ -155,9 +151,8 @@ describe('createRepositoryClient', () => {
       },
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
-      method: 'GET',
+    expect(getMock).toHaveBeenCalledTimes(1);
+    expect(getMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
       body: JSON.stringify({
         payload: 'body_value',
       }),
@@ -189,9 +184,8 @@ describe('createRepositoryClient', () => {
       },
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
-      method: 'GET',
+    expect(getMock).toHaveBeenCalledTimes(1);
+    expect(getMock).toHaveBeenNthCalledWith(1, '/internal/handler', {
       body: undefined,
       query: {
         parameter: 'query_value',

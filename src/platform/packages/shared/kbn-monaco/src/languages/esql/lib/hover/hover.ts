@@ -144,9 +144,9 @@ export async function getHoverItem(
       );
     }
 
-    if (!!source.prefix) {
+    if (!!source.cluster) {
       const mode = ENRICH_MODES.find(
-        ({ name }) => '_' + name === source.prefix!.valueUnquoted.toLowerCase()
+        ({ name }) => '_' + name === source.cluster!.valueUnquoted.toLowerCase()
       )!;
       if (mode) {
         hoverContent.contents.push(

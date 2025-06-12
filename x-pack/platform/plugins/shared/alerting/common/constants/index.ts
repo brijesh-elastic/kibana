@@ -15,4 +15,3 @@ export {
 export { PLUGIN } from './plugin';
 export { gapStatus } from './gap_status';
 export type { GapStatus } from './gap_status';
-export { alertDeleteCategoryIds } from './alert_delete';

@@ -56,7 +56,6 @@ import {
   LAYERED_XY_VIS,
   EXTENDED_ANNOTATION_LAYER,
   EXTENDED_REFERENCE_LINE_DECORATION_CONFIG,
-  PointVisibilityOptions,
 } from '../constants';
 import { XYRender } from './expression_renderers';
 
@@ -74,7 +73,6 @@ export type ValueLabelMode = $Values<typeof ValueLabelModes>;
 export type AxisExtentMode = $Values<typeof AxisExtentModes>;
 export type FittingFunction = $Values<typeof FittingFunctions>;
 export type AvailableReferenceLineIcon = $Values<typeof AvailableReferenceLineIcons>;
-export type PointVisibility = $Values<typeof PointVisibilityOptions>;
 
 export interface AxesSettingsConfig {
   yLeft: boolean;
@@ -306,7 +304,6 @@ export interface LayeredXYArgs {
   splitRowAccessor?: ExpressionValueVisDimension | string;
   splitColumnAccessor?: ExpressionValueVisDimension | string;
   singleTable?: boolean;
-  pointVisibility?: PointVisibility;
 }
 
 export interface XYProps {
@@ -332,7 +329,6 @@ export interface XYProps {
   showTooltip: boolean;
   singleTable?: boolean;
   annotations?: ExpressionAnnotationResult;
-  pointVisibility?: PointVisibility;
 }
 
 export interface AnnotationLayerArgs {

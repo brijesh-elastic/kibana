@@ -692,7 +692,7 @@
                 "section": "def-public.AutoRefreshDoneFn",
                 "text": "AutoRefreshDoneFn"
               },
-              ">; triggerFetch: () => void; getFetch$: () => ",
+              ">; getFetch$: () => ",
               "Observable",
               "<void>; getTime: () => ",
               {

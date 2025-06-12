@@ -24,7 +24,6 @@ import { finished } from 'stream/promises';
 import type { IncomingMessage } from 'http';
 import { PassThrough } from 'stream';
 import type { KibanaRequest } from '@kbn/core-http-server';
-import { TaskErrorSource, createTaskRunError } from '@kbn/task-manager-plugin/server';
 import { inspect } from 'util';
 import type { ConnectorUsageCollector } from '../usage';
 import { assertURL } from './helpers/validators';
@@ -173,61 +172,39 @@ export abstract class SubActionConnector<Config, Secrets> {
 
       return res;
     } catch (error) {
-      this.logger.debug(
-        `Request to external service failed. Connector Id: ${this.connector.id}. Connector type: ${this.connector.type}. Method: ${error.config?.method}. URL: ${error.config?.url}`
-      );
+      if (isAxiosError(error)) {
+        this.logger.debug(
+          `Request to external service failed. Connector Id: ${this.connector.id}. Connector type: ${this.connector.type}. Method: ${error.config?.method}. URL: ${error.config?.url}`
+        );
 
-      const finalError = await this.getRequestError(error);
-      throw finalError;
-    }
-  }
+        let responseBody = '';
 
-  private async getRequestError(initialError: unknown) {
-    if (isAxiosError(initialError)) {
-      const error = await this.getErrorWithResponse(initialError);
+        // The error response body may also be a stream, e.g. for the GenAI connector
+        if (error.response?.config?.responseType === 'stream' && error.response?.data) {
+          try {
+            const incomingMessage = error.response.data as IncomingMessage;
 
-      const errorMessage = `Status code: ${
-        error.status ?? error.response?.status
-      }. Message: ${this.getResponseErrorMessage(error)}`;
+            const pt = incomingMessage.pipe(new PassThrough());
 
-      const errorInstance = new Error(errorMessage);
+            pt.on('data', (chunk) => {
+              responseBody += chunk.toString();
+            });
 
-      // Mark rate limiting errors as user errors
-      if (error.status === 429 || error.response?.status === 429) {
-        return createTaskRunError(errorInstance, TaskErrorSource.USER);
+            await finished(pt);
+
+            error.response.data = JSON.parse(responseBody);
+          } catch {
+            // the response body is a nice to have, no worries if it fails
+          }
+        }
+
+        const errorMessage = `Status code: ${
+          error.status ?? error.response?.status
+        }. Message: ${this.getResponseErrorMessage(error)}`;
+        throw new Error(errorMessage);
       }
 
-      return errorInstance;
+      throw error;
     }
-
-    return initialError;
-  }
-
-  private async getErrorWithResponse(error: AxiosError): Promise<AxiosError> {
-    let responseBody = '';
-
-    // The error response body may also be a stream, e.g. for the GenAI connector
-    if (error.response?.config?.responseType === 'stream' && error.response?.data) {
-      try {
-        const incomingMessage = error.response.data as IncomingMessage;
-
-        const pt = incomingMessage.pipe(new PassThrough());
-
-        pt.on('data', (chunk) => {
-          responseBody += chunk.toString();
-        });
-
-        await finished(pt);
-
-        error.response.data = JSON.parse(responseBody);
-
-        return error;
-      } catch {
-        // the response body is a nice to have, no worries if it fails
-        return error;
-      }
-    }
-
-    return error;
   }
 }

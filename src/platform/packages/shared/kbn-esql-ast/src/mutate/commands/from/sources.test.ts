@@ -55,7 +55,7 @@ describe('commands.from.sources', () => {
           index: {
             valueUnquoted: 'index3',
           },
-          prefix: {
+          cluster: {
             type: 'literal',
             literalType: 'keyword',
             valueUnquoted: 'cl',
@@ -107,7 +107,7 @@ describe('commands.from.sources', () => {
         index: {
           valueUnquoted: 's1',
         },
-        prefix: {
+        cluster: {
           type: 'literal',
           literalType: 'keyword',
           valueUnquoted: 'c',

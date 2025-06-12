@@ -122,8 +122,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     jest.clearAllMocks();
     jest.setSystemTime(new Date(date));
 
-    (services.alertsClient.report as jest.Mock).mockReturnValue({ uuid: 'fake-alert' });
-
     (findDocuments as jest.Mock).mockResolvedValue(getFindAnonymizationFieldsResultWithSingleHit());
     (generateAttackDiscoveries as jest.Mock).mockResolvedValue({
       anonymizedAlerts: mockAnonymizedAlerts,
@@ -144,7 +142,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     const attackDiscoveryScheduleExecutorPromise = attackDiscoveryScheduleExecutor({
       options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
       telemetry: mockTelemetry,
     });
     await expect(attackDiscoveryScheduleExecutorPromise).rejects.toBeInstanceOf(AlertsClientError);
@@ -158,7 +155,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     const attackDiscoveryScheduleExecutorPromise = attackDiscoveryScheduleExecutor({
       options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
       telemetry: mockTelemetry,
     });
     await expect(attackDiscoveryScheduleExecutorPromise).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -172,7 +168,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     await attackDiscoveryScheduleExecutor({
       options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
       telemetry: mockTelemetry,
     });
 
@@ -191,7 +186,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     await attackDiscoveryScheduleExecutor({
       options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
       telemetry: mockTelemetry,
     });
     const anonymizationFields = [
@@ -225,7 +219,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
       await attackDiscoveryScheduleExecutor({
         options,
         logger: mockLogger,
-        publicBaseUrl: undefined,
         telemetry: mockTelemetry,
       });
     }).rejects.toThrow();
@@ -244,7 +237,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     await attackDiscoveryScheduleExecutor({
       options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
       telemetry: mockTelemetry,
     });
 
@@ -267,7 +259,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     await attackDiscoveryScheduleExecutor({
       options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
       telemetry: mockTelemetry,
     });
 
@@ -275,10 +266,6 @@ describe('attackDiscoveryScheduleExecutor', () => {
     expect(services.alertsClient.report).toHaveBeenCalledWith({
       id: expect.anything(),
       actionGroup: 'default',
-    });
-
-    expect(services.alertsClient.setAlertData).toHaveBeenCalledWith({
-      id: expect.anything(),
       payload: {
         'ecs.version': EcsVersion,
         'kibana.alert.attack_discovery.alerts_context_count': 2,
@@ -330,38 +317,13 @@ describe('attackDiscoveryScheduleExecutor', () => {
     });
   });
 
-  it('should generated attack discovery details url and pass via alerts context', async () => {
-    const options = { ...executorOptions } as unknown as RuleExecutorOptions;
-
-    await attackDiscoveryScheduleExecutor({
-      options,
-      logger: mockLogger,
-      publicBaseUrl: 'http://fake-host.io/test',
-      telemetry: mockTelemetry,
-    });
-
-    const { id, ...restDiscovery } = mockAttackDiscoveries[0];
-    expect(services.alertsClient.setAlertData).toHaveBeenCalledWith({
-      id: expect.anything(),
-      payload: expect.anything(),
-      context: {
-        attack: {
-          ...restDiscovery,
-          detailsUrl:
-            'http://fake-host.io/test/s/test-space/app/security/attack_discovery?id=fake-alert',
-        },
-      },
-    });
-  });
-
   it('should throw an error on execution timeout', async () => {
     const options = { ...executorOptions } as unknown as RuleExecutorOptions;
     options.services.shouldStopExecution = () => true;
 
     const attackDiscoveryScheduleExecutorPromise = attackDiscoveryScheduleExecutor({
-      options,
       logger: mockLogger,
-      publicBaseUrl: undefined,
+      options,
       telemetry: mockTelemetry,
     });
     await expect(attackDiscoveryScheduleExecutorPromise).rejects.toThrowErrorMatchingInlineSnapshot(

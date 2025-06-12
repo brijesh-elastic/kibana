@@ -127,7 +127,7 @@ describe('WHERE <expression>', () => {
         EXPECTED_COMPARISON_WITH_TEXT_FIELD_SUGGESTIONS
       );
       await assertSuggestions(
-        'from a | where textField >= textFiel/',
+        'from a | where textField >= textField/',
         EXPECTED_COMPARISON_WITH_TEXT_FIELD_SUGGESTIONS
       );
     });

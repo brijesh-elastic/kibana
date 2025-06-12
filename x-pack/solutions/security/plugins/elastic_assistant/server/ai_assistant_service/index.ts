@@ -14,6 +14,7 @@ import type {
   KibanaRequest,
   SavedObjectsClientContract,
 } from '@kbn/core/server';
+import { ATTACK_DISCOVERY_ALERTS_AD_HOC_INDEX_RESOURCE_PREFIX } from '@kbn/elastic-assistant-common';
 import type { TaskManagerSetupContract } from '@kbn/task-manager-plugin/server';
 import type { MlPluginSetup } from '@kbn/ml-plugin/server';
 import { Subject } from 'rxjs';
@@ -26,7 +27,6 @@ import {
 import { omit, some } from 'lodash';
 import { InstallationStatus } from '@kbn/product-doc-base-plugin/common/install_status';
 import { TrainedModelsProvider } from '@kbn/ml-plugin/server/shared_services/providers';
-import { IRuleDataClient } from '@kbn/rule-registry-plugin/server';
 import { alertSummaryFieldsFieldMap } from '../ai_assistant_data_clients/alert_summary/field_maps_configuration';
 import { attackDiscoveryFieldMap } from '../lib/attack_discovery/persistence/field_maps_configuration/field_maps_configuration';
 import { defendInsightsFieldMap } from '../lib/defend_insights/persistence/field_maps_configuration';
@@ -58,6 +58,7 @@ import {
   GetAIAssistantKnowledgeBaseDataClientParams,
 } from '../ai_assistant_data_clients/knowledge_base';
 import { AttackDiscoveryDataClient } from '../lib/attack_discovery/persistence';
+import { attackDiscoveryAlertFieldMap } from '../lib/attack_discovery/schedules/fields';
 import { DefendInsightsDataClient } from '../lib/defend_insights/persistence';
 import { createGetElserId, ensureProductDocumentationInstalled } from './helpers';
 import { hasAIAssistantLicense } from '../routes/helpers';
@@ -88,6 +89,7 @@ export interface AIAssistantServiceOpts {
   taskManager: TaskManagerSetupContract;
   pluginStop$: Subject<void>;
   productDocManager: Promise<ProductDocBaseStartContract['management']>;
+  savedAttackDiscoveries?: boolean; // feature flag
 }
 
 export interface CreateAIAssistantClientParams {
@@ -105,7 +107,8 @@ export type CreateDataStream = (params: {
     | 'prompts'
     | 'attackDiscovery'
     | 'defendInsights'
-    | 'alertSummary';
+    | 'alertSummary'
+    | 'attackDiscoveryAlerts';
   fieldMap: FieldMap;
   kibanaVersion: string;
   spaceId?: string;
@@ -124,6 +127,7 @@ export class AIAssistantService {
   private alertSummaryDataStream: DataStreamSpacesAdapter;
   private anonymizationFieldsDataStream: DataStreamSpacesAdapter;
   private attackDiscoveryDataStream: DataStreamSpacesAdapter;
+  private attackDiscoveryAlertsDataStream: DataStreamSpacesAdapter | null;
   private defendInsightsDataStream: DataStreamSpacesAdapter;
   private resourceInitializationHelper: ResourceInstallationHelper;
   private initPromise: Promise<InitializationPromise>;
@@ -131,11 +135,13 @@ export class AIAssistantService {
   private hasInitializedV2KnowledgeBase: boolean = false;
   private productDocManager?: ProductDocBaseStartContract['management'];
   private isProductDocumentationInProgress: boolean = false;
+  private savedAttackDiscoveries: boolean = false; // feature flag
 
   constructor(private readonly options: AIAssistantServiceOpts) {
     this.initialized = false;
     this.getElserId = createGetElserId(options.ml.trainedModelsProvider);
     this.elserInferenceId = options.elserInferenceId;
+    this.savedAttackDiscoveries = options.savedAttackDiscoveries ?? false;
 
     this.conversationsDataStream = this.createDataStream({
       resource: 'conversations',
@@ -162,6 +168,17 @@ export class AIAssistantService {
       kibanaVersion: options.kibanaVersion,
       fieldMap: attackDiscoveryFieldMap,
     });
+
+    if (options.savedAttackDiscoveries) {
+      // the `savedAttackDiscoveries` feature flag is enabled
+      this.attackDiscoveryAlertsDataStream = this.createDataStream({
+        resource: 'attackDiscoveryAlerts',
+        kibanaVersion: options.kibanaVersion,
+        fieldMap: attackDiscoveryAlertFieldMap,
+      });
+    } else {
+      this.attackDiscoveryAlertsDataStream = null;
+    }
 
     this.defendInsightsDataStream = this.createDataStream({
       resource: 'defendInsights',
@@ -429,6 +446,15 @@ export class AIAssistantService {
         pluginStop$: this.options.pluginStop$,
       });
 
+      if (this.savedAttackDiscoveries && this.attackDiscoveryAlertsDataStream != null) {
+        // The `savedAttackDiscoveries` feature flag is enabled
+        await this.attackDiscoveryAlertsDataStream.install({
+          esClient,
+          logger: this.options.logger,
+          pluginStop$: this.options.pluginStop$,
+        });
+      }
+
       await this.defendInsightsDataStream.install({
         esClient,
         logger: this.options.logger,
@@ -459,6 +485,9 @@ export class AIAssistantService {
       prompts: getResourceName('component-template-prompts'),
       anonymizationFields: getResourceName(ANONYMIZATION_FIELDS_COMPONENT_TEMPLATE),
       attackDiscovery: getResourceName('component-template-attack-discovery'),
+      attackDiscoveryAlerts: getResourceName(
+        `${ATTACK_DISCOVERY_ALERTS_AD_HOC_INDEX_RESOURCE_PREFIX}-component-template`
+      ),
       defendInsights: getResourceName('component-template-defend-insights'),
     },
     aliases: {
@@ -468,6 +497,7 @@ export class AIAssistantService {
       prompts: getResourceName('prompts'),
       anonymizationFields: getResourceName(ANONYMIZATION_FIELDS_RESOURCE),
       attackDiscovery: getResourceName('attack-discovery'),
+      attackDiscoveryAlerts: ATTACK_DISCOVERY_ALERTS_AD_HOC_INDEX_RESOURCE_PREFIX,
       defendInsights: getResourceName('defend-insights'),
     },
     indexPatterns: {
@@ -477,6 +507,7 @@ export class AIAssistantService {
       prompts: getResourceName('prompts*'),
       anonymizationFields: getResourceName(ANONYMIZATION_FIELDS_INDEX_PATTERN),
       attackDiscovery: getResourceName('attack-discovery*'),
+      attackDiscoveryAlerts: `${ATTACK_DISCOVERY_ALERTS_AD_HOC_INDEX_RESOURCE_PREFIX}*`,
       defendInsights: getResourceName('defend-insights*'),
     },
     indexTemplate: {
@@ -486,6 +517,7 @@ export class AIAssistantService {
       prompts: getResourceName('index-template-prompts'),
       anonymizationFields: getResourceName(ANONYMIZATION_FIELDS_INDEX_TEMPLATE),
       attackDiscovery: getResourceName('index-template-attack-discovery'),
+      attackDiscoveryAlerts: `${ATTACK_DISCOVERY_ALERTS_AD_HOC_INDEX_RESOURCE_PREFIX}-index-template`,
       defendInsights: getResourceName('index-template-defend-insights'),
     },
     pipelines: {
@@ -611,9 +643,7 @@ export class AIAssistantService {
   }
 
   public async createAttackDiscoveryDataClient(
-    opts: CreateAIAssistantClientParams & {
-      adhocAttackDiscoveryDataClient: IRuleDataClient | undefined;
-    }
+    opts: CreateAIAssistantClientParams
   ): Promise<AttackDiscoveryDataClient | null> {
     const res = await this.checkResourcesInstallation(opts);
 
@@ -622,7 +652,8 @@ export class AIAssistantService {
     }
 
     return new AttackDiscoveryDataClient({
-      adhocAttackDiscoveryDataClient: opts.adhocAttackDiscoveryDataClient,
+      attackDiscoveryAlertsIndexPatternsResourceName:
+        this.resourceNames.aliases.attackDiscoveryAlerts,
       logger: this.options.logger.get('attackDiscovery'),
       currentUser: opts.currentUser,
       elasticsearchClientPromise: this.options.elasticsearchClientPromise,

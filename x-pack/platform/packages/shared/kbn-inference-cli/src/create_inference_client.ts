@@ -5,10 +5,8 @@
  * 2.0.
  */
 
-import { InferenceChatModel } from '@kbn/inference-langchain';
-import { createRestClient } from '@kbn/inference-plugin/common';
-import { KibanaClient, createKibanaClient, toHttpHandler } from '@kbn/kibana-api-cli';
 import { ToolingLog } from '@kbn/tooling-log';
+import { KibanaClient, createKibanaClient } from '@kbn/kibana-api-cli';
 import { InferenceCliClient } from './client';
 import { selectConnector } from './select_connector';
 
@@ -22,7 +20,7 @@ export async function createInferenceClient({
   log,
   prompt,
   signal,
-  kibanaClient: givenKibanaClient,
+  kibanaClient,
   connectorId,
 }: {
   log: ToolingLog;
@@ -31,7 +29,7 @@ export async function createInferenceClient({
   kibanaClient?: KibanaClient;
   connectorId?: string;
 }): Promise<InferenceCliClient> {
-  const kibanaClient = givenKibanaClient || (await createKibanaClient({ log, signal }));
+  kibanaClient = kibanaClient || (await createKibanaClient({ log, signal }));
 
   const license = await kibanaClient.es.license.get();
 
@@ -47,23 +45,10 @@ export async function createInferenceClient({
     preferredConnectorId: connectorId,
   });
 
-  const client = createRestClient({
-    fetch: toHttpHandler(kibanaClient),
+  return new InferenceCliClient({
+    log,
+    kibanaClient,
+    connector,
     signal,
-    bindTo: {
-      connectorId: connector.connectorId,
-      functionCalling: 'auto',
-    },
   });
-
-  return {
-    ...client,
-    getLangChainChatModel: (): InferenceChatModel => {
-      return new InferenceChatModel({
-        connector,
-        chatComplete: client.chatComplete,
-        signal,
-      });
-    },
-  };
 }

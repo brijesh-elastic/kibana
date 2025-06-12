@@ -62,10 +62,10 @@ describe('case', () => {
       'from a | eval case( keywordField != /)',
       [
         // Notice no extra space after field name
-        ...getFieldNamesByType(['keyword', 'text']).map((field) => `${field}`),
+        ...getFieldNamesByType(['keyword', 'text', 'boolean']).map((field) => `${field}`),
         ...getFunctionSignaturesByReturnType(
           Location.EVAL,
-          ['keyword', 'text'],
+          ['keyword', 'text', 'boolean'],
           { scalar: true },
           undefined,
           []

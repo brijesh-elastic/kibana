@@ -27,19 +27,7 @@ import { ChatItemActions } from './chat_item_actions';
 import { ChatItemAvatar } from './chat_item_avatar';
 import { ChatItemContentInlinePromptEditor } from './chat_item_content_inline_prompt_editor';
 import { ChatTimelineItem } from './chat_timeline';
-// Helper function to extract plain text from a React node.
-function extractTextFromReactNode(node: React.ReactNode): string {
-  if (typeof node === 'string' || typeof node === 'number') {
-    return node.toString();
-  }
-  if (Array.isArray(node)) {
-    return node.map(extractTextFromReactNode).join('');
-  }
-  if (React.isValidElement(node)) {
-    return extractTextFromReactNode(node.props.children);
-  }
-  return '';
-}
+
 export interface ChatItemProps extends Omit<ChatTimelineItem, 'message'> {
   onActionClick: ChatActionClickHandler;
   onEditSubmit: (message: Message) => void;
@@ -48,7 +36,6 @@ export interface ChatItemProps extends Omit<ChatTimelineItem, 'message'> {
   onSendTelemetry: (eventWithPayload: TelemetryEventTypeWithPayload) => void;
   onStopGeneratingClick: () => void;
   isConversationOwnedByCurrentUser: boolean;
-  displayContent?: React.ReactNode;
 }
 
 const moreCompactHeaderClassName = css`
@@ -108,7 +95,6 @@ export function ChatItem({
   onRegenerateClick,
   onSendTelemetry,
   onStopGeneratingClick,
-  anonymizedHighlightedContent,
 }: ChatItemProps) {
   const accordionId = useGeneratedHtmlId({ prefix: 'chat' });
 
@@ -149,21 +135,17 @@ export function ChatItem({
     return onEditSubmit(newMessage);
   };
 
-  // extract text if content is not a string.
   const handleCopyToClipboard = () => {
-    const copyText = typeof content === 'string' ? content : extractTextFromReactNode(content);
-    navigator.clipboard.writeText(copyText || '');
+    navigator.clipboard.writeText(content || '');
   };
 
-  let contentElement: React.ReactNode;
-  contentElement =
+  let contentElement: React.ReactNode =
     content || loading || error ? (
       <ChatItemContentInlinePromptEditor
         editing={editing}
         loading={loading}
         functionCall={functionCall}
         content={content}
-        anonymizedHighlightedContent={anonymizedHighlightedContent}
         role={role}
         onSubmit={handleInlineEditSubmit}
         onActionClick={onActionClick}

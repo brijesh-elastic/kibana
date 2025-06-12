@@ -7,6 +7,8 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
+import './_dashboard_container.scss';
+
 import classNames from 'classnames';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
@@ -17,7 +19,6 @@ import { LocatorPublic } from '@kbn/share-plugin/common';
 
 import { ExitFullScreenButtonKibanaProvider } from '@kbn/shared-ux-button-exit-full-screen';
 import { i18n } from '@kbn/i18n';
-import { css } from '@emotion/react';
 import type { DashboardLocatorParams } from '../../common';
 import { DashboardApi, DashboardInternalApi } from '../dashboard_api/types';
 import { coreServices, screenshotModeService } from '../services/kibana_services';
@@ -28,7 +29,6 @@ import { DashboardViewport } from './viewport/dashboard_viewport';
 import { loadDashboardApi } from '../dashboard_api/load_dashboard_api';
 import { DashboardInternalContext } from '../dashboard_api/use_dashboard_internal_api';
 import { DashboardRedirect } from '../dashboard_app/types';
-import { GlobalPrintStyles } from './print_styles';
 
 export interface DashboardRendererProps {
   onApiAvailable?: (api: DashboardApi) => void;
@@ -92,12 +92,10 @@ export function DashboardRenderer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedObjectId]);
 
-  const isDashboardViewportLoading = !dashboardApi && !error;
-
   const viewportClasses = classNames(
     'dashboardViewport',
     { 'dashboardViewport--screenshotMode': screenshotModeService.isScreenshotMode() },
-    { 'dashboardViewport--loading': isDashboardViewportLoading }
+    { 'dashboardViewport--loading': !error && !dashboardApi }
   );
 
   const loadingSpinner = showPlainSpinner ? (
@@ -127,13 +125,7 @@ export function DashboardRenderer({
     }
 
     return dashboardApi && dashboardInternalApi ? (
-      <div
-        className="dashboardContainer"
-        data-test-subj="dashboardContainer"
-        css={styles.renderer}
-        ref={(e) => (dashboardContainerRef.current = e)}
-      >
-        <GlobalPrintStyles />
+      <div className="dashboardContainer" ref={(e) => (dashboardContainerRef.current = e)}>
         <ExitFullScreenButtonKibanaProvider
           coreStart={{ chrome: coreServices.chrome, customBranding: coreServices.customBranding }}
         >
@@ -150,7 +142,7 @@ export function DashboardRenderer({
   };
 
   return (
-    <div ref={dashboardViewport} className={viewportClasses} css={styles.renderer}>
+    <div ref={dashboardViewport} className={viewportClasses}>
       {dashboardViewport?.current && dashboardApi && (
         <ParentClassController
           viewportRef={dashboardViewport.current}
@@ -161,18 +153,6 @@ export function DashboardRenderer({
     </div>
   );
 }
-
-const styles = {
-  renderer: css({
-    display: 'flex',
-    flex: 'auto',
-    width: '100%',
-    '&.dashboardViewport--loading': {
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  }),
-};
 
 /**
  * Maximizing a panel in Dashboard only works if the parent div has a certain class. This

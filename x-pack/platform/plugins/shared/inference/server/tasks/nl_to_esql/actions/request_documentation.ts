@@ -13,9 +13,8 @@ import {
   withoutOutputUpdateEvents,
   ChatCompleteMetadata,
   ChatCompleteOptions,
-  OutputAPI,
 } from '@kbn/inference-common';
-
+import { InferenceClient } from '../../..';
 import { requestDocumentationSchema } from './shared';
 
 export const requestDocumentation = ({
@@ -29,7 +28,7 @@ export const requestDocumentation = ({
   metadata,
   toolOptions: { tools, toolChoice },
 }: {
-  outputApi: OutputAPI;
+  outputApi: InferenceClient['output'];
   system: string;
   messages: Message[];
   connectorId: string;

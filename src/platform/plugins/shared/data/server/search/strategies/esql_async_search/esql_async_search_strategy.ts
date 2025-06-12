@@ -7,7 +7,7 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import { Logger } from '@kbn/core/server';
+import type { IScopedClusterClient, Logger } from '@kbn/core/server';
 import { catchError, tap } from 'rxjs';
 import { getKbnServerError } from '@kbn/kibana-utils-plugin/server';
 import type { IKibanaSearchResponse, IKibanaSearchRequest } from '@kbn/search-types';
@@ -33,16 +33,15 @@ type ESQLQueryRequest = ESQLSearchParams & SqlQueryRequest;
 
 export const esqlAsyncSearchStrategyProvider = (
   searchConfig: SearchConfigSchema,
-  logger: Logger
+  logger: Logger,
+  useInternalUser: boolean = false
 ): ISearchStrategy<
   IKibanaSearchRequest<ESQLQueryRequest>,
   IKibanaSearchResponse<SqlGetAsyncResponse>
 > => {
-  function cancelEsqlAsyncSearch(
-    id: string,
-    { esClient }: Pick<SearchStrategyDependencies, 'esClient'>
-  ) {
-    return esClient.asCurrentUser.transport.request(
+  function cancelAsyncSearch(id: string, esClient: IScopedClusterClient) {
+    const client = useInternalUser ? esClient.asInternalUser : esClient.asCurrentUser;
+    return client.transport.request(
       {
         method: 'DELETE',
         path: `/_query/async/${id}`,
@@ -55,96 +54,54 @@ export const esqlAsyncSearchStrategyProvider = (
     );
   }
 
-  function stopEsqlAsyncSearch(
-    id: string,
-    options: IAsyncSearchOptions,
-    { esClient }: Pick<SearchStrategyDependencies, 'esClient'>
-  ) {
-    return esClient.asCurrentUser.transport.request<SqlGetAsyncResponse>(
-      {
-        method: 'POST',
-        path: `/_query/async/${id}/stop`,
-      },
-      {
-        ...options.transport,
-        signal: options.abortSignal,
-        meta: true,
-        asStream: options.stream,
-      }
-    );
-  }
-
-  function getEsqlAsyncSearch(
+  function asyncSearch(
     { id, ...request }: IKibanaSearchRequest<ESQLQueryRequest>,
     options: IAsyncSearchOptions,
-    { esClient }: SearchStrategyDependencies
+    { esClient, uiSettingsClient }: SearchStrategyDependencies
   ) {
-    const params = {
-      ...getCommonDefaultAsyncGetParams(searchConfig, options),
-      ...(request.params?.keep_alive ? { keep_alive: request.params.keep_alive } : {}),
-      ...(request.params?.wait_for_completion_timeout
-        ? { wait_for_completion_timeout: request.params.wait_for_completion_timeout }
-        : {}),
-    };
-
-    return esClient.asCurrentUser.transport.request<SqlGetAsyncResponse>(
-      {
-        method: 'GET',
-        path: `/_query/async/${id}`,
-        querystring: { ...params, drop_null_columns: request.params?.dropNullColumns },
-      },
-      {
-        ...options.transport,
-        signal: options.abortSignal,
-        meta: true,
-        asStream: options.stream,
-      }
-    );
-  }
-
-  async function submitEsqlSearch(
-    { id, ...request }: IKibanaSearchRequest<ESQLQueryRequest>,
-    options: IAsyncSearchOptions,
-    { esClient }: SearchStrategyDependencies
-  ) {
+    const client = useInternalUser ? esClient.asInternalUser : esClient.asCurrentUser;
     const { dropNullColumns, ...requestParams } = request.params ?? {};
-
-    const params = {
-      ...(await getCommonDefaultAsyncSubmitParams(searchConfig, options)),
-      ...requestParams,
-    };
-
-    return esClient.asCurrentUser.transport.request<SqlGetAsyncResponse>(
-      {
-        method: 'POST',
-        path: `/_query/async`,
-        body: params,
-        querystring: dropNullColumns ? 'drop_null_columns' : '',
-      },
-      {
-        ...options.transport,
-        signal: options.abortSignal,
-        meta: true,
-        asStream: options.stream,
-      }
-    );
-  }
-
-  function esqlAsyncSearch(
-    { id, ...request }: IKibanaSearchRequest<ESQLQueryRequest>,
-    searchOptions: IAsyncSearchOptions,
-    deps: SearchStrategyDependencies
-  ) {
-    // This abortSignal comes from getRequestAbortedSignal and fires if the HTTP request is aborted;
-    // in the case of these async APIs, we  don't want to cancel the async request if the HTTP
-    // request is aborted
-    const { abortSignal, ...options } = searchOptions;
     const search = async () => {
-      const response = await (!id
-        ? submitEsqlSearch({ id, ...request }, options, deps)
-        : options.retrieveResults
-        ? stopEsqlAsyncSearch(id, options, deps)
-        : getEsqlAsyncSearch({ id, ...request }, options, deps));
+      const params = id
+        ? {
+            ...getCommonDefaultAsyncGetParams(searchConfig, options),
+            ...(request.params?.keep_alive ? { keep_alive: request.params.keep_alive } : {}),
+            ...(request.params?.wait_for_completion_timeout
+              ? { wait_for_completion_timeout: request.params.wait_for_completion_timeout }
+              : {}),
+          }
+        : {
+            ...(await getCommonDefaultAsyncSubmitParams(searchConfig, options)),
+            ...requestParams,
+          };
+      const response = id
+        ? await client.transport.request<SqlGetAsyncResponse>(
+            {
+              method: 'GET',
+              path: `/_query/async/${id}`,
+              querystring: { ...params, drop_null_columns: dropNullColumns },
+            },
+            {
+              ...options.transport,
+              signal: options.abortSignal,
+              meta: true,
+              asStream: options.stream,
+            }
+          )
+        : await client.transport.request<SqlGetAsyncResponse>(
+            {
+              method: 'POST',
+              path: `/_query/async`,
+              body: params,
+              querystring: dropNullColumns ? 'drop_null_columns' : '',
+            },
+            {
+              ...options.transport,
+              signal: options.abortSignal,
+              meta: true,
+              asStream: options.stream,
+            }
+          );
 
       const { body, headers, meta } = response;
 
@@ -154,7 +111,7 @@ export const esqlAsyncSearchStrategyProvider = (
     const cancel = async () => {
       if (!id || options.isStored) return;
       try {
-        await cancelEsqlAsyncSearch(id, deps);
+        await cancelAsyncSearch(id, esClient);
       } catch (e) {
         // A 404 means either this search request does not exist, or that it is already cancelled
         if (e.meta?.statusCode === 404) return;
@@ -185,9 +142,9 @@ export const esqlAsyncSearchStrategyProvider = (
      */
     search: (request, options: IAsyncSearchOptions, deps) => {
       logger.debug(() => `search ${JSON.stringify(request) || request.id}`);
-      return esqlAsyncSearch(request, options, deps);
-    },
 
+      return asyncSearch(request, options, deps);
+    },
     /**
      * @param id async search ID to cancel, as returned from _async_search API
      * @param options
@@ -195,16 +152,14 @@ export const esqlAsyncSearchStrategyProvider = (
      * @returns `Promise<void>`
      * @throws `KbnServerError`
      */
-
-    cancel: async (id, options, deps) => {
+    cancel: async (id, options, { esClient }) => {
       logger.debug(`cancel ${id}`);
       try {
-        await cancelEsqlAsyncSearch(id, deps);
+        await cancelAsyncSearch(id, esClient);
       } catch (e) {
         throw getKbnServerError(e);
       }
     },
-
     /**
      *
      * @param id async search ID to extend, as returned from _async_search API
@@ -217,7 +172,8 @@ export const esqlAsyncSearchStrategyProvider = (
     extend: async (id, keepAlive, options, { esClient }) => {
       logger.debug(`extend ${id} by ${keepAlive}`);
       try {
-        await esClient.asCurrentUser.transport.request(
+        const client = useInternalUser ? esClient.asInternalUser : esClient.asCurrentUser;
+        await client.transport.request(
           { method: 'GET', path: `/_query/async/${id}`, body: { id, keep_alive: keepAlive } },
           { ...options.transport, signal: options.abortSignal, meta: true }
         );

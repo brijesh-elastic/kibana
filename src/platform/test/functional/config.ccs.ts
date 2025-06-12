@@ -53,7 +53,6 @@ export default async function ({ readConfigFile }: FtrConfigProviderContext) {
 
     esTestCluster: {
       ...baseConfig.get('esTestCluster'),
-      license: 'trial',
       ccs: {
         remoteClusterUrl:
           process.env.REMOTE_CLUSTER_URL ??

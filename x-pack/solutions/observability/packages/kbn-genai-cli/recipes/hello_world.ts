@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import { runRecipe } from '@kbn/inference-cli';
+import { runRecipe } from '../utils/run_recipe';
 
 /**
  * Simple example of how to use these recipes

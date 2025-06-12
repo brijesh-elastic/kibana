@@ -90,7 +90,6 @@ export const LogAIAssistant = ({
             title={similarLogMessagesTitle}
             messages={similarLogMessageMessages}
             dataTestSubj="obsAiAssistantInsightButtonSimilarLogMessage"
-            showElasticLlmCallout={false}
           />
         </EuiFlexItem>
       ) : null}

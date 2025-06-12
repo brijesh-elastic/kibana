@@ -17,9 +17,6 @@ import type {
   CreateUpdateProtectionUpdatesNoteSchema,
   GetProtectionUpdatesNoteSchema,
 } from '../../../../common/api/endpoint/protection_updates_note';
-import type { SecuritySolutionRequestHandlerContext } from '../../../types';
-import type { EndpointAppContext } from '../../types';
-import { errorHandler } from '../error_handler';
 
 const getProtectionNote = async (SOClient: SavedObjectsClientContract, packagePolicyId: string) => {
   return SOClient.find<{ note: string }>({
@@ -64,60 +61,27 @@ const createProtectionNote = async (
   );
 };
 
-async function getSavedObjectClient(
-  context: SecuritySolutionRequestHandlerContext,
-  endpointContext: EndpointAppContext,
-  packagePolicyId: string
-): Promise<SavedObjectsClientContract> {
-  const { endpointManagementSpaceAwarenessEnabled } = endpointContext.experimentalFeatures;
-  if (!endpointManagementSpaceAwarenessEnabled) {
-    return (await context.core).savedObjects.client;
-  }
-
-  const spaceId = (await context.securitySolution).getSpaceId();
-  const scopedFleetService = endpointContext.service.getInternalFleetServices(spaceId);
-  await scopedFleetService.ensureInCurrentSpace({ integrationPolicyIds: [packagePolicyId] });
-  const unscopedFleetService = endpointContext.service.getInternalFleetServices(undefined, true);
-  return unscopedFleetService.getSoClient();
-}
-
-export const postProtectionUpdatesNoteHandler = function (
-  endpointContext: EndpointAppContext
-): RequestHandler<
+export const postProtectionUpdatesNoteHandler = function (): RequestHandler<
   TypeOf<typeof CreateUpdateProtectionUpdatesNoteSchema.params>,
   undefined,
-  TypeOf<typeof CreateUpdateProtectionUpdatesNoteSchema.body>,
-  SecuritySolutionRequestHandlerContext
+  TypeOf<typeof CreateUpdateProtectionUpdatesNoteSchema.body>
 > {
   return async (context, request, response) => {
+    const SOClient = (await context.core).savedObjects.client;
     const { package_policy_id: packagePolicyId } = request.params;
-    let SOClient: SavedObjectsClientContract;
-    let soClientResponse: Awaited<ReturnType<typeof getProtectionNote>>;
-
-    const logger = endpointContext.logFactory.get('protectionUpdatesNote');
-
-    try {
-      SOClient = await getSavedObjectClient(context, endpointContext, packagePolicyId);
-      soClientResponse = await getProtectionNote(SOClient, packagePolicyId);
-    } catch (err) {
-      return errorHandler(logger, response, err);
-    }
-
     const { note } = request.body;
+
+    const soClientResponse = await getProtectionNote(SOClient, packagePolicyId);
+
     if (soClientResponse.saved_objects[0]) {
       const { references } = soClientResponse.saved_objects[0];
-      let updatedNoteSO: Awaited<ReturnType<typeof updateProtectionNote>>;
 
-      try {
-        updatedNoteSO = await updateProtectionNote(
-          SOClient,
-          soClientResponse.saved_objects[0].id,
-          note,
-          references
-        );
-      } catch (err) {
-        return errorHandler(logger, response, err);
-      }
+      const updatedNoteSO = await updateProtectionNote(
+        SOClient,
+        soClientResponse.saved_objects[0].id,
+        note,
+        references
+      );
 
       const { attributes } = updatedNoteSO;
 
@@ -132,12 +96,7 @@ export const postProtectionUpdatesNoteHandler = function (
       },
     ];
 
-    let noteSO: Awaited<ReturnType<typeof createProtectionNote>>;
-    try {
-      noteSO = await createProtectionNote(SOClient, note, references);
-    } catch (err) {
-      return errorHandler(logger, response, err);
-    }
+    const noteSO = await createProtectionNote(SOClient, note, references);
 
     const { attributes } = noteSO;
 
@@ -145,26 +104,16 @@ export const postProtectionUpdatesNoteHandler = function (
   };
 };
 
-export const getProtectionUpdatesNoteHandler = function (
-  endpointContext: EndpointAppContext
-): RequestHandler<
+export const getProtectionUpdatesNoteHandler = function (): RequestHandler<
   TypeOf<typeof GetProtectionUpdatesNoteSchema.params>,
   undefined,
-  undefined,
-  SecuritySolutionRequestHandlerContext
+  undefined
 > {
   return async (context, request, response) => {
+    const SOClient = (await context.core).savedObjects.client;
     const { package_policy_id: packagePolicyId } = request.params;
-    let SOClient: SavedObjectsClientContract;
-    let soClientResponse: Awaited<ReturnType<typeof getProtectionNote>>;
 
-    try {
-      SOClient = await getSavedObjectClient(context, endpointContext, packagePolicyId);
-      soClientResponse = await getProtectionNote(SOClient, packagePolicyId);
-    } catch (err) {
-      const logger = endpointContext.logFactory.get('protectionUpdatesNote');
-      return errorHandler(logger, response, err);
-    }
+    const soClientResponse = await getProtectionNote(SOClient, packagePolicyId);
 
     if (!soClientResponse.saved_objects[0] || !soClientResponse.saved_objects[0].attributes) {
       return response.notFound({ body: { message: 'No note found for this policy' } });

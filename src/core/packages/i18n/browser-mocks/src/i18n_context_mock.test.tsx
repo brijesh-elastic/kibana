@@ -10,16 +10,16 @@
 import React from 'react';
 import { FormattedMessage } from '@kbn/i18n-react';
 import { I18nProviderMock } from './i18n_context_mock';
-import { render } from '@testing-library/react';
+import { shallow } from 'enzyme';
 
 describe('I18nProviderMock', () => {
   it('interpolates to default message if present', () => {
     expect(
-      render(
+      shallow(
         <I18nProviderMock>
           <FormattedMessage id="id" defaultMessage="default message" />
         </I18nProviderMock>
-      ).container.innerHTML
+      ).html()
     ).toMatchInlineSnapshot(`"default message"`);
   });
 });

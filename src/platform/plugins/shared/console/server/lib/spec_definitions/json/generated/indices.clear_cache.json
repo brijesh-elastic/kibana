@@ -5,7 +5,6 @@
       "filter_path": [],
       "human": "__flag__",
       "pretty": "__flag__",
-      "index": [],
       "allow_no_indices": "__flag__",
       "expand_wildcards": [
         "all",
@@ -27,7 +26,7 @@
       "_cache/clear",
       "{index}/_cache/clear"
     ],
-    "documentation": "https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-clear-cache",
+    "documentation": "https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-clearcache.html",
     "availability": {
       "stack": true,
       "serverless": false

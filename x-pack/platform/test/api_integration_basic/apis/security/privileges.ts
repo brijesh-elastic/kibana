@@ -381,8 +381,6 @@ export default function ({ getService }: FtrProviderContext) {
               'minimal_read',
               'allFlappingSettings',
               'readFlappingSettings',
-              'allAlertDeleteSettings',
-              'readAlertDeleteSettings',
             ],
             maintenanceWindow: ['all', 'read', 'minimal_all', 'minimal_read'],
             streams: ['all', 'read', 'minimal_all', 'minimal_read'],

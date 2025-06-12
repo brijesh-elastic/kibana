@@ -23,8 +23,6 @@ import type {
   BedrockToolChoiceSchema,
   BedrockClientSendParamsSchema,
   BedrockClientSendResponseSchema,
-  ConverseActionParamsSchema,
-  ConverseStreamActionParamsSchema,
 } from './schema';
 
 export type Config = TypeOf<typeof ConfigSchema>;
@@ -43,6 +41,3 @@ export type BedrockMessage = TypeOf<typeof BedrockMessageSchema>;
 export type BedrockToolChoice = TypeOf<typeof BedrockToolChoiceSchema>;
 export type ConverseActionParams = TypeOf<typeof BedrockClientSendParamsSchema>;
 export type ConverseActionResponse = TypeOf<typeof BedrockClientSendResponseSchema>;
-// New types for Bedrock's converse and converse-stream APIs
-export type ConverseParams = TypeOf<typeof ConverseActionParamsSchema>;
-export type ConverseStreamParams = TypeOf<typeof ConverseStreamActionParamsSchema>;

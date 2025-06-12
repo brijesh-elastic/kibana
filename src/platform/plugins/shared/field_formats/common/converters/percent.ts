@@ -26,7 +26,6 @@ export class PercentFormat extends NumeralFormat {
   getParamDefaults = () => ({
     pattern: this.getConfig!(FORMATS_UI_SETTINGS.FORMAT_PERCENT_DEFAULT_PATTERN),
     fractional: true,
-    alwaysShowSign: false,
   });
 
   textConvert: TextContextTypeConvert = (val: string | number) => {

@@ -4,24 +4,20 @@
  * 2.0; you may not use this file except in compliance with the Elastic License
  * 2.0.
  */
-import { v4 as uuidv4 } from 'uuid';
-import { omit } from 'lodash';
+
 import { IContentClient } from '@kbn/content-management-plugin/server/types';
 import type { Logger, SavedObjectsFindResult } from '@kbn/core/server';
 import { isDashboardSection } from '@kbn/dashboard-plugin/common';
 import type { DashboardAttributes, DashboardPanel } from '@kbn/dashboard-plugin/server';
+import type { LensAttributes } from '@kbn/lens-embeddable-utils';
 import type {
   FieldBasedIndexPatternColumn,
   GenericIndexPatternColumn,
 } from '@kbn/lens-plugin/public';
-import type { LensAttributes } from '@kbn/lens-embeddable-utils';
-import type {
-  RelevantPanel,
-  RelatedDashboard,
-  SuggestedDashboard,
-} from '@kbn/observability-schema';
-import type { InvestigateAlertsClient } from './investigate_alerts_client';
+import type { RelatedDashboard, RelevantPanel } from '@kbn/observability-schema';
+import { v4 as uuidv4 } from 'uuid';
 import type { AlertData } from './alert_data';
+import type { InvestigateAlertsClient } from './investigate_alerts_client';
 
 type Dashboard = SavedObjectsFindResult<DashboardAttributes>;
 export class RelatedDashboardsClient {
@@ -35,56 +31,35 @@ export class RelatedDashboardsClient {
     private alertId: string
   ) {}
 
-  public async fetchRelatedDashboards(): Promise<{
-    suggestedDashboards: RelatedDashboard[];
-    linkedDashboards: RelatedDashboard[];
-  }> {
-    const [alertDocument] = await Promise.all([
-      this.alertsClient.getAlertById(this.alertId),
-      this.fetchFirst500Dashboards(),
-    ]);
-    this.setAlert(alertDocument);
-    const [suggestedDashboards, linkedDashboards] = await Promise.all([
-      this.fetchSuggestedDashboards(),
-      this.getLinkedDashboards(),
-    ]);
-    const filteredSuggestedDashboards = suggestedDashboards.filter(
-      (suggested) => !linkedDashboards.some((linked) => linked.id === suggested.id)
-    );
-    return {
-      suggestedDashboards: filteredSuggestedDashboards.slice(0, 10), // limit to 10 suggested dashboards
-      linkedDashboards,
-    };
-  }
-
-  private setAlert(alert: AlertData) {
+  setAlert(alert: AlertData) {
     this.alert = alert;
   }
 
-  private checkAlert(): AlertData {
-    if (!this.alert)
+  async fetchSuggestedDashboards(): Promise<{ suggestedDashboards: RelatedDashboard[] }> {
+    const allRelatedDashboards = new Set<RelatedDashboard>();
+    const relevantDashboardsById = new Map<string, RelatedDashboard>();
+    const [alert] = await Promise.all([
+      this.alertsClient.getAlertById(this.alertId),
+      this.fetchFirst500Dashboards(),
+    ]);
+    this.setAlert(alert);
+    if (!this.alert) {
       throw new Error(
         `Alert with id ${this.alertId} not found. Could not fetch related dashboards.`
       );
-    return this.alert;
-  }
-
-  private async fetchSuggestedDashboards(): Promise<SuggestedDashboard[]> {
-    const alert = this.checkAlert();
-    const allSuggestedDashboards = new Set<SuggestedDashboard>();
-    const relevantDashboardsById = new Map<string, SuggestedDashboard>();
+    }
     const index = await this.getRuleQueryIndex();
-    const allRelevantFields = alert.getAllRelevantFields();
+    const allRelevantFields = this.alert.getAllRelevantFields();
 
     if (index) {
       const { dashboards } = this.getDashboardsByIndex(index);
-      dashboards.forEach((dashboard) => allSuggestedDashboards.add(dashboard));
+      dashboards.forEach((dashboard) => allRelatedDashboards.add(dashboard));
     }
     if (allRelevantFields.length > 0) {
       const { dashboards } = this.getDashboardsByField(allRelevantFields);
-      dashboards.forEach((dashboard) => allSuggestedDashboards.add(dashboard));
+      dashboards.forEach((dashboard) => allRelatedDashboards.add(dashboard));
     }
-    allSuggestedDashboards.forEach((dashboard) => {
+    allRelatedDashboards.forEach((dashboard) => {
       const dedupedPanels = this.dedupePanels([
         ...(relevantDashboardsById.get(dashboard.id)?.relevantPanels || []),
         ...dashboard.relevantPanels,
@@ -104,10 +79,10 @@ export class RelatedDashboardsClient {
     const sortedDashboards = Array.from(relevantDashboardsById.values()).sort((a, b) => {
       return b.score - a.score;
     });
-    return sortedDashboards;
+    return { suggestedDashboards: sortedDashboards.slice(0, 10) };
   }
 
-  private async fetchDashboards({
+  async fetchDashboards({
     page,
     perPage = 20,
     limit,
@@ -137,14 +112,14 @@ export class RelatedDashboardsClient {
     await this.fetchDashboards({ page: page + 1, perPage, limit });
   }
 
-  private async fetchFirst500Dashboards() {
+  async fetchFirst500Dashboards() {
     await this.fetchDashboards({ page: 1, perPage: 500, limit: 500 });
   }
 
-  private getDashboardsByIndex(index: string): {
-    dashboards: SuggestedDashboard[];
+  getDashboardsByIndex(index: string): {
+    dashboards: RelatedDashboard[];
   } {
-    const relevantDashboards: SuggestedDashboard[] = [];
+    const relevantDashboards: RelatedDashboard[] = [];
     this.dashboardsById.forEach((d) => {
       const panels = d.attributes.panels;
       const matchingPanels = this.getPanelsByIndex(index, panels);
@@ -173,7 +148,7 @@ export class RelatedDashboardsClient {
     return { dashboards: relevantDashboards };
   }
 
-  private dedupePanels(panels: RelevantPanel[]): RelevantPanel[] {
+  dedupePanels(panels: RelevantPanel[]): RelevantPanel[] {
     const uniquePanels = new Map<string, RelevantPanel>();
     panels.forEach((p) => {
       uniquePanels.set(p.panel.panelIndex, {
@@ -184,10 +159,10 @@ export class RelatedDashboardsClient {
     return Array.from(uniquePanels.values());
   }
 
-  private getDashboardsByField(fields: string[]): {
-    dashboards: SuggestedDashboard[];
+  getDashboardsByField(fields: string[]): {
+    dashboards: RelatedDashboard[];
   } {
-    const relevantDashboards: SuggestedDashboard[] = [];
+    const relevantDashboards: RelatedDashboard[] = [];
     this.dashboardsById.forEach((d) => {
       const panels = d.attributes.panels;
       const matchingPanels = this.getPanelsByField(fields, panels);
@@ -274,13 +249,15 @@ export class RelatedDashboardsClient {
     }
   }
 
-  private getRuleQueryIndex(): string | null {
-    const alert = this.checkAlert();
-    const index = alert.getRuleQueryIndex();
+  getRuleQueryIndex(): string | null {
+    if (!this.alert) {
+      throw new Error('Alert not found. Could not get the rule query index.');
+    }
+    const index = this.alert.getRuleQueryIndex();
     return index;
   }
 
-  private getLensVizIndices(lensAttr: LensAttributes): Set<string> {
+  getLensVizIndices(lensAttr: LensAttributes): Set<string> {
     const indices = new Set(
       lensAttr.references
         .filter((r) => r.name.match(`indexpattern`))
@@ -289,7 +266,7 @@ export class RelatedDashboardsClient {
     return indices;
   }
 
-  private getLensVizFields(lensAttr: LensAttributes): Set<string> {
+  getLensVizFields(lensAttr: LensAttributes): Set<string> {
     const fields = new Set<string>();
     const dataSourceLayers = lensAttr.state.datasourceStates.formBased?.layers || {};
     Object.values(dataSourceLayers).forEach((ds) => {
@@ -307,43 +284,10 @@ export class RelatedDashboardsClient {
     return fields;
   }
 
-  private async getLinkedDashboards(): Promise<RelatedDashboard[]> {
-    const alert = this.checkAlert();
-    const ruleId = alert.getRuleId();
-    if (!ruleId) {
-      throw new Error(
-        `Alert with id ${this.alertId} does not have a rule ID. Could not fetch linked dashboards.`
-      );
-    }
-    const rule = await this.alertsClient.getRuleById(ruleId);
-    if (!rule) {
-      throw new Error(
-        `Rule with id ${ruleId} not found. Could not fetch linked dashboards for alert with id ${this.alertId}.`
-      );
-    }
-    const linkedDashboardsArtifacts = rule.artifacts?.dashboards || [];
-    const linkedDashboards = await this.getLinkedDashboardsByIds(
-      linkedDashboardsArtifacts.map((d) => d.id)
-    );
-    return linkedDashboards;
-  }
-
-  private async getLinkedDashboardsByIds(ids: string[]): Promise<RelatedDashboard[]> {
-    const dashboardsResponse = await Promise.all(ids.map((id) => this.dashboardClient.get(id)));
-    const linkedDashboards: Dashboard[] = dashboardsResponse.map((d) => {
-      return d.result.item;
-    });
-    return linkedDashboards.map((d) => ({
-      id: d.id,
-      title: d.attributes.title,
-      matchedBy: { linked: true },
-    }));
-  }
-
-  private getMatchingFields(dashboard: RelatedDashboard): string[] {
+  getMatchingFields(dashboard: RelatedDashboard): string[] {
     const matchingFields = new Set<string>();
     // grab all the top level arrays from the matchedBy object via Object.values
-    Object.values(omit(dashboard.matchedBy, 'linked')).forEach((match) => {
+    Object.values(dashboard.matchedBy).forEach((match) => {
       // add the values of each array to the matchingFields set
       match.forEach((value) => {
         matchingFields.add(value);
@@ -352,9 +296,13 @@ export class RelatedDashboardsClient {
     return Array.from(matchingFields);
   }
 
-  private getScore(dashboard: RelatedDashboard): number {
-    const alert = this.checkAlert();
-    const allRelevantFields = alert.getAllRelevantFields();
+  getScore(dashboard: RelatedDashboard): number {
+    if (!this.alert) {
+      throw new Error(
+        `Alert with id ${this.alertId} not found. Could not compute the relevance score for suggested dashboard.`
+      );
+    }
+    const allRelevantFields = this.alert.getAllRelevantFields();
     const index = this.getRuleQueryIndex();
     const setA = new Set<string>([...allRelevantFields, ...(index ? [index] : [])]);
     const setB = new Set<string>(this.getMatchingFields(dashboard));

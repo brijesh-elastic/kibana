@@ -209,7 +209,6 @@ export const CreatePackagePolicySinglePage: CreatePackagePolicyParams = ({
     hasFleetAddAgentsPrivileges,
     setNewAgentPolicy,
     setSelectedPolicyTab,
-    hideAgentlessSelector: !!addIntegrationFlyoutProps,
   });
 
   if (addIntegrationFlyoutProps?.agentPolicy) {
@@ -424,7 +423,7 @@ export const CreatePackagePolicySinglePage: CreatePackagePolicyParams = ({
             validationResults={validationResults}
             isEditPage={false}
             handleSetupTechnologyChange={handleSetupTechnologyChange}
-            isAgentlessEnabled={isAgentlessIntegration(packageInfo) && !addIntegrationFlyoutProps}
+            isAgentlessEnabled={isAgentlessIntegration(packageInfo)}
             defaultSetupTechnology={defaultSetupTechnology}
             integrationToEnable={integrationToEnable}
             setIntegrationToEnable={setIntegrationToEnable}

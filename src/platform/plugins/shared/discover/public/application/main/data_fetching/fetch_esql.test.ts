@@ -60,7 +60,6 @@ describe('fetchEsql', () => {
       records,
       esqlQueryColumns: ['_id', 'foo'],
       esqlHeaderWarning: undefined,
-      interceptedWarnings: [],
     });
     expect(resolveDocumentProfileSpy).toHaveBeenCalledTimes(2);
     expect(resolveDocumentProfileSpy).toHaveBeenCalledWith({ record: records[0] });

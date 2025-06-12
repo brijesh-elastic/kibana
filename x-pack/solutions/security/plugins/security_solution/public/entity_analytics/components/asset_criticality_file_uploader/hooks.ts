@@ -6,7 +6,7 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import type { ParseLocalConfig } from 'papaparse';
+import type { ParseConfig } from 'papaparse';
 import { unparse, parse } from 'papaparse';
 import { useCallback, useMemo } from 'react';
 import type { EuiStepHorizontalProps } from '@elastic/eui/src/components/steps/step_horizontal';
@@ -72,8 +72,7 @@ export const useFileValidation = ({ onError, onComplete }: UseFileChangeCbParams
         },
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const parserConfig: ParseLocalConfig<any, File> = {
+      const parserConfig: ParseConfig = {
         dynamicTyping: true,
         skipEmptyLines: true,
         complete(parsedFile, returnedFile) {

@@ -27,7 +27,6 @@ import {
   FittingFunction,
   ValueLabelMode,
   XScaleType,
-  PointVisibility,
 } from '../../common';
 import { SeriesTypes, ValueLabelModes, AxisModes } from '../../common/constants';
 import {
@@ -65,7 +64,6 @@ interface Props {
   uiState?: PersistedState;
   singleTable?: boolean;
   isDarkMode: boolean;
-  pointVisibility?: PointVisibility;
 }
 
 export const DataLayers: FC<Props> = ({
@@ -92,7 +90,6 @@ export const DataLayers: FC<Props> = ({
   uiState,
   singleTable,
   isDarkMode,
-  pointVisibility,
 }) => {
   // for singleTable mode we should use y accessors from all layers for creating correct series name and getting color
   const allYAccessors = layers.flatMap((layer) => layer.accessors);
@@ -181,7 +178,6 @@ export const DataLayers: FC<Props> = ({
             singleTable,
             multipleLayersWithSplits,
             isDarkMode,
-            pointVisibility,
           });
 
           const index = `${layer.layerId}-${accessorIndex}`;

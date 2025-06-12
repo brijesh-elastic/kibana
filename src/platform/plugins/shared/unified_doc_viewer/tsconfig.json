@@ -44,8 +44,7 @@
     "@kbn/apm-ui-shared",
     "@kbn/react-hooks",
     "@kbn/embeddable-plugin",
-    "@kbn/apm-types-shared",
-    "@kbn/es-query"
+    "@kbn/apm-types-shared"
   ],
   "exclude": ["target/**/*"]
 }

@@ -5,21 +5,19 @@
  * 2.0.
  */
 
+import { elasticsearchServiceMock } from '@kbn/core-elasticsearch-server-mocks';
 import { loggerMock } from '@kbn/logging-mocks';
-import { ruleRegistryMocks } from '@kbn/rule-registry-plugin/server/mocks';
 
 import { createAttackDiscoveryAlerts } from '.';
 import { mockAuthenticatedUser } from '../../../../__mocks__/mock_authenticated_user';
 import { mockCreateAttackDiscoveryAlertsParams } from '../../../../__mocks__/mock_create_attack_discovery_alerts_params';
 
-const ADHOC_ALERTS_INDEX = 'mock-index' as const;
-const ruleDataClientMock = ruleRegistryMocks.createRuleDataClient(ADHOC_ALERTS_INDEX);
-
 describe('createAttackDiscoveryAlerts', () => {
+  const mockEsClient = elasticsearchServiceMock.createElasticsearchClient();
   const mockLogger = loggerMock.create();
   const mockNow = new Date('2025-04-24T17:36:25.812Z');
   const spaceId = 'default';
-  const bulkMock = jest.fn();
+  const attackDiscoveryAlertsIndex = 'mock-index';
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -33,9 +31,10 @@ describe('createAttackDiscoveryAlerts', () => {
     };
 
     const result = await createAttackDiscoveryAlerts({
-      adhocAttackDiscoveryDataClient: ruleDataClientMock,
+      attackDiscoveryAlertsIndex,
       authenticatedUser: mockAuthenticatedUser,
       createAttackDiscoveryAlertsParams: mockParams,
+      esClient: mockEsClient,
       logger: mockLogger,
       spaceId,
     });
@@ -44,28 +43,26 @@ describe('createAttackDiscoveryAlerts', () => {
   });
 
   it('throws an error if bulk insertion fails', async () => {
-    bulkMock.mockResolvedValue({
-      body: {
-        items: [
-          {
-            create: {
-              _index: 'mock-index',
-              status: 400,
-              error: { reason: 'Test error', type: 'test_error' },
-            },
+    mockEsClient.bulk.mockResolvedValue({
+      items: [
+        {
+          create: {
+            _index: 'mock-index',
+            status: 400,
+            error: { reason: 'Test error', type: 'test_error' },
           },
-        ],
-        errors: true,
-        took: 1,
-      },
+        },
+      ],
+      errors: true,
+      took: 1,
     });
-    (ruleDataClientMock.getWriter as jest.Mock).mockResolvedValue({ bulk: bulkMock });
 
     await expect(
       createAttackDiscoveryAlerts({
-        adhocAttackDiscoveryDataClient: ruleDataClientMock,
+        attackDiscoveryAlertsIndex,
         authenticatedUser: mockAuthenticatedUser,
         createAttackDiscoveryAlertsParams: mockCreateAttackDiscoveryAlertsParams,
+        esClient: mockEsClient,
         logger: mockLogger,
         spaceId,
       })
@@ -73,32 +70,29 @@ describe('createAttackDiscoveryAlerts', () => {
   });
 
   it('logs an error if fetching created alerts fails', async () => {
-    bulkMock.mockResolvedValue({
-      body: {
-        items: [
-          {
-            create: {
-              result: 'created',
-              _id: 'mock-id-1',
-              _index: 'mock-index',
-              status: 201,
-            },
+    mockEsClient.bulk.mockResolvedValue({
+      items: [
+        {
+          create: {
+            result: 'created',
+            _id: 'mock-id-1',
+            _index: 'mock-index',
+            status: 201,
           },
-        ],
-        errors: false,
-        took: 1,
-      },
+        },
+      ],
+      errors: false,
+      took: 1,
     });
-    (ruleDataClientMock.getWriter as jest.Mock).mockResolvedValue({ bulk: bulkMock });
 
-    const searchMock = jest.fn().mockRejectedValue(new Error('Search error'));
-    (ruleDataClientMock.getReader as jest.Mock).mockReturnValue({ search: searchMock });
+    mockEsClient.search.mockRejectedValue(new Error('Search error'));
 
     await expect(
       createAttackDiscoveryAlerts({
-        adhocAttackDiscoveryDataClient: ruleDataClientMock,
+        attackDiscoveryAlertsIndex,
         authenticatedUser: mockAuthenticatedUser,
         createAttackDiscoveryAlertsParams: mockCreateAttackDiscoveryAlertsParams,
+        esClient: mockEsClient,
         logger: mockLogger,
         spaceId,
       })

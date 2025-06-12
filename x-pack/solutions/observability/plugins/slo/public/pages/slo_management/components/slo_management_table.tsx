@@ -136,22 +136,10 @@ export function SloManagementTable() {
         defaultMessage: 'Delete',
       }),
       'data-test-subj': 'sloActionsDelete',
-      enabled: () => !!permissions?.hasAllWriteRequested,
+      enabled: (slo: SLODefinitionResponse) => !!permissions?.hasAllWriteRequested,
       onClick: (slo: SLODefinitionResponse) => triggerAction({ item: slo, type: 'delete' }),
     },
-    {
-      type: 'icon',
-      icon: 'logstashOutput',
-      name: i18n.translate('xpack.slo.item.actions.purge', {
-        defaultMessage: 'Purge',
-      }),
-      description: i18n.translate('xpack.slo.item.actions.purge', {
-        defaultMessage: 'Purge',
-      }),
-      'data-test-subj': 'sloActionsPurge',
-      enabled: () => !!permissions?.hasAllWriteRequested,
-      onClick: (slo: SLODefinitionResponse) => triggerAction({ item: slo, type: 'purge' }),
-    },
+
     {
       type: 'icon',
       icon: 'refresh',

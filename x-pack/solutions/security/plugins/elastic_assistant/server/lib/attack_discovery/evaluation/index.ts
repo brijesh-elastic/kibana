@@ -22,7 +22,6 @@ import { AttackDiscoveryGraphMetadata } from '../../langchain/graphs';
 import { DefaultAttackDiscoveryGraph } from '../graphs/default_attack_discovery_graph';
 import { getLlmType } from '../../../routes/utils';
 import { runEvaluations } from './run_evaluations';
-import { createOrUpdateEvaluationResults, EvaluationStatus } from '../../../routes/evaluate/utils';
 
 interface ConnectorWithPrompts extends Connector {
   prompts: CombinedPrompts;
@@ -36,7 +35,6 @@ export const evaluateAttackDiscovery = async ({
   connectorTimeout,
   datasetName,
   esClient,
-  esClientInternalUser,
   evaluationId,
   evaluatorConnectorId,
   langSmithApiKey,
@@ -53,7 +51,6 @@ export const evaluateAttackDiscovery = async ({
   connectorTimeout: number;
   datasetName: string;
   esClient: ElasticsearchClient;
-  esClientInternalUser: ElasticsearchClient;
   evaluationId: string;
   evaluatorConnectorId: string | undefined;
   langSmithApiKey: string | undefined;
@@ -129,11 +126,5 @@ export const evaluateAttackDiscovery = async ({
       langSmithApiKey,
       logger,
     });
-  });
-
-  await createOrUpdateEvaluationResults({
-    evaluationResults: [{ id: evaluationId, status: EvaluationStatus.COMPLETE }],
-    esClientInternalUser,
-    logger,
   });
 };

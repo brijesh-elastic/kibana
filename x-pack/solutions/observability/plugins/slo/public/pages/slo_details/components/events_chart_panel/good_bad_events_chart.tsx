@@ -34,8 +34,6 @@ export interface Props {
   onBrushed?: (timeBounds: TimeBounds) => void;
 }
 
-const DEFAULT_INTERVAL = 10 * 60 * 1_000; // 10 minutes in milliseconds
-
 export function GoodBadEventsChart({ data, slo, onBrushed }: Props) {
   const { charts, uiSettings, discover } = useKibana().services;
   const { euiTheme } = useEuiTheme();
@@ -52,7 +50,7 @@ export function GoodBadEventsChart({ data, slo, onBrushed }: Props) {
   const intervalInMilliseconds =
     data && data.length > 2
       ? moment(data[1].date).valueOf() - moment(data[0].date).valueOf()
-      : DEFAULT_INTERVAL;
+      : 10 * 60000;
 
   const goodEventId = i18n.translate('xpack.slo.sloDetails.eventsChartPanel.goodEventsLabel', {
     defaultMessage: 'Good events',
@@ -64,21 +62,13 @@ export function GoodBadEventsChart({ data, slo, onBrushed }: Props) {
 
   const barClickHandler = (params: XYChartElementEvent[]) => {
     const [datum, eventDetail] = params[0];
-    const isGoodEventClicked = eventDetail.specId === goodEventId;
-    const isBadEventClicked = eventDetail.specId === badEventId;
+    const isBad = eventDetail.specId === badEventId;
     const timeRange = {
-      from: moment(datum.x).startOf('minute').toISOString(),
-      to: moment(datum.x).add(intervalInMilliseconds, 'ms').startOf('minute').toISOString(),
+      from: moment(datum.x).toISOString(),
+      to: moment(datum.x).add(intervalInMilliseconds, 'ms').toISOString(),
       mode: 'absolute' as const,
     };
-    openInDiscover({
-      slo,
-      showBad: isBadEventClicked,
-      showGood: isGoodEventClicked,
-      timeRange,
-      discover,
-      uiSettings,
-    });
+    openInDiscover({ slo, showBad: isBad, showGood: !isBad, timeRange, discover, uiSettings });
   };
 
   return (

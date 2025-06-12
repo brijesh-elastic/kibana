@@ -36,20 +36,16 @@ export interface Props {
   selectedTabId: SloTabId;
 }
 export function SloDetails({ slo, isAutoRefreshing, selectedTabId }: Props) {
-  const [range, setRange] = useState<{ from: Date; to: Date }>(() => {
-    const now = new Date();
-    return {
-      from: moment(now).subtract(1, 'day').toDate(),
-      to: now,
-    };
+  const [range, setRange] = useState<{ from: Date; to: Date }>({
+    from: moment().subtract(1, 'day').toDate(),
+    to: new Date(),
   });
 
   useEffect(() => {
     let intervalId: any;
     if (isAutoRefreshing) {
       intervalId = setInterval(() => {
-        const now = new Date();
-        setRange({ from: moment(now).subtract(1, 'day').toDate(), to: now });
+        setRange({ from: moment().subtract(1, 'day').toDate(), to: new Date() });
       }, 60 * 1000);
     }
 

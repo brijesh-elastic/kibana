@@ -33,9 +33,6 @@ import {
   XYChartSeriesIdentifier,
   Tooltip,
   LegendValue,
-  PointStyle,
-  AreaSeriesStyle,
-  LineSeriesStyle,
 } from '@elastic/charts';
 import { Datatable } from '@kbn/expressions-plugin/common';
 import { EmptyPlaceholder } from '@kbn/charts-plugin/public';
@@ -62,12 +59,7 @@ import {
   sampleLayer,
 } from '../../common/__mocks__';
 import { XYChart, XYChartRenderProps } from './xy_chart';
-import {
-  ExtendedDataLayerConfig,
-  XYProps,
-  AnnotationLayerConfigResult,
-  PointVisibility,
-} from '../../common/types';
+import { ExtendedDataLayerConfig, XYProps, AnnotationLayerConfigResult } from '../../common/types';
 import { DataLayers } from './data_layers';
 import { SplitChart } from './split_chart';
 import { LegendSize } from '@kbn/visualizations-plugin/common';
@@ -858,59 +850,31 @@ describe('XYChart component', () => {
     expect(lineArea.prop('lineSeriesStyle')).toEqual(expectedSeriesStyle);
   });
 
-  describe('point visibility in line/area chart', () => {
-    const getAreaLinePointStyles = ({
-      pointVisibility,
-      showPoints,
-    }: {
-      pointVisibility?: PointVisibility;
-      showPoints?: boolean;
-    }) => {
+  test('applies showPoints to the chart', () => {
+    const checkIfPointsVisibilityIsApplied = (showPoints: boolean) => {
       const { args } = sampleArgs();
       const component = shallow(
         <XYChart
           {...defaultProps}
           args={{
             ...args,
-            pointVisibility,
             layers: [{ ...(args.layers[0] as DataLayerConfig), showPoints }],
           }}
         />
       );
       const dataLayers = component.find(DataLayers).dive();
       const lineArea = dataLayers.find(LineSeries).at(0);
-      return {
-        areaPointStyle: (lineArea.prop('areaSeriesStyle') as AreaSeriesStyle).point as PointStyle,
-        linePointStyle: (lineArea.prop('lineSeriesStyle') as LineSeriesStyle).point as PointStyle,
-      };
+      const expectedSeriesStyle = expect.objectContaining({
+        point: expect.objectContaining({
+          visible: showPoints ? 'always' : 'auto',
+        }),
+      });
+      expect(lineArea.prop('areaSeriesStyle')).toEqual(expectedSeriesStyle);
+      expect(lineArea.prop('lineSeriesStyle')).toEqual(expectedSeriesStyle);
     };
 
-    test(`should be 'auto' when pointVisibility is 'auto'`, () => {
-      const { areaPointStyle, linePointStyle } = getAreaLinePointStyles({
-        pointVisibility: 'auto',
-      });
-
-      expect(areaPointStyle.visible).toBe('auto');
-      expect(linePointStyle.visible).toBe('auto');
-    });
-
-    test(`should be 'always' when pointVisibility is undefined and showPoints is 'true'`, () => {
-      const { areaPointStyle, linePointStyle } = getAreaLinePointStyles({
-        showPoints: true,
-      });
-
-      expect(areaPointStyle.visible).toBe('always');
-      expect(linePointStyle.visible).toBe('always');
-    });
-
-    test(`should be 'auto' when pointVisibility is undefined and showPoints is 'false'`, () => {
-      const { areaPointStyle, linePointStyle } = getAreaLinePointStyles({
-        showPoints: false,
-      });
-
-      expect(areaPointStyle.visible).toBe('auto');
-      expect(linePointStyle.visible).toBe('auto');
-    });
+    checkIfPointsVisibilityIsApplied(true);
+    checkIfPointsVisibilityIsApplied(false);
   });
 
   test('applies point radius to the chart', () => {

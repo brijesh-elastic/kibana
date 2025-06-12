@@ -26,7 +26,6 @@ import {
   ALERT_RULE_TYPE_ID,
   ALERT_RULE_UUID,
   ALERT_STATUS,
-  ALERT_URL,
   ALERT_UUID,
   ALERT_WORKFLOW_STATUS,
   ECS_VERSION,
@@ -57,25 +56,15 @@ import {
   ALERT_RISK_SCORE,
 } from '../../../schedules/fields/field_names';
 import { AttackDiscoveryAlertDocument } from '../../../schedules/types';
-import { getAlertUrl } from './get_alert_url';
 
-type AttackDiscoveryAlertDocumentBase = Omit<
-  AttackDiscoveryAlertDocument,
-  keyof Omit<Alert, typeof ALERT_URL>
->;
+type AttackDiscoveryAlertDocumentBase = Omit<AttackDiscoveryAlertDocument, keyof Alert>;
 
 export const transformToBaseAlertDocument = ({
-  alertId,
   attackDiscovery,
   alertsParams,
-  publicBaseUrl,
-  spaceId,
 }: {
-  alertId: string;
   attackDiscovery: AttackDiscovery;
   alertsParams: Omit<CreateAttackDiscoveryAlertsParams, 'attackDiscoveries' | 'generationUuid'>;
-  publicBaseUrl?: string;
-  spaceId: string;
 }): AttackDiscoveryAlertDocumentBase => {
   const { alertsContextCount, anonymizedAlerts, apiConfig, connectorName, replacements } =
     alertsParams;
@@ -96,7 +85,6 @@ export const transformToBaseAlertDocument = ({
       alertIds,
       anonymizedAlerts,
     }),
-    [ALERT_URL]: getAlertUrl({ alertId, basePath: publicBaseUrl, spaceId }),
 
     // Attack discovery fields
     [ALERT_ATTACK_DISCOVERY_ALERT_IDS]: alertIds,
@@ -160,10 +148,8 @@ export const transformToAlertDocuments = ({
     const alertUuid = uuidv4();
 
     const baseAlertDocument = transformToBaseAlertDocument({
-      alertId: alertUuid,
       attackDiscovery,
       alertsParams: restParams,
-      spaceId,
     });
 
     return {

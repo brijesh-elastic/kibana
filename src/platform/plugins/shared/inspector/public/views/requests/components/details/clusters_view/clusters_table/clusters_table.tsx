@@ -159,9 +159,6 @@ export function ClustersTable({ clusters }: Props) {
       noItemsMessage={i18n.translate('inspector.requests.clusters.table.noItemsFound', {
         defaultMessage: 'No clusters found',
       })}
-      cellProps={(item, column) => ({
-        'data-test-subj': `inspectorRequestClustersTableCell-${column.name}-${item.name}`,
-      })}
     />
   );
 }

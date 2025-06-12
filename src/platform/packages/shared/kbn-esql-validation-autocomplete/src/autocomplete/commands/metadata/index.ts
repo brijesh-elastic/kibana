@@ -13,7 +13,13 @@ import { TRIGGER_SUGGESTION_COMMAND, buildFieldsDefinitions } from '../../factor
 import { handleFragment } from '../../helper';
 import { commaCompleteItem, pipeCompleteItem } from '../../complete_items';
 import { METADATA_FIELDS } from '../../../shared/constants';
-import { isColumnItem, isOptionItem } from '../../../shared/helpers';
+import { isMarkerNode } from '../../../shared/context';
+import {
+  isColumnItem,
+  isRestartingExpression,
+  isSingleItem,
+  isOptionItem,
+} from '../../../shared/helpers';
 
 export const metadataSuggestion: SuggestionRawDefinition = {
   label: 'METADATA',
@@ -44,11 +50,13 @@ async function suggestForMetadata(metadata: ESQLCommandOption, innerText: string
   const existingFields = new Set(metadata.args.filter(isColumnItem).map(({ name }) => name));
   const filteredMetaFields = METADATA_FIELDS.filter((name) => !existingFields.has(name));
   const suggestions: SuggestionRawDefinition[] = [];
-
   // FROM something METADATA /
   // FROM something METADATA field/
   // FROM something METADATA field, /
-  if (/(?:,|METADATA)\s+$/i.test(innerText) || /\S$/.test(innerText)) {
+  if (
+    metadata.args.filter((arg) => isSingleItem(arg) && !isMarkerNode(arg)).length === 0 ||
+    isRestartingExpression(innerText)
+  ) {
     suggestions.push(
       ...(await handleFragment(
         innerText,

@@ -20,10 +20,4 @@ export type GetEvaluateResponse = z.infer<typeof GetEvaluateResponse>;
 export const GetEvaluateResponse = z.object({
   datasets: z.array(z.string()),
   graphs: z.array(z.string()),
-  results: z.array(
-    z.object({
-      id: z.string(),
-      status: z.string(),
-    })
-  ),
 });

@@ -25,6 +25,5 @@
     "@kbn/discover-plugin",
     "@kbn/i18n",
     "@kbn/presentation-publishing",
-    "@kbn/saved-search-plugin",
   ]
 }

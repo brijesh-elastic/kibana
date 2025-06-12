@@ -21,7 +21,6 @@
       "data",
       "eventLog",
       "ml",
-      "ruleRegistry",
       "taskManager",
       "licensing",
       "llmTasks",

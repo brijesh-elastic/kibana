@@ -410,11 +410,7 @@ export class SearchInterceptor {
           return from(
             this.runSearch({ id, ...request }, { ...options, retrieveResults: true })
           ).pipe(
-            map((response) =>
-              options.strategy === ENHANCED_ES_SEARCH_STRATEGY
-                ? toPartialResponseAfterTimeout(response)
-                : response
-            ),
+            map(toPartialResponseAfterTimeout),
             tap(async () => {
               await sendCancelRequest();
               this.handleSearchError(e, request?.params?.body ?? {}, options, true);

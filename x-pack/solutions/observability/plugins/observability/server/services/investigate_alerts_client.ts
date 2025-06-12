@@ -5,13 +5,12 @@
  * 2.0.
  */
 import { OBSERVABILITY_RULE_TYPE_IDS } from '@kbn/rule-data-utils';
-import type { RulesClientApi } from '@kbn/alerting-plugin/server/types';
-import type { AlertsClient } from '@kbn/rule-registry-plugin/server';
+import { AlertsClient } from '@kbn/rule-registry-plugin/server';
 import { AlertNotFoundError } from '../common/errors/alert_not_found_error';
 import { AlertData } from './alert_data';
 
 export class InvestigateAlertsClient {
-  constructor(private alertsClient: AlertsClient, private rulesClient: RulesClientApi) {}
+  constructor(private alertsClient: AlertsClient) {}
 
   async getAlertById(alertId: string): Promise<AlertData> {
     const indices = (await this.getAlertsIndices()) || [];
@@ -30,10 +29,6 @@ export class InvestigateAlertsClient {
       }
       throw e;
     }
-  }
-
-  async getRuleById(ruleId: string) {
-    return await this.rulesClient.get({ id: ruleId });
   }
 
   async getAlertsIndices() {

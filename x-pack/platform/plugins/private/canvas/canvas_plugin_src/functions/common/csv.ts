@@ -56,7 +56,7 @@ export function csv(): ExpressionFunctionDefinition<'csv', null, Arguments, Data
       if (delimiter != null) {
         config.delimiter = delimiter;
       }
-      if (newline != null && (newline === '\r' || newline === '\n' || newline === '\r\n')) {
+      if (newline != null) {
         config.newline = newline;
       }
 

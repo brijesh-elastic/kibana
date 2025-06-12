@@ -9,17 +9,15 @@ import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 
 import { ScheduleDefinition } from '.';
-import { useCreateDataView } from '../../../../../../common/hooks/use_create_data_view';
+import { useDataView } from '../../../alert_selection/use_data_view';
 import { TestProviders } from '../../../../../../common/mock';
 import { useSourcererDataView } from '../../../../../../sourcerer/containers';
 import { mockAttackDiscoverySchedule } from '../../../../mock/mock_attack_discovery_schedule';
-import { useIsExperimentalFeatureEnabled } from '../../../../../../common/hooks/use_experimental_features';
 
-jest.mock('../../../../../../common/hooks/use_create_data_view');
+jest.mock('../../../alert_selection/use_data_view');
 jest.mock('../../../../../../sourcerer/containers');
-jest.mock('../../../../../../common/hooks/use_experimental_features');
 
-const mockUseCreateDataView = useCreateDataView as jest.MockedFunction<typeof useCreateDataView>;
+const mockUseDataView = useDataView as jest.MockedFunction<typeof useDataView>;
 const mockUseSourcererDataView = useSourcererDataView as jest.MockedFunction<
   typeof useSourcererDataView
 >;
@@ -34,11 +32,10 @@ describe('ScheduleDefinition', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    (useIsExperimentalFeatureEnabled as jest.Mock).mockReturnValue(false);
-    mockUseCreateDataView.mockReturnValue({
+    mockUseDataView.mockReturnValue({
       getIndexPattern: () => 'logstash-*',
       fields: [{ name: '_type' }],
-    } as unknown as jest.Mocked<ReturnType<typeof useCreateDataView>>);
+    } as unknown as jest.Mocked<ReturnType<typeof useDataView>>);
     mockUseSourcererDataView.mockReturnValue({
       sourcererDataView: {},
       loading: false,

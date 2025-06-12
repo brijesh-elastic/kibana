@@ -7,7 +7,6 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import apm from 'elastic-apm-node';
 import { BehaviorSubject, filter, firstValueFrom, ReplaySubject } from 'rxjs';
 import { takeWhile, tap, toArray } from 'rxjs';
 import { schema } from '@kbn/config-schema';
@@ -43,13 +42,6 @@ export class AnalyticsPluginAPlugin implements Plugin {
             description: 'The lifecycle step in which the plugin is',
           },
         },
-        traceId: {
-          type: 'keyword',
-          _meta: {
-            description: 'The trace ID of the APM transaction',
-            optional: true,
-          },
-        },
       },
     });
 
@@ -57,7 +49,6 @@ export class AnalyticsPluginAPlugin implements Plugin {
     reportEvent('test-plugin-lifecycle', {
       plugin: 'analyticsPluginA',
       step: 'setup',
-      traceId: apm.currentTraceIds?.['trace.id'],
     });
 
     const actions$ = new ReplaySubject<Action>();
@@ -146,7 +137,6 @@ export class AnalyticsPluginAPlugin implements Plugin {
     analytics.reportEvent('test-plugin-lifecycle', {
       plugin: 'analyticsPluginA',
       step: 'start',
-      traceId: apm.currentTraceIds?.['trace.id'],
     });
   }
 

@@ -17,13 +17,11 @@ import { attackDiscoveryScheduleExecutor } from './executor';
 
 export interface GetAttackDiscoveryScheduleParams {
   logger: Logger;
-  publicBaseUrl: string | undefined;
   telemetry: AnalyticsServiceSetup;
 }
 
 export const getAttackDiscoveryScheduleType = ({
   logger,
-  publicBaseUrl,
   telemetry,
 }: GetAttackDiscoveryScheduleParams): AttackDiscoveryScheduleType => {
   return {
@@ -56,7 +54,6 @@ export const getAttackDiscoveryScheduleType = ({
       return attackDiscoveryScheduleExecutor({
         options,
         logger,
-        publicBaseUrl,
         telemetry,
       });
     },
