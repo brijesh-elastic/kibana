@@ -9,7 +9,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ActionConnector } from '@kbn/triggers-actions-ui-plugin/public/types';
 import { TheHiveParamsAlertFields } from './params_alert';
-import { SUB_ACTION, TheHiveSeverity } from '../../../common/thehive/constants';
+import { SUB_ACTION } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 
 describe('TheHiveParamsFields renders', () => {
@@ -18,6 +18,7 @@ describe('TheHiveParamsFields renders', () => {
     description: 'description test',
     tlp: 2,
     severity: 2,
+    isRuleSeverity: false,
     tags: ['test1'],
     source: 'source test',
     type: 'sourceType test',
@@ -79,7 +80,7 @@ describe('TheHiveParamsFields renders', () => {
     expect(getByTestId('rule-severity-toggle')).toBeEnabled();
     expect(editAction).toHaveBeenCalledWith(
       'subActionParams',
-      { ...subActionParams, severity: TheHiveSeverity.RULE_SEVERITY },
+      { ...subActionParams, severity: 2, isRuleSeverity: true },
       0
     );
 

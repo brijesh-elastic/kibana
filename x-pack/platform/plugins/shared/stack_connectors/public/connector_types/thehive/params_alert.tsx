@@ -14,7 +14,6 @@ import {
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, EuiComboBox, EuiSwitch } from '@elastic/eui';
-import { TheHiveSeverity } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import { severityOptions, tlpOptions } from './constants';
 import * as translations from './translations';
@@ -33,6 +32,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
       ({
         tlp: 2,
         severity: 2,
+        isRuleSeverity: true,
         tags: [],
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
@@ -44,9 +44,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>(
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
-  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(
-    alert.severity === TheHiveSeverity.RULE_SEVERITY ? true : false
-  );
+  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(alert.isRuleSeverity);
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
@@ -166,16 +164,11 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
             data-test-subj="rule-severity-toggle"
             onChange={(e) => {
               setIsRuleSeverity(e.target.checked);
-              setSeverity(
-                e.target.checked ? TheHiveSeverity.RULE_SEVERITY : TheHiveSeverity.MEDIUM
-              );
               editAction(
                 'subActionParams',
                 {
                   ...alert,
-                  severity: e.target.checked
-                    ? TheHiveSeverity.RULE_SEVERITY
-                    : TheHiveSeverity.MEDIUM,
+                  isRuleSeverity: e.target.checked,
                 },
                 index
               );

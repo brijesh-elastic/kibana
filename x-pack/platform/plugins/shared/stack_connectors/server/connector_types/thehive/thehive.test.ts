@@ -413,6 +413,7 @@ describe('TheHiveConnector', () => {
       source: 'alert source',
       sourceRef: 'test123',
       severity: 1,
+      isRuleSeverity: false,
       tlp: 2,
       tags: ['tag1', 'tag2'],
       body: JSON.stringify(
@@ -437,7 +438,7 @@ describe('TheHiveConnector', () => {
       ),
     };
 
-    const { body, ...restOfAlert } = alert;
+    const { body, isRuleSeverity, ...restOfAlert } = alert;
     const expectedAlertBody = { ...JSON.parse(body || '{}'), ...restOfAlert };
 
     it('TheHive API call is successful with correct parameters', async () => {
