@@ -24,7 +24,6 @@ export enum TheHiveSeverity {
   MEDIUM = 2,
   HIGH = 3,
   CRITICAL = 4,
-  RULE_SEVERITY = 5,
 }
 export enum TheHiveTLP {
   CLEAR = 0,
