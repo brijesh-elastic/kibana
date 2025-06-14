@@ -80,8 +80,7 @@ const TheHiveParamsFields: React.FunctionComponent<ActionParamsProps<ExecutorPar
       eventActionType === SUB_ACTION.CREATE_ALERT
         ? {
             tlp: 2,
-            isRuleSeverity: isTest ? false : true,
-            severity: TheHiveSeverity.MEDIUM,
+            severity: isTest ? TheHiveSeverity.MEDIUM : TheHiveSeverity.RULE_SEVERITY,
             tags: [],
             sourceRef: isTest ? undefined : '{{alert.uuid}}',
             body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],

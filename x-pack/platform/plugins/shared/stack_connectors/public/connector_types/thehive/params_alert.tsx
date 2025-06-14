@@ -15,7 +15,7 @@ import {
 } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, EuiComboBox, EuiSwitch } from '@elastic/eui';
 import { TemplateOptions, Template } from './template_component';
-import { TheHiveTemplate } from '../../../common/thehive/constants';
+import { TheHiveSeverity, TheHiveTemplate } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
 import {
   bodyOption,
@@ -41,7 +41,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
       ({
         tlp: 2,
         severity: 2,
-        isRuleSeverity: true,
         tags: [],
         body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],
       } as unknown as ExecutorSubActionCreateAlertParams),
@@ -54,7 +53,9 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>(
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
-  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(alert.isRuleSeverity === true);
+  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(
+    alert.severity === TheHiveSeverity.RULE_SEVERITY ? true : false
+  );
   const [selectedTemplate, setSelectedTemplate] = useState('');
 
   const onCreateOption = (searchValue: string) => {
@@ -187,11 +188,16 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
             data-test-subj="rule-severity-toggle"
             onChange={(e) => {
               setIsRuleSeverity(e.target.checked);
+              setSeverity(
+                e.target.checked ? TheHiveSeverity.RULE_SEVERITY : TheHiveSeverity.MEDIUM
+              );
               editAction(
                 'subActionParams',
                 {
                   ...alert,
-                  isRuleSeverity: e.target.checked,
+                  severity: e.target.checked
+                    ? TheHiveSeverity.RULE_SEVERITY
+                    : TheHiveSeverity.MEDIUM,
                 },
                 index
               );

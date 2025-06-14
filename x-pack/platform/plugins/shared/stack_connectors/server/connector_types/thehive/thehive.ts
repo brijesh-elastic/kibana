@@ -157,7 +157,7 @@ export class TheHiveConnector extends CaseConnector<
 
   private formatAlertBody(alert: ExecutorSubActionCreateAlertParams) {
     try {
-      const { body, isRuleSeverity, ...restOfAlert } = alert;
+      const { body, ...restOfAlert } = alert;
       const bodyJson = JSON.parse(body || '{}');
       const mergedAlertBody = { ...bodyJson, ...restOfAlert };
 
