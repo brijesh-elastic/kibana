@@ -72,7 +72,6 @@ describe('TheHiveParamsFields renders', () => {
         severity: TheHiveSeverity.RULE_SEVERITY,
         tags: [],
         sourceRef: '{{alert.uuid}}',
-        body: null,
       },
       0
     );

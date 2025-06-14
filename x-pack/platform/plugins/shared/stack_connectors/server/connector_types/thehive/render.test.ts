@@ -19,7 +19,7 @@ const params = {
     source: 'source',
     sourceRef: '{{alert.uuid}}',
     tlp: 2,
-    severity: 5,
+    severity: -1,
     body: '{"observables":[{"datatype":"url","data":"{{url}}"}],"tags":["test"]}',
   },
 };

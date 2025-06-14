@@ -14,17 +14,9 @@ import {
   ActionConnectorMode,
 } from '@kbn/triggers-actions-ui-plugin/public';
 import { EuiFormRow, EuiSelect, EuiComboBox, EuiSwitch } from '@elastic/eui';
-import { TemplateOptions, Template } from './template_component';
-import { TheHiveSeverity, TheHiveTemplate } from '../../../common/thehive/constants';
+import { TheHiveSeverity } from '../../../common/thehive/constants';
 import { ExecutorParams, ExecutorSubActionCreateAlertParams } from '../../../common/thehive/types';
-import {
-  bodyOption,
-  testBodyOption,
-  severityOptions,
-  tlpOptions,
-  testCustomTemplatePlaceHolder,
-  ruleCustomTemplatePlaceHolder,
-} from './constants';
+import { severityOptions, tlpOptions } from './constants';
 import * as translations from './translations';
 
 export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams>> = ({
@@ -42,7 +34,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         tlp: 2,
         severity: 2,
         tags: [],
-        body: bodyOption[TheHiveTemplate.CUSTOM_TEMPLATE],
       } as unknown as ExecutorSubActionCreateAlertParams),
     [actionParams.subActionParams]
   );
@@ -56,7 +47,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(
     alert.severity === TheHiveSeverity.RULE_SEVERITY ? true : false
   );
-  const [selectedTemplate, setSelectedTemplate] = useState('');
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
@@ -70,18 +60,6 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
       { ...alert, tags: selectedOptionList.map((option) => option.label) },
       index
     );
-  };
-
-  const onSelectTemplate = (template: Template) => {
-    editAction(
-      'subActionParams',
-      {
-        ...alert,
-        body: isTest ? testBodyOption[template.name] : bodyOption[template.name],
-      },
-      index
-    );
-    setSelectedTemplate(template.name);
   };
 
   return (
@@ -248,24 +226,10 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
       </EuiFormRow>
       {alert.body != null && (
         <JsonEditorWithMessageVariables
-          key={selectedTemplate}
           messageVariables={messageVariables}
           paramsProperty={'body'}
           inputTargetValue={alert.body}
-          euiCodeEditorProps={{
-            placeholder: isTest ? testCustomTemplatePlaceHolder : ruleCustomTemplatePlaceHolder,
-            height: '320px',
-          }}
-          label={
-            <>
-              {translations.BODY_LABEL}
-              <TemplateOptions
-                buttonTitle={translations.SELECT_BODY_TEMPLATE_POPOVER_BUTTON}
-                paramsProperty="body"
-                onSelectEventHandler={onSelectTemplate}
-              />
-            </>
-          }
+          label={translations.BODY_LABEL}
           ariaLabel={translations.BODY_DESCRIPTION}
           errors={errors.body as string[]}
           onDocumentsChange={(json: string) =>
@@ -277,6 +241,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
               editAction('subActionParams', { ...alert, body: null }, index);
             }
           }}
+          isOptionalField
         />
       )}
     </>

@@ -438,7 +438,7 @@ describe('TheHiveConnector', () => {
     };
 
     const { body, ...restOfAlert } = alert;
-    const expectedAlertBody = { ...JSON.parse(body ?? '{}'), ...restOfAlert };
+    const expectedAlertBody = { ...JSON.parse(body || '{}'), ...restOfAlert };
 
     it('TheHive API call is successful with correct parameters', async () => {
       await connector.createAlert(alert, connectorUsageCollector);
