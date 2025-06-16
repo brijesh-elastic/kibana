@@ -70,7 +70,7 @@ describe('TheHiveParamsFields renders', () => {
       {
         tlp: 2,
         severity: TheHiveSeverity.MEDIUM,
-        isRuleSeverity: true,
+        isRuleSeverity: false,
         tags: [],
         sourceRef: '{{alert.uuid}}',
       },
