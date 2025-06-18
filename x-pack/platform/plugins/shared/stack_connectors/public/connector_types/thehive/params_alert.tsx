@@ -155,11 +155,11 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
         }}
         errors={errors['createAlertParam.sourceRef'] as string[]}
       />
-      {!isTest && isRuleSeverity && (
+      {!isTest && (
         <EuiFormRow fullWidth>
           <EuiSwitch
             label={translations.IS_RULE_SEVERITY_LABEL}
-            checked={isRuleSeverity}
+            checked={Boolean(isRuleSeverity)}
             compressed={true}
             data-test-subj="rule-severity-toggle"
             onChange={(e) => {
@@ -176,7 +176,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
           />
         </EuiFormRow>
       )}
-      {!isRuleSeverity && (
+      {!Boolean(isRuleSeverity) && (
         <EuiFormRow fullWidth label={translations.SEVERITY_LABEL}>
           <EuiSelect
             fullWidth
