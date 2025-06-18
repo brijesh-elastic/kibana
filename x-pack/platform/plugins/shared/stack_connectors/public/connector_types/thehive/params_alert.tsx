@@ -44,7 +44,7 @@ export const TheHiveParamsAlertFields: React.FC<ActionParamsProps<ExecutorParams
   const [selectedOptions, setSelected] = useState<Array<{ label: string }>>(
     alert.tags?.map((tag) => ({ label: tag })) ?? []
   );
-  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(alert.isRuleSeverity);
+  const [isRuleSeverity, setIsRuleSeverity] = useState<boolean>(Boolean(alert.isRuleSeverity));
 
   const onCreateOption = (searchValue: string) => {
     setSelected([...selectedOptions, { label: searchValue }]);
